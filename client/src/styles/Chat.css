@@ -1,0 +1,22 @@
+.chat__container{
+    display: flex;
+    height: 100vh;
+    max-height: 100vh;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    background-color: rgb(146, 181, 146);
+    position: fixed; /*Ayuda a mantener el Chat siempre dentro del campo de vista de la aplicación.*/
+    top: 0;
+    transform: translateY(100%);
+    transition: transform 200ms ease-in-out;
+}
+
+.chat__body {
+    overflow-y: scroll;
+    flex: 1;
+}
+
+.show-chat{
+    transform: translateY(0%);
+}
