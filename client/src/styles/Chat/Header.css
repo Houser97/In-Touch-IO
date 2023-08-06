@@ -1,0 +1,34 @@
+.header__chat {
+    display: flex;
+    flex-direction: row;
+    background-color: #121212;
+    padding: 10px;
+    align-items: center;
+    gap: 20px;
+    position: sticky;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+}
+
+.header__chat .contact {
+    flex-direction: row;
+    align-items: center;
+    color: white;
+    gap: 10px;
+}
+
+.header__chat .contact .contact__name{
+    font-size: 1rem;
+    max-width: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.arrow-left{
+    height: 30px;
+    width: 30px;
+    fill: white;
+    cursor: pointer;
+}
