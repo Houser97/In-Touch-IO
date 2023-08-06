@@ -3,3 +3,31 @@
   padding: 0;
   box-sizing: border-box;
 }
+
+.App {
+  display: flex;
+  flex-direction: column;
+  width: 100%; /*No poner 100vw, ya que eso hace que el scrollbar ocupe espacio.*/
+  background-color: white;
+  overflow: hidden;
+  overflow-y: scroll;
+  --text-color: gray;
+  --name-color: black;
+  font-family: 'Helvetica', 'Arial', sans-serif;
+  position: relative;
+  height: 100vh;
+}
+
+.main__container {
+  width: 100%;
+  display: flex;
+}
+
+svg {
+  cursor: pointer;
+}
+
+img {
+  height: auto;
+  width: 100%;
+}
