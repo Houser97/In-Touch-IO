@@ -1,0 +1,21 @@
+.contact {
+    display: flex;
+    flex-direction: column;
+    color: var(--name-color);
+    font-size: 0.635rem;
+    font-weight: 600;
+}
+
+.contact__picture {
+    display: block;
+    border-radius: 50%;
+    width: 46px;
+    height: 46px;
+    background-color: rgb(227, 227, 227);
+}
+
+.contact__name{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
