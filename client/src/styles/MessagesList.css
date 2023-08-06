@@ -1,0 +1,26 @@
+.message__list{
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    padding: 0px 10px;
+}
+
+.create__chat {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(194, 194, 194);
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    cursor: pointer;
+}
+
+.new__chat-svg{
+    fill: black;
+    height: 20px;
+    width: 20px;
+}
