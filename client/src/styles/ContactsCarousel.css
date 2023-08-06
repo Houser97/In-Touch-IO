@@ -1,0 +1,37 @@
+.contacts__carousel {
+    flex-direction: row;
+    gap: 30px;
+    padding: 20px 0px;
+    padding-bottom: 30px;
+    width: 100%;
+    height: max-content;
+    border-bottom: 1px solid rgb(219, 219, 219);
+    margin-bottom: 15px;
+}
+
+.slick-slide div{ /*Contenedor de cada elemento en el Carousel. (contact)*/
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.search__svg{
+    width: 25px;
+}
+
+.contacts__carousel .contact {
+    max-width: 80px;
+}
+
+.contacts__carousel .contact__picture {
+    margin: auto; /*Ayuda a centrar la imagen en el contenedor del carousel.*/
+    margin-bottom: 7px;
+}
+
+.carousel {
+    height: max-content;
+    width: 100%; /*Importante especificar para que slack-track aparezca*/
+    display: flex;
+    overflow: hidden;
+}
