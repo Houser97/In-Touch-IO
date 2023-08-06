@@ -1,0 +1,42 @@
+.message__container{
+    flex-direction: column;
+    color: white;
+}
+
+.chat__body {
+    display: flex;
+    flex-direction: column;
+    padding: 0px 10px;
+}
+
+.left,
+.right{
+    position: relative;
+    width: 90%;
+    margin: 10px 0px;
+    font-size: 0.9rem;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.left {
+    background-color: rgb(48, 48, 48);
+    align-self: flex-start;
+}
+
+.right {
+    background-color: rgb(38, 43, 174); 
+    align-self: flex-end;
+}
+
+.left::before,
+.right::before {
+    content: '';
+    position: absolute;
+}
+
+.message__hour {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+}
