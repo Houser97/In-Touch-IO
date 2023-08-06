@@ -1,0 +1,36 @@
+.message__form {
+    max-width: 250px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    position: sticky;
+    bottom: 0px;
+    border: none;
+    outline: none;
+    margin: 10px 0px;
+    gap: 10px;
+}
+
+.message__input {
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    color: var(--name-color);
+    font-size: 1rem;
+    border: none;
+    outline: none;
+    width: 100%;
+    padding: 5px 8px;
+    border-radius: 10px;
+    background-color: white;
+}
+
+.send__message{
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: none;
+}
