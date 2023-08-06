@@ -1,0 +1,30 @@
+.header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    padding: 10px 16px;
+    padding-top: 24px;
+    font-weight: 500;
+    position: relative;
+}
+
+.greetings__message {
+    color: var(--text-color);
+    font-size: 0.654rem;
+}
+
+.app__title{
+    color: var(--name-color);
+    font-size: 1rem;
+    letter-spacing: 0.2px;
+}
+
+.edit__svg{
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    right: 5px;
+    top: 5px;
+    opacity: 0.5;
+}
