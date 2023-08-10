@@ -6,8 +6,27 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+const apiRouter = require('./routes/api');
+const mongoose = require('mongoose')
 
 var app = express();
+
+
+// Set up Dotenv
+if(process.env.NODE_ENV !== 'production'){
+  require('dotenv').config();
+  const cors = require('cors')
+  app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+  }))
+}
+
+// DB 
+const MongoDB = `mongodb+srv://${process.env.USERNAME}:${process.env.PASSWORD}@cluster0.e5vib9j.mongodb.net/${process.env.PASSWORD}?retryWrites=true&w=majority`
+mongoose.connect(MongoDB, {useNewUrlParser: true, useUnifiedTopology: true})
+const db = mongoose.connection;
+db.on('error', console.error.bind((console, 'MongoDB connection error: ')))
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -21,6 +40,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/api', apiRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
