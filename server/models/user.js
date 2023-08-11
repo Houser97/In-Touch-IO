@@ -5,7 +5,8 @@ const UserSchema = Schema({
     name: {type: String, required: true},
     email: {type: String, required: true, unique: true},
     password: {type: String, required: true},
-    picture: {type: String, default: ""},
+    pictureUrl: {type: String, default: ""},
+    publicId: {type: String},
     friends: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
