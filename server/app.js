@@ -23,6 +23,7 @@ if(process.env.NODE_ENV !== 'production'){
 }
 
 // DB 
+mongoose.set("strictQuery", false);
 const MongoDB = `mongodb+srv://${process.env.USERNAME}:${process.env.PASSWORD}@cluster0.e5vib9j.mongodb.net/${process.env.PASSWORD}?retryWrites=true&w=majority`
 mongoose.connect(MongoDB, {useNewUrlParser: true, useUnifiedTopology: true})
 const db = mongoose.connection;
