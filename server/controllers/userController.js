@@ -1,7 +1,10 @@
 const User = require('../models/user');
 const {body, validationResult} = require('express-validator');
 const bcryptjs = require('bcryptjs');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const { cloudinary } = require('../services/cloudinary');
+
+const CLOUDINARY_PRESET = 'InTouch';
 
 exports.check_email = [
     body('email', 'E-mail must be a valid address.').isEmail()
@@ -128,5 +131,19 @@ exports.get_user_data = function(req, res, next){
         })
     } else {
         return res.json('forbidden')
+    }
+}
+
+exports.upload_image = async (req, res) => {
+    try {
+        const fileStr = req.body.image;
+        const uploadResponse = await cloudinary.uploader.upload(fileStr, {
+            upload_preset: CLOUDINARY_PRESET
+        })
+        console.log(uploadResponse)
+        res.json({msg: 'Uploaded Image'})
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ err: 'Something went wrong' })
     }
 }
