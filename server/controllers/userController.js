@@ -137,10 +137,17 @@ exports.get_user_data = function(req, res, next){
 exports.upload_image = async (req, res) => {
     try {
         const fileStr = req.body.image;
-        const uploadResponse = await cloudinary.uploader.upload(fileStr, {
+        const data = await cloudinary.uploader.upload(fileStr, {
             upload_preset: CLOUDINARY_PRESET
         })
-        console.log(uploadResponse)
+        const savedImg = await User.updateOne({_id: req.params.id},
+            {
+                $set: {
+                    pictureUrl: data.url,
+                    publicId: data.public_id
+                }
+            })
+        console.log(savedImg)
         res.json({msg: 'Uploaded Image'})
     } catch (error) {
         console.log(error);
