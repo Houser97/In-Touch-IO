@@ -1,0 +1,169 @@
+.authentication__container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    color: black;
+
+}
+
+.authentication__form {
+    width: 100%;
+    /*background: linear-gradient(rgb(244, 244, 244), white) padding-box,
+                linear-gradient(135deg, transparent 25%,#0B2447, #124791) border-box;
+    border: 4px solid transparent;*/
+    padding: 60px 30px;
+    font-size: 14px;
+    font-family: inherit;
+    color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 50px;
+    box-sizing: border-box;
+    border-radius: 16px;
+}
+
+.authentication__form div {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.form__section-container{
+    position: relative;
+}
+
+.authentication__form input {
+    padding: 10px;
+    height: 40px;
+    border: 2px solid #0B2447;
+    border-top: none;
+    border-bottom: none;
+    font-size: 16px;
+    background: transparent;
+    outline: none;
+    box-shadow: 6px 7px 0px 0px #0B2447;
+    transition: all 0.5s;
+}
+
+.authentication__form input:focus {
+    box-shadow: none;
+}
+
+.authentication__form .topline {
+    position: absolute;
+    content: "";
+    background-color: #0B2447;
+    width: 0%;
+    height: 2px;
+    right: 0;
+    top: 0;
+    transition: all 0.5s;
+}
+
+.authentication__form input:focus ~ .topline {
+    width: 85%;
+    transition: all 0.5s;
+}
+
+.authentication__form .underline {
+    position: absolute;
+    content: "";
+    background-color: #0B2447;
+    width: 0%;
+    height: 2px;
+    right: 0;
+    bottom: 0;
+    transition: all 0.5s;
+}
+
+.authentication__form input:focus ~ .underline {
+    width: 100%;
+    transition: all 0.5s;
+}
+
+.authentication__form .create__account-btn {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    font-size: 0.9rem;
+    align-items: center;
+}
+
+.authentication__swap {
+    border: none;
+    font-weight: bold;
+    background-color: transparent;
+    width: max-content;
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    font-size: inherit;
+    cursor: pointer;
+}
+
+.authentication__submit {
+    width: 100%;
+    border-radius: 15px;
+    border: none;
+    font-size: 1.2rem;
+    padding: 8px;
+    background-color: #041E42;
+    color: white;
+    font-weight: bold;
+    max-width: 250px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.authentication__submit span:not(:nth-child(6)) {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    height: 30px;
+    width: 30px;
+    background-color: #0c66ed;
+    border-radius: 50%;
+    transition: .6s ease;
+}
+  
+.authentication__submit span:nth-child(6) {
+    position: relative;
+}
+
+.authentication__submit span:nth-child(1) {
+    transform: translate(-3.3em, -4em);
+}
+
+.authentication__submit span:nth-child(2) {
+    transform: translate(-6em, 1.3em);
+}
+
+.authentication__submit span:nth-child(3) {
+    transform: translate(-.2em, 1.8em);
+}
+
+.authentication__submit span:nth-child(4) {
+    transform: translate(3.5em, 1.4em);
+}
+
+.authentication__submit span:nth-child(5) {
+    transform: translate(3.5em, -3.8em);
+}
+
+.authentication__submit:hover span:not(:nth-child(6)) {
+    transform: translate(-50%, -50%) scale(10);
+    transition: 1.5s ease;
+}
+
+label {
+    font-weight: bold;
+}
+
