@@ -2,32 +2,46 @@ import { FormEvent, SetStateAction, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 interface Login_type {
-  setIsLogin: React.Dispatch<SetStateAction<boolean>>
+  setIsLogin: React.Dispatch<SetStateAction<boolean>>,
+  setValidationErrors: React.Dispatch<SetStateAction<validationError_type[]>>,
 }
 
-const Login = ({setIsLogin}: Login_type) => {
+interface validationError_type {
+  msg: string
+}
+
+const Login = ({setIsLogin, setValidationErrors}: Login_type) => {
 
   const navigate = useNavigate()
 
   const [email, setEmail] = useState('');
   const [pwd, setPwd] = useState('');
 
-  const login = (e: FormEvent) => {
+  const login = async (e: FormEvent) => {
     e.preventDefault();
     if(!email || !pwd) return undefined;
-    fetch(`http://localhost:3000/api/login`, {
+    const response = await fetch(`http://localhost:3000/api/login`, {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json'
       },
       body: JSON.stringify({pwd,email})
-  }).then(response => response.json())
-  .then(token => {
-    localStorage.setItem('token', JSON.stringify(token));
-    setEmail('');
-    setPwd('');
-    navigate('/chats')
-  })
+    })
+    const data = await response.json();
+    if(Array.isArray(data)){
+      setValidationErrors(data)
+    } else {
+      localStorage.setItem('token', JSON.stringify(data));
+      setEmail('');
+      setPwd('');
+      setValidationErrors([]);
+      navigate('/chats')
+    }
+  }
+
+  const handleSwap = () => {
+    setIsLogin(false);
+    setValidationErrors([])
   }
 
   return (
@@ -58,7 +72,7 @@ const Login = ({setIsLogin}: Login_type) => {
         </button>
         <div className="create__account-btn">
           <span>Don't have an account?</span> 
-          <button className='authentication__swap' onClick={() => setIsLogin(false)}>Sign-up</button>
+          <button className='authentication__swap' onClick={() => handleSwap()}>Sign-up</button>
         </div>
     </form>
   )
