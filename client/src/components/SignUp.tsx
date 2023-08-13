@@ -1,4 +1,4 @@
-import { FormEvent, SetStateAction, useState } from 'react'
+import { FormEvent, SetStateAction, useEffect, useState } from 'react'
 import '../styles/SignUp.css'
 
 interface SignUp_type {
@@ -16,11 +16,12 @@ const SignUp = ({setIsLogin, setValidationErrors}: SignUp_type) => {
   const [username, setUsername] = useState('')
   const [pwd, setPwd] = useState('')
   const [email, setEmail] = useState('')
-  const [repeatPwd, setRepeatPwd] = useState('')
+  const [passwordsMatch, setPasswordsMatch] = useState(true)
 
   const createUser = async (e: FormEvent) => {
     e.preventDefault()
 
+    if(!passwordsMatch) return;
     const response = await fetch(`http://localhost:3000/api/signup`, {
       method: 'POST',
       headers: {
@@ -39,13 +40,18 @@ const SignUp = ({setIsLogin, setValidationErrors}: SignUp_type) => {
     setIsLogin(true);
     setValidationErrors([])
   }
+
+  const comparePasswords = (repeatPwd: string) => {
+    setPasswordsMatch(repeatPwd === pwd)
+  }
+  
     
   return (
     <form className='authentication__form signup__form' onSubmit={(e) => createUser(e)}>
         <div className="email__container form__section-container">
             <label htmlFor="email" className="authentication__label">E-mail</label>
             <div className="form__section-container">
-              <input id='email' type="text" name='email' onChange={(e) => setEmail(e.target.value)}/>
+              <input id='email' type="text" name='email' onChange={(e) => setEmail(e.target.value)} required/>
               <div className="topline"></div>
               <div className="underline"></div>
             </div>
@@ -58,7 +64,7 @@ const SignUp = ({setIsLogin, setValidationErrors}: SignUp_type) => {
               <div className="underline"></div>
             </div>
         </div>
-        <div className="password__container">
+        <div className={`password__container ${!passwordsMatch && 'no-match'}`}>
             <label htmlFor="pwd" className="authentication__label">Password</label>
             <div className="form__section-container">
               <input id='pwd' type="password" name='pwd' onChange={(e) => setPwd(e.target.value)}/>
@@ -66,10 +72,10 @@ const SignUp = ({setIsLogin, setValidationErrors}: SignUp_type) => {
               <div className="underline"></div>
             </div>
         </div>
-        <div className="password__container">
+        <div className={`password__container ${!passwordsMatch && 'no-match'}`}>
             <label htmlFor="re-pwd" className="authentication__label">Repeat Password</label>
             <div className="form__section-container">
-              <input id='re-pwd' type="password" name='re-pwd' onChange={(e) => setRepeatPwd(e.target.value)}/>
+              <input id='re-pwd' type="password" name='re-pwd' onChange={(e) => comparePasswords(e.target.value)}/>
               <div className="topline"></div>
               <div className="underline"></div>
             </div>
