@@ -2,21 +2,44 @@ import { FormEvent, SetStateAction, useState } from 'react'
 import '../styles/SignUp.css'
 
 interface SignUp_type {
-    setIsLogin: React.Dispatch<SetStateAction<boolean>>
-  }
+    setIsLogin: React.Dispatch<SetStateAction<boolean>>,
+    setValidationErrors: React.Dispatch<SetStateAction<validationError_type[]>>,
+}
+
+interface validationError_type {
+  msg: string
+}
   
-  const SignUp = ({setIsLogin}: SignUp_type) => {
+  
+const SignUp = ({setIsLogin, setValidationErrors}: SignUp_type) => {
 
-    const [username, setUsername] = useState('')
-    const [pwd, setPwd] = useState('')
-    const [email, setEmail] = useState('')
-    const [repeatPwd, setRepeatPwd] = useState('')
+  const [username, setUsername] = useState('')
+  const [pwd, setPwd] = useState('')
+  const [email, setEmail] = useState('')
+  const [repeatPwd, setRepeatPwd] = useState('')
 
-    const createUser = async (e: FormEvent) => {
+  const createUser = async (e: FormEvent) => {
+    e.preventDefault()
 
-    };
+    const response = await fetch(`http://localhost:3000/api/signup`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({email, pwd, username})
+    })
+
+    const data = await response.json()
+    if(Array.isArray(data)) {
+      setValidationErrors(data)
+    }
+  };
+
+  const handleSwap = () => {
+    setIsLogin(true);
+    setValidationErrors([])
+  }
     
-
   return (
     <form className='authentication__form signup__form' onSubmit={(e) => createUser(e)}>
         <div className="email__container form__section-container">
@@ -61,7 +84,7 @@ interface SignUp_type {
         </button>
         <div className="create__account-btn">
           <span>Already an account?</span> 
-          <button className='authentication__swap' onClick={() => setIsLogin(true)}>Login</button>
+          <button className='authentication__swap' onClick={() => handleSwap()}>Login</button>
         </div>
     </form>
   )
