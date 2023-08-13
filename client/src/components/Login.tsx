@@ -23,7 +23,9 @@ const Login = ({setIsLogin}: Login_type) => {
       body: JSON.stringify({pwd,email})
   }).then(response => response.json())
   .then(token => {
-    localStorage.setItem('token', JSON.stringify(token))
+    localStorage.setItem('token', JSON.stringify(token));
+    setEmail('');
+    setPwd('');
     navigate('/chats')
   })
   }
