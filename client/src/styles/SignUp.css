@@ -1,0 +1,23 @@
+.signup__form {
+    gap: 30px;
+    --border-color: #2dc000;
+}
+
+.signup__form input {
+    gap: 30px;
+    height: 30px;
+    box-shadow: 6px 7px 0px 0px var(--border-color);
+    border-color: var(--border-color);
+}
+
+.signup__submit {
+    background-color: var(--border-color);
+}
+
+.authentication__form.signup__form .topline {
+    background-color: var(--border-color);
+}
+
+.authentication__form.signup__form .underline {
+    background-color: var(--border-color);
+}

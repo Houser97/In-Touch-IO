@@ -1,6 +1,5 @@
 import { FormEvent, SetStateAction, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import '../styles/Login.css'
 
 interface Login_type {
   setIsLogin: React.Dispatch<SetStateAction<boolean>>
@@ -31,16 +30,34 @@ const Login = ({setIsLogin}: Login_type) => {
 
   return (
     <form className='authentication__form' onSubmit={(e) => login(e)}>
-        <div className="email__container">
+        <div className="email__container form__section-container">
             <label htmlFor="email" className="authentication__label">E-mail</label>
-            <input id='email' type="text" name='email' onChange={(e) => setEmail(e.target.value)}/>
+            <div className="form__section-container">
+              <input id='email' type="text" name='email' onChange={(e) => setEmail(e.target.value)}/>
+              <div className="topline"></div>
+              <div className="underline"></div>
+            </div>
         </div>
         <div className="password__container">
             <label htmlFor="pwd" className="authentication__label">Password</label>
-            <input id='pwd' type="password" name='pwd' onChange={(e) => setPwd(e.target.value)}/>
+            <div className="form__section-container">
+              <input id='pwd' type="password" name='pwd' onChange={(e) => setPwd(e.target.value)}/>
+              <div className="topline"></div>
+              <div className="underline"></div>
+            </div>
         </div>
-        <button className="authentication__submit">Login</button>
-        <button className='authentication__swap' onClick={() => setIsLogin(false)}>Create Account</button>
+        <button className="authentication__submit">
+          <span className="circle1"></span>
+          <span className="circle2"></span>
+          <span className="circle3"></span>
+          <span className="circle4"></span>
+          <span className="circle5"></span>
+          <span className="text">Login</span>
+        </button>
+        <div className="create__account-btn">
+          <span>Don't have an account?</span> 
+          <button className='authentication__swap' onClick={() => setIsLogin(false)}>Sign-up</button>
+        </div>
     </form>
   )
 }
