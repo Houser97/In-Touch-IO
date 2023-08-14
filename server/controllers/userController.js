@@ -52,7 +52,7 @@ exports.create_user = [
                 name: req.body.username,
                 friends: []
             }).save();
-            res.json(user);
+            res.json({id: user._id});
         } catch (err) {
             return res.json(err);
         }
@@ -65,18 +65,20 @@ exports.login = [
     .escape()
     .normalizeEmail(),
 
-    async (req, res, next) => {
+    async (req, res) => {
+        const errors = validationResult(req);
+        if(!errors.isEmpty()) return res.json(errors.array());
         try {
             const user = await User.findOne({'email': req.body.email}).exec();
-            if(!user) return res.json(false)
+            if(!user) return res.json([{msg: 'Email does not exist.'}])
             bcryptjs.compare(req.body.pwd, user.password, (err, passwordMatch) => {
                 if(passwordMatch){
-                    jwt.sign({user}, `${process.env.SECRET_KEY}`, {expiresIn: '6s'} ,(err, token) => {
+                    jwt.sign({user}, `${process.env.SECRET_KEY}`, {expiresIn: '15s'} ,(err, token) => {
                         if(err) return res.json(err)
-                        return res.json(token)
+                        return res.json({token, id: user._id})
                     })
                 } else {
-                    return res.json({ message: 'Password does not match' });
+                    return res.json([{ msg: 'Incorrect Password' }]);
                 }
             })
         } catch (err) {
@@ -99,7 +101,7 @@ exports.validate_token = function(req, res, next){
         const bearerToken = bearer[1]
 
         jwt.verify(bearerToken, `${process.env.SECRET_KEY}`, (err) => {
-            if(err) return res.sendStatus(403)
+            if(err) return res.json(false)
             else {
                 next()
             }
@@ -109,30 +111,19 @@ exports.validate_token = function(req, res, next){
     }
 }
 
-exports.get_user_data = function(req, res, next){
-    // FORMAT
-    // Authorization : Bearer <access_token>
+exports.get_user_data = [
+    body('email', 'E-mail must be a valid address.').isEmail()
+    .trim()
+    .escape()
+    .normalizeEmail(),
 
-    // Get auth header value
-    const bearerHeader = req.headers['authorization']
-
-    if(typeof bearerHeader !== 'undefined'){
-        // Separar usando el espacio.
-        const bearer = bearerHeader.split(' ')
-        // Obtener el token.
-        const bearerToken = bearer[1]
-
-        jwt.verify(bearerToken, `${process.env.SECRET_KEY}`, (err, authData) => {
-            if(err) return res.json(false)
-            else {
-                const {name} = authData.user
-                return res.json({name})
-            }
-        })
-    } else {
-        return res.json('forbidden')
+    async (req, res, next) => {
+        const user = await User.findOne({_id: req.body.id})
+        if(!user) return res.json(false)
+        const { _id, email, pictureUrl, publicId, name } = user
+        return res.json({ _id, email, pictureUrl, publicId, name })
     }
-}
+]
 
 exports.upload_image = async (req, res) => {
     try {
@@ -147,8 +138,7 @@ exports.upload_image = async (req, res) => {
                     publicId: data.public_id
                 }
             })
-        console.log(savedImg)
-        res.json({msg: 'Uploaded Image'})
+        res.json({pictureUrl: data.url})
     } catch (error) {
         console.log(error);
         res.status(500).json({ err: 'Something went wrong' })
