@@ -1,4 +1,6 @@
 import { FormEvent, SetStateAction, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { API } from '../assets/constants'
 import '../styles/SignUp.css'
 
 interface SignUp_type {
@@ -13,6 +15,8 @@ interface validationError_type {
   
 const SignUp = ({setIsLogin, setValidationErrors}: SignUp_type) => {
 
+  const navigate = useNavigate();
+
   const [username, setUsername] = useState('')
   const [pwd, setPwd] = useState('')
   const [email, setEmail] = useState('')
@@ -22,7 +26,7 @@ const SignUp = ({setIsLogin, setValidationErrors}: SignUp_type) => {
     e.preventDefault()
 
     if(!passwordsMatch) return;
-    const response = await fetch(`http://localhost:3000/api/signup`, {
+    const response = await fetch(`${API}/user/signup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -30,9 +34,30 @@ const SignUp = ({setIsLogin, setValidationErrors}: SignUp_type) => {
       body: JSON.stringify({email, pwd, username})
     })
 
-    const data = await response.json()
-    if(Array.isArray(data)) {
-      setValidationErrors(data)
+    const user = await response.json()
+    if(Array.isArray(user)) {
+      setValidationErrors(user)
+    } else {
+      const { id } = user
+      const response = await fetch(`${API}/user/login`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({pwd,email})
+      })
+      const data = await response.json();
+      if(Array.isArray(data)){
+        setValidationErrors(data)
+      } else {
+        const { token, id } = data;
+        localStorage.setItem('token', JSON.stringify(token));
+        localStorage.setItem('idInTouch', JSON.stringify(id));
+        setEmail('');
+        setPwd('');
+        setValidationErrors([]);
+        navigate(`/settings/${id}`)
+      }
     }
   };
 

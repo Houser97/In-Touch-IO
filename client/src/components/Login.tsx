@@ -1,5 +1,6 @@
 import { FormEvent, SetStateAction, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { API } from '../assets/constants'
 
 interface Login_type {
   setIsLogin: React.Dispatch<SetStateAction<boolean>>,
@@ -9,6 +10,7 @@ interface Login_type {
 interface validationError_type {
   msg: string
 }
+
 
 const Login = ({setIsLogin, setValidationErrors}: Login_type) => {
 
@@ -20,7 +22,7 @@ const Login = ({setIsLogin, setValidationErrors}: Login_type) => {
   const login = async (e: FormEvent) => {
     e.preventDefault();
     if(!email || !pwd) return undefined;
-    const response = await fetch(`http://localhost:3000/api/login`, {
+    const response = await fetch(`${API}/user/login`, {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json'

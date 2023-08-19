@@ -1,6 +1,7 @@
 import React, { createContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './App.css'
+import { API } from './assets/constants'
 import Chat from './components/Chat'
 import ContactsCarousel from './components/ContactsCarousel'
 import HeaderMain from './components/HeaderMain'
@@ -72,7 +73,7 @@ function App() {
   useEffect(() => {
     const token = JSON.parse(localStorage.getItem('token') || "");
     const id = JSON.parse(localStorage.getItem('idInTouch') || "");
-    fetch(`http://localhost:3000/api/get_user_data`, {
+    fetch(`${API}/user/get_user_data`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
