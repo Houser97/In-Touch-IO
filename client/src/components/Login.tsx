@@ -31,7 +31,9 @@ const Login = ({setIsLogin, setValidationErrors}: Login_type) => {
     if(Array.isArray(data)){
       setValidationErrors(data)
     } else {
-      localStorage.setItem('token', JSON.stringify(data));
+      const { token, id } = data
+      localStorage.setItem('token', JSON.stringify(token));
+      localStorage.setItem('idInTouch', JSON.stringify(id));
       setEmail('');
       setPwd('');
       setValidationErrors([]);
