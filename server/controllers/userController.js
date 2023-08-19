@@ -100,9 +100,10 @@ exports.validate_token = function(req, res, next){
         // Obtener el token.
         const bearerToken = bearer[1]
 
-        jwt.verify(bearerToken, `${process.env.SECRET_KEY}`, (err) => {
+        jwt.verify(bearerToken, `${process.env.SECRET_KEY}`, (err, authData) => {
             if(err) return res.json(false)
             else {
+                req.userId = authData._id
                 next()
             }
         })
