@@ -73,7 +73,7 @@ exports.login = [
             if(!user) return res.json([{msg: 'Email does not exist.'}])
             bcryptjs.compare(req.body.pwd, user.password, (err, passwordMatch) => {
                 if(passwordMatch){
-                    jwt.sign({user}, `${process.env.SECRET_KEY}`, {expiresIn: '15s'} ,(err, token) => {
+                    jwt.sign({user}, `${process.env.SECRET_KEY}`, {expiresIn: '180s'} ,(err, token) => {
                         if(err) return res.json(err)
                         return res.json({token, id: user._id})
                     })
@@ -86,31 +86,6 @@ exports.login = [
         }
     }
 ]
-
-exports.validate_token = function(req, res, next){
-    // FORMAT
-    // Authorization : Bearer <access_token>
-
-    // Get auth header value
-    const bearerHeader = req.headers['authorization']
-
-    if(typeof bearerHeader !== 'undefined'){
-        // Separar usando el espacio.
-        const bearer = bearerHeader.split(' ')
-        // Obtener el token.
-        const bearerToken = bearer[1]
-
-        jwt.verify(bearerToken, `${process.env.SECRET_KEY}`, (err, authData) => {
-            if(err) return res.json(false)
-            else {
-                req.userId = authData._id
-                next()
-            }
-        })
-    } else {
-        return res.json('forbidden')
-    }
-}
 
 exports.get_user_data = [
     body('email', 'E-mail must be a valid address.').isEmail()
@@ -155,7 +130,7 @@ exports.searchUser = async(req, res) => {
         ]
     }
     : {}
-
-    const users = await User.find(keyword).find({ _id: { $ne: req.userId }})
+    const users = await User.find(keyword, {'password': 0, '_id': 0, 'publicId': 0}).find({ _id: { $ne: req.userId }})
+    console.log(req.userId)
     return res.json(users)
 }
