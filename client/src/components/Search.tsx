@@ -1,4 +1,5 @@
 import { FormEvent, useState } from 'react'
+import { API } from '../assets/constants'
 import '../styles/Search.css'
 import Contact from './Contact'
 
@@ -10,7 +11,7 @@ const Search = () => {
   const searchUsers = async(e: FormEvent) => {
     e.preventDefault();
     const token = JSON.parse(localStorage.getItem("token") || '');
-    const response =await fetch(`http://localhost:3000/api/searchUser?search=${query}`, {
+    const response =await fetch(`${API}/user/searchUser?search=${query}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -32,9 +33,9 @@ const Search = () => {
         <div className="search__result">
           {
             userSearchResult.length
-            ? userSearchResult.map(({name, pictureUrl}) => {
+            ? userSearchResult.map(({name, pictureUrl, _id}) => {
               return(
-                <Contact name={name} picture={pictureUrl} />
+                <Contact name={name} picture={pictureUrl} id={_id} key={_id} />
               )
             })
             
