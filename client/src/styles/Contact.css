@@ -4,6 +4,7 @@
     color: var(--name-color);
     font-size: 0.635rem;
     font-weight: 600;
+    z-index: 1001;
 }
 
 .contact__picture {
