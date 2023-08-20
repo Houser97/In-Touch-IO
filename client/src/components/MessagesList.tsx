@@ -1,28 +1,11 @@
-import { useEffect, useState } from 'react'
-import { API, images } from '../assets/constants'
+import { useContext } from 'react'
+import { chatContext } from '../App'
 import '../styles/MessagesList.css'
 import ChatCard from './ChatCard'
 
 const MessagesList = () => {
 
-  const [chats, setChats] = useState([])
-
-  useEffect(() => {
-    const token = JSON.parse(localStorage.getItem('token') || "");
-    if(!token.length) return undefined;
-    fetch(`${API}/chat/getChats`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
-    })
-    .then(response => response.json())
-    .then(chats => {
-      if(!chats.length) return undefined
-      setChats(chats);
-    })
-  }, [])
+  const { chats } = useContext(chatContext)
 
   return (
     <section className='message__list main__container'>

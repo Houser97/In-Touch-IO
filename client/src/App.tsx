@@ -21,12 +21,27 @@ interface user_type {
 interface chatData_type {
   image: string,
   name: string,
+  id: string
+}
+
+interface chat {
+  _id: string,
+  name: string,
+  pictureUrl: string
+}
+
+interface chats_type {
+  _id: string,
+  users: chat[]
 }
 
 interface chatContext_types {
   openChat: boolean,
   user: user_type,
   chatData: chatData_type,
+  chats: chats_type[],
+  openSearch: boolean,
+  setOpenSearch: React.Dispatch<React.SetStateAction<boolean>>,
   setOpenChat: React.Dispatch<React.SetStateAction<boolean>>,
   setUser: React.Dispatch<React.SetStateAction<user_type>>,
   setChatData: React.Dispatch<React.SetStateAction<chatData_type>>
@@ -34,6 +49,7 @@ interface chatContext_types {
 
 export const chatContext = createContext<chatContext_types>({
   openChat: false,
+  chats: [],
   user: {
     image: {
       url: '',
@@ -44,8 +60,11 @@ export const chatContext = createContext<chatContext_types>({
   },
   chatData: {
     name: '',
-    image: ''
+    image: '',
+    id: ''
   },
+  openSearch: false,
+  setOpenSearch: () => false,
   setOpenChat: () => false,
   setUser: () => false,
   setChatData: () => false
@@ -56,10 +75,12 @@ function App() {
   const navigate = useNavigate();
 
   const [openChat, setOpenChat] = useState(false)
+  const [openSearch, setOpenSearch] = useState(false)
   //Estado que se usa para mostrar datos del contacto al abrir el chat.
   const [chatData, setChatData] = useState({
     image: '',
-    name: ''
+    name: '',
+    id: ''
   })
   const [user, setUser] = useState({
     image: {
@@ -69,6 +90,8 @@ function App() {
     name: '',
     id: '',
   })
+
+  const [chats, setChats] = useState([])
 
   useEffect(() => {
     const token = JSON.parse(localStorage.getItem('token') || "");
@@ -95,9 +118,26 @@ function App() {
       setUser({name, image, id: _id})
     })
   }, [])
+
+  useEffect(() => {
+    const token = JSON.parse(localStorage.getItem('token') || "");
+    if(!token.length) return undefined;
+    fetch(`${API}/chat/getChats`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(response => response.json())
+    .then(chats => {
+      if(!chats.length) return undefined
+      setChats(chats);
+    })
+  }, [])
   
 
-  const values = {setOpenChat, openChat, user, setUser, chatData, setChatData}
+  const values = {setOpenChat, openChat, user, setUser, chatData, setChatData, chats, openSearch, setOpenSearch}
 
   return (
     <div className='App'>
