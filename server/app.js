@@ -9,6 +9,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const userRouter = require('./routes/user');
 const chatRouter = require('./routes/chat');
+const messageRouter = require('./routes/message');
 const mongoose = require('mongoose')
 
 var app = express();
@@ -48,6 +49,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/api/user', userRouter);
 app.use('/api/chat', chatRouter);
+app.use('/api/message', messageRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
