@@ -4,7 +4,7 @@ const User = require('../models/user');
 exports.accessChat = async(req, res) => {
     const friendId  = req.body.friendId;
 
-    if(!friendId){
+    if(!friendId  || friendId === req.userId){
         return res.json(false)
     }
 
@@ -40,4 +40,10 @@ exports.accessChat = async(req, res) => {
     } catch (error) {
         return res.json(error)
     }
+}
+
+
+exports.findUserChats = async(req, res) => {
+    const Chats = await Chat.find({ users: { $elemMatch: { $eq:req.userId }}}).populate("users", "-password")
+    return res.json(Chats);
 }
