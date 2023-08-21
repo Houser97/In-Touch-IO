@@ -5,13 +5,16 @@ import ChatCard from './ChatCard'
 
 const MessagesList = () => {
 
-  const { chats } = useContext(chatContext)
+  const { chats } = useContext(chatContext);
+  const userId = JSON.parse(localStorage.getItem('idInTouch') || "");
 
   return (
     <section className='message__list main__container'>
-        {chats.length ? chats.map(({_id, users:[ , {_id: friendId, name, pictureUrl}]}) => {
+        {chats.length ? chats.map(({_id, users}) => {
+          const friendData = users.filter(user => user._id !== userId)
+          const {name, pictureUrl} = friendData[0]
             return(
-                <ChatCard key={`ChatCard-${_id}`} name={name} picture={pictureUrl} friendId={friendId}/>
+                <ChatCard key={`ChatCard-${_id}`} name={name} picture={pictureUrl} chatId={_id}/>
             )
         }) : 'No Chats'}
         <div className='create__chat'>
