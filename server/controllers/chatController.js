@@ -1,4 +1,5 @@
 const Chat = require('../models/chat');
+const Message = require('../models/message');
 const User = require('../models/user');
 
 exports.accessChat = async(req, res) => {
@@ -9,7 +10,7 @@ exports.accessChat = async(req, res) => {
     }
 
     let isChat = await Chat.find({
-        isGroupChat: false,
+        isGroup: false,
         $and: [
             { users: { $elemMatch: { $eq: req.userId } } },
             { users: { $elemMatch: { $eq: friendId } } }
@@ -47,3 +48,21 @@ exports.findUserChats = async(req, res) => {
     const Chats = await Chat.find({ users: { $elemMatch: { $eq:req.userId }}}).populate("users", "-password")
     return res.json(Chats);
 }
+
+//Controlador que busca en paralelo al Chat y sus mensajes
+exports.ChatAndMessages = async(req, res) => {
+    const chatId = req.params.chatId
+    const [chatRaw, messages] = await Promise.all([
+        Chat.findOne({_id: chatId}).populate("users", "-password")
+        .populate("lastMsg"),
+        Message.find({chat: chatId}).populate('sender', 'name pictureUrl email')
+        .populate('chat')
+    ])
+
+    const chat = await User.populate(chatRaw, {
+        path: 'lastMsg.sender',
+        select: 'name pictureUrl email'
+    })
+
+    return res.json({messages, chat})
+};
