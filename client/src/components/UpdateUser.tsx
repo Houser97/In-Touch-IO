@@ -1,7 +1,12 @@
 import { ChangeEvent, FormEvent, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { API } from '../assets/constants';
 import '../styles/UpdateUser.css'
 
 const UpdateUser = () => {
+
+    const { id } = useParams();
+    const navigate = useNavigate();
 
     const [fileInputState, setFileInputState] = useState('');
     const [previewSource, setPreviewSource] = useState('');
@@ -22,15 +27,19 @@ const UpdateUser = () => {
 
     const uploadImage = async (image: string | ArrayBuffer | null) => {
         try {
-            await fetch(`http://localhost:3000/api/upload_image`, {
+            const response = await fetch(`${API}/user/upload_image/${id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({image})
             })
-            setFileInputState('');
-            setPreviewSource('');
+            const data = await response.json()
+            if(data) {
+                setFileInputState('');
+                setPreviewSource('');
+                navigate('/chats')
+            }
         } catch (error) {
             console.log(error);
         }
@@ -57,17 +66,31 @@ const UpdateUser = () => {
   return (
     <div>
         <form className='update__user-form authentication__form' onSubmit={(e) => updateUser(e)}>
+        <label className="custum-file-upload" htmlFor="file">
+            <div className="icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>camera</title><path d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9Z" /></svg>
+            </div>
+            <div className="text">
+                <span>Click to upload image</span>
+            </div>
             <input 
                 type="file" 
+                id='file'
                 name='image'
                 onChange={(e) => handleFileInputChange(e)}
                 value={fileInputState}
                 className='input__image'/>
-            <button className="authentication__submit">Sign Up</button>
+            {previewSource && (
+                <img className='preview__update-user' src={previewSource} alt="preview" />
+            )}
+        </label>
+        <div className='change__username'>
+            <label htmlFor="username">Username</label>
+            <input type="text" name='username' id='username'/>
+        </div>
+
+            <button className="authentication__submit">Update</button>
         </form>
-        {previewSource && (
-            <img src={previewSource} alt="preview" />
-        )}
     </div>
   )
 }
