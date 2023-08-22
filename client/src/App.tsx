@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from 'react'
+import { createContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './App.css'
 import { API } from './assets/constants'
@@ -6,46 +6,8 @@ import Chat from './components/Chat'
 import ContactsCarousel from './components/ContactsCarousel'
 import HeaderMain from './components/HeaderMain'
 import MessagesList from './components/MessagesList'
-
-interface image_type {
-  url: string,
-  publicId: string,
-}
-
-interface user_type {
-  image: image_type,
-  name: string,
-  id: string
-}
-
-interface chatData_type {
-  image: string,
-  name: string,
-  id: string
-}
-
-interface chat {
-  _id: string,
-  name: string,
-  pictureUrl: string
-}
-
-interface chats_type {
-  _id: string,
-  users: chat[]
-}
-
-interface chatContext_types {
-  openChat: boolean,
-  user: user_type,
-  chatData: chatData_type,
-  chats: chats_type[],
-  openSearch: boolean,
-  setOpenSearch: React.Dispatch<React.SetStateAction<boolean>>,
-  setOpenChat: React.Dispatch<React.SetStateAction<boolean>>,
-  setUser: React.Dispatch<React.SetStateAction<user_type>>,
-  setChatData: React.Dispatch<React.SetStateAction<chatData_type>>
-}
+import Search from './components/Search'
+import { chatContext_types } from './TypeScript/types'
 
 export const chatContext = createContext<chatContext_types>({
   openChat: false,
@@ -61,9 +23,12 @@ export const chatContext = createContext<chatContext_types>({
   chatData: {
     name: '',
     image: '',
-    id: ''
+    id: '',
+    messages: []
   },
   openSearch: false,
+  updateChats: false,
+  setUpdateChats: () => false,
   setOpenSearch: () => false,
   setOpenChat: () => false,
   setUser: () => false,
@@ -74,13 +39,16 @@ function App() {
 
   const navigate = useNavigate();
 
-  const [openChat, setOpenChat] = useState(false)
-  const [openSearch, setOpenSearch] = useState(false)
+  const [openChat, setOpenChat] = useState(false);
+  const [openSearch, setOpenSearch] = useState(false);
+  // Estado que llama a API de chats cuando se crea un nuevo chat.
+  const [updateChats, setUpdateChats] = useState(false)
   //Estado que se usa para mostrar datos del contacto al abrir el chat.
   const [chatData, setChatData] = useState({
     image: '',
     name: '',
-    id: ''
+    id: '',
+    messages: [],
   })
   const [user, setUser] = useState({
     image: {
@@ -134,10 +102,10 @@ function App() {
       if(!chats.length) return undefined
       setChats(chats);
     })
-  }, [])
+  }, [updateChats])
   
 
-  const values = {setOpenChat, openChat, user, setUser, chatData, setChatData, chats, openSearch, setOpenSearch}
+  const values = {setOpenChat, openChat, user, setUser, chatData, setChatData, chats, openSearch, setOpenSearch, updateChats, setUpdateChats}
 
   return (
     <div className='App'>
@@ -146,6 +114,7 @@ function App() {
         <ContactsCarousel />
         <MessagesList />
         <Chat />
+        <Search />
       </chatContext.Provider>
     </div>
   )
