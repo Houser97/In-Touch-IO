@@ -7,20 +7,20 @@ import MessageInput from './Chat/MessageInput'
 
 const Chat = () => {
 
-    const { openChat, chatData } = useContext(chatContext)
+    const { openChat, chatData } = useContext(chatContext);
+    const userId = JSON.parse(localStorage.getItem('idInTouch') || "");
 
   return (
     <div className={`chat__container ${openChat && 'show-chat'}`}>
         <Header />
         <div className='chat__body'>
-            <Message owner={true} hour={'01:02'}/>
-            <Message hour={'01:03'}/>
-            <Message owner={true} hour={'01:32'}/>
-            <Message owner={true} hour={'01:32'}/>
-            <Message hour={'02:02'}/>
-            <Message hour={'02:02'}/>
+          {chatData.messages.length ? chatData.messages.map(({sender, content, createdAt}) => {
+            return(
+              <Message owner={userId === sender._id} hour={createdAt} content={content}/>
+            )
+          }) : ''}
         </div>
-        <MessageInput />
+        <MessageInput chatId={chatData.id}/>
     </div>
   )
 }
