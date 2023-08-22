@@ -1,24 +1,39 @@
 import { useContext } from 'react'
 import { chatContext } from '../App'
+import { API } from '../assets/constants'
 import '../styles/ChatCard.css'
 import Contact from './Contact'
 
 interface ChatCard_props {
     picture: string,
-    name: string
+    name: string,
+    chatId: string,
 }
 
-const ChatCard = ({picture, name}: ChatCard_props) => {
+const ChatCard = ({picture, name, chatId}: ChatCard_props) => {
 
     const { setOpenChat, setChatData } = useContext(chatContext)
 
-    const handleClick = () => {
+    const userId = JSON.parse(localStorage.getItem('idInTouch') || "");
+
+    const retrieveChatData = async() => {
+        const token = JSON.parse(localStorage.getItem('token') || '')
+        const response = await fetch(`${API}/message/${chatId}`, {
+            method: 'GET', 
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const {chat, messages} = await response.json()
+        const friendData = chat.users.filter(user => user._id !== userId)
+        const {name} = friendData[0]
+        setChatData({image: picture, name, id: chatId, messages})
         setOpenChat(true);
-        setChatData({image: picture, name})
     }
 
   return (
-    <div className='chat__card-container main__container' onClick={handleClick}>
+    <div className='chat__card-container main__container' onClick={retrieveChatData}>
         <Contact picture={picture}/>
         <section className='chat__data'>
             <h3 className='chat__card-name'>{name}</h3>
