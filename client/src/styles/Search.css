@@ -5,6 +5,13 @@
     padding: 10px 20px;
     background-color: #212121;
     min-height: 100vh;
+    width: 100%;
+    position: absolute;
+    z-index: 1010;
+    left: 0px;
+    top: 0px;
+    transform: translateX(-100%);
+    transition: transform 250ms ease-in-out;
 }
 
 .search__form {
@@ -62,14 +69,19 @@
     flex-direction: row;
     width: 100%;
     max-width: 250px;
-    background-color: white;
+    background-color: rgb(255, 255, 255);
     color: black;
     border-radius: 10px;
-    padding: 10px 30px;
+    padding: 10px 20px;
     align-items: center;
     justify-content: space-between;
+    cursor: pointer;
 }
 
 .search__container .contact__name {
     font-size: 1.2rem;
+}
+
+.show-search {
+    transform: translateX(0%);
 }
