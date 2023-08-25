@@ -1,14 +1,18 @@
+import { useContext } from 'react'
+import { chatContext } from '../App'
 import { AccessChat } from '../assets/constants'
 import '../styles/Contact.css'
 
 const Contact = ({picture = '', name = '', id = ''}) => {
+
+  const { setUpdateChats } = useContext(chatContext)
 
   const handleClick = async() => {
     const token = JSON.parse(localStorage.getItem('token') || '');
     const userId = JSON.parse(localStorage.getItem('idInTouch') || "");
     if(userId === id) return
     const chat = await AccessChat(token, id)
-    console.log(chat)
+    setUpdateChats(prev => !prev)
   }
 
   return (
