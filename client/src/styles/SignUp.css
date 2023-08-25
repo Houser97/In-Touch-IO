@@ -1,4 +1,4 @@
-.signup__form {
+.authentication__form.signup__form {
     gap: 30px;
     --border-color: #2dc000;
 }
@@ -20,4 +20,14 @@
 
 .authentication__form.signup__form .underline {
     background-color: var(--border-color);
+}
+
+.no-match input{
+    box-shadow: 6px 7px 0px 0px rgb(254, 62, 62);
+    border-color: rgb(254, 62, 62);
+}
+
+.authentication__form.signup__form .no-match .topline,
+.authentication__form.signup__form .no-match .underline {
+    background-color: rgb(254, 62, 62);
 }
