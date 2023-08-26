@@ -7,18 +7,15 @@ import ContactsCarousel from './components/ContactsCarousel'
 import HeaderMain from './components/HeaderMain'
 import MessagesList from './components/MessagesList'
 import Search from './components/Search'
-import { chatContext_types } from './TypeScript/types'
+import { chatContext_types } from './TypeScript/typesApp'
 
 export const chatContext = createContext<chatContext_types>({
   openChat: false,
   chats: [],
   user: {
-    image: {
-      url: '',
-      publicId: ''
-    },
+    image: '',
     name: '',
-    id: ''
+    _id: ''
   },
   chatData: {
     name: '',
@@ -48,15 +45,21 @@ function App() {
     image: '',
     name: '',
     id: '',
-    messages: [],
+    messages: [{   
+      sender: {
+        _id: '',
+        image: '',
+        name: ''
+      },
+      content: '',
+      id: '',
+      createdAt: ''
+    }],
   })
   const [user, setUser] = useState({
-    image: {
-      url: '',
-      publicId: ''
-    },
+    image: '',
     name: '',
-    id: '',
+    _id: '',
   })
 
   const [chats, setChats] = useState([])
@@ -78,12 +81,9 @@ function App() {
         navigate('/')
         return undefined
       }
-      const { name, pictureUrl, publicId, _id } = user
-      const image = {
-        url: pictureUrl,
-        publicId
-      }
-      setUser({name, image, id: _id})
+      const { name, pictureUrl, _id } = user
+      const image = pictureUrl
+      setUser({name, image, _id})
     })
   }, [])
 
