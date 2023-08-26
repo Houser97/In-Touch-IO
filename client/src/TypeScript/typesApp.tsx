@@ -1,20 +1,14 @@
-interface image_type {
-    url: string,
-    publicId: string,
-}
-
 interface user_type {
-    image: image_type,
+    image: string,
     name: string,
-    id: string
+    _id: string
 }
 
 interface messages {
-    senderId: string,
-    senderName: string,
-    senderImage: string,
+    sender: user_type,
     content: string,
-    id: string
+    id: string,
+    createdAt: string
 }
 
 interface chatData_type {
