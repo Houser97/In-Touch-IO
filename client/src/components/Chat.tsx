@@ -16,7 +16,7 @@ const Chat = () => {
         <div className='chat__body'>
           {chatData.messages.length ? chatData.messages.map(({sender, content, createdAt}) => {
             return(
-              <Message owner={userId === sender._id} hour={createdAt} content={content}/>
+              <Message owner={userId === sender._id} hour={createdAt} content={content} key={sender._id}/>
             )
           }) : ''}
         </div>
