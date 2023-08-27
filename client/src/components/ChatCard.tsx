@@ -10,9 +10,14 @@ interface ChatCard_props {
     chatId: string,
 }
 
+interface User {
+    _id: string,
+    name: string
+}
+
 const ChatCard = ({picture, name, chatId}: ChatCard_props) => {
 
-    const { setOpenChat, setChatData } = useContext(chatContext)
+    const { setOpenChat, setChatData, socket, setMessages } = useContext(chatContext)
 
     const userId = JSON.parse(localStorage.getItem('idInTouch') || "");
 
@@ -26,10 +31,12 @@ const ChatCard = ({picture, name, chatId}: ChatCard_props) => {
             }
         });
         const {chat, messages} = await response.json()
-        const friendData = chat.users.filter(user => user._id !== userId)
+        const friendData = chat.users.filter((user: User) => user._id !== userId)
         const {name} = friendData[0]
-        setChatData({image: picture, name, id: chatId, messages})
+        setChatData({image: picture, name, id: chatId})
+        setMessages(messages)
         setOpenChat(true);
+        socket.emit('join chat', chatId)
     }
 
   return (
