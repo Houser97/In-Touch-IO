@@ -8,6 +8,7 @@ var app = require('../app');
 var debug = require('debug')('server:server');
 var http = require('http');
 
+
 /**
  * Get port from environment and store in Express.
  */
@@ -21,6 +22,13 @@ app.set('port', port);
 
 var server = http.createServer(app);
 
+const io = require('socket.io')(server, {
+  pingTimeout: 60000,
+  cors: {
+    origin: "http://localhost:5173",
+  }
+})
+
 /**
  * Listen on provided port, on all network interfaces.
  */
@@ -28,6 +36,32 @@ var server = http.createServer(app);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
+
+io.on('connection', (socket) => {
+  console.log('connected to socket.io');
+  // New room using id of user.
+  socket.on('setup', (userId) => {
+    socket.join(userId);
+    socket.emit('connected')
+  })
+  // New room using id of user.
+  socket.on('join chat', (room) => {
+    socket.join(room);
+    console.log('User joined Room:' + room)
+  })
+
+  socket.on('new message', (newMessage) => {
+    const chat = newMessage.chat
+
+    if(!chat.users.length) return
+
+    chat.users.forEach(user => {
+      socket.in(user._id).emit('message received', newMessage)
+      console.log('veamos')
+    })
+  })
+})
+
 
 /**
  * Normalize a port into a number, string, or false.
