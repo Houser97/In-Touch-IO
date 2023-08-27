@@ -1,5 +1,6 @@
 import { createContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { io, Socket } from 'socket.io-client'
 import './App.css'
 import { API } from './assets/constants'
 import Chat from './components/Chat'
@@ -7,7 +8,7 @@ import ContactsCarousel from './components/ContactsCarousel'
 import HeaderMain from './components/HeaderMain'
 import MessagesList from './components/MessagesList'
 import Search from './components/Search'
-import { chatContext_types } from './TypeScript/typesApp'
+import { chatContext_types, message } from './TypeScript/typesApp'
 
 export const chatContext = createContext<chatContext_types>({
   openChat: false,
@@ -21,7 +22,6 @@ export const chatContext = createContext<chatContext_types>({
     name: '',
     image: '',
     id: '',
-    messages: []
   },
   openSearch: false,
   updateChats: false,
@@ -36,8 +36,19 @@ function App() {
 
   const navigate = useNavigate();
 
+  const [socket, setSocket] = useState<Socket | null>(null);
   const [openChat, setOpenChat] = useState(false);
   const [openSearch, setOpenSearch] = useState(false);
+  const [messages, setMessages] = useState([{   
+    sender: {
+      _id: '',
+      image: '',
+      name: ''
+    },
+    content: '',
+    _id: '',
+    createdAt: ''
+  }],)
   // Estado que llama a API de chats cuando se crea un nuevo chat.
   const [updateChats, setUpdateChats] = useState(false)
   //Estado que se usa para mostrar datos del contacto al abrir el chat.
@@ -45,16 +56,6 @@ function App() {
     image: '',
     name: '',
     id: '',
-    messages: [{   
-      sender: {
-        _id: '',
-        image: '',
-        name: ''
-      },
-      content: '',
-      id: '',
-      createdAt: ''
-    }],
   })
   const [user, setUser] = useState({
     image: '',
@@ -103,9 +104,44 @@ function App() {
       setChats(chats);
     })
   }, [updateChats])
+
+  useEffect(() => {
+    const userId = JSON.parse(localStorage.getItem('idInTouch') || '');
+    const newSocket = io("http://localhost:3000", {
+      transports: ['websocket', 'polling', 'flashsocket']
+    });
+
+    newSocket.emit("setup", userId);
+    newSocket.on("connection", () => {
+      console.log('Cui cui');
+    });
+
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.disconnect(); // Asegurarse de desconectar el socket cuando el componente se desmonte
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!socket) return; // Si el socket no está listo, no hacemos nada en este efecto
+  
+    const messageReceivedHandler = (newMessage: message) => {
+      if (chatData.id !== newMessage.chat._id || chatData.id === '') {
+        return;
+      }
+      setMessages(prev => [...prev, newMessage]);
+    };
+  
+    socket.on('message received', messageReceivedHandler);
+  
+    return () => {
+      socket.off('message received', messageReceivedHandler);
+    };
+  }, [chatData.id, socket]);
   
 
-  const values = {setOpenChat, openChat, user, setUser, chatData, setChatData, chats, openSearch, setOpenSearch, updateChats, setUpdateChats}
+  const values = {setOpenChat, openChat, user, setUser, chatData, setChatData, chats, openSearch, setOpenSearch, updateChats, setUpdateChats, socket, messages, setMessages}
 
   return (
     <div className='App'>
