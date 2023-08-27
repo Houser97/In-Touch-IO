@@ -1,12 +1,7 @@
 .message__container{
     flex-direction: column;
     color: white;
-}
-
-.chat__body {
-    display: flex;
-    flex-direction: column;
-    padding: 0px 10px;
+    max-width: 200px;
 }
 
 .left,
@@ -15,7 +10,7 @@
     width: 90%;
     margin: 10px 0px;
     font-size: 0.9rem;
-    padding: 10px;
+    padding: 20px;
     border-radius: 10px;
 }
 

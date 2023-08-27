@@ -14,7 +14,7 @@ const Chat = () => {
   return (
     <div className={`chat__container ${openChat && 'show-chat'}`}>
         <Header />
-        <ScrollableFeed className='chat__body'>
+        <ScrollableFeed>
           {messages.length ? messages.map(({sender, content, createdAt, _id}) => {
             return(
               <Message owner={userId === sender._id} hour={createdAt} content={content} key={_id}/>
