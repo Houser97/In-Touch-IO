@@ -22,6 +22,7 @@ const ChatCard = ({picture, name, chatId}: ChatCard_props) => {
     const userId = JSON.parse(localStorage.getItem('idInTouch') || "");
 
     const retrieveChatData = async() => {
+        if(!socket) return
         const token = JSON.parse(localStorage.getItem('token') || '')
         const response = await fetch(`${API}/message/${chatId}`, {
             method: 'GET', 
