@@ -4,18 +4,10 @@ interface user_type {
     _id: string
 }
 
-interface messages {
-    sender: user_type,
-    content: string,
-    id: string,
-    createdAt: string
-}
-
 interface chatData_type {
     image: string,
     name: string,
     id: string,
-    messages: messages[]
 }
 
 interface chat {
@@ -41,4 +33,12 @@ export interface chatContext_types {
     setOpenChat: React.Dispatch<React.SetStateAction<boolean>>,
     setUser: React.Dispatch<React.SetStateAction<user_type>>,
     setChatData: React.Dispatch<React.SetStateAction<chatData_type>>
+}
+
+export interface message {
+    sender: user_type,
+    content: string,
+    _id: string,
+    createdAt: string,
+    chat: chat
 }
