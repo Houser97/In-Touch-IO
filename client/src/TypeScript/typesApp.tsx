@@ -1,3 +1,5 @@
+import { Socket } from "socket.io-client"
+
 interface user_type {
     image: string,
     name: string,
@@ -21,6 +23,14 @@ interface chats_type {
     users: chat[]
 }
 
+export interface message {
+    sender: user_type,
+    content: string,
+    _id: string,
+    createdAt: string,
+    chat: chat
+}
+
 export interface chatContext_types {
     openChat: boolean,
     user: user_type,
@@ -28,17 +38,12 @@ export interface chatContext_types {
     chats: chats_type[],
     openSearch: boolean,
     updateChats: boolean,
+    socket: null | Socket,
+    messages: message[],
+    setMessages: React.Dispatch<React.SetStateAction<message[]>>
     setUpdateChats: React.Dispatch<React.SetStateAction<boolean>>,
     setOpenSearch: React.Dispatch<React.SetStateAction<boolean>>,
     setOpenChat: React.Dispatch<React.SetStateAction<boolean>>,
     setUser: React.Dispatch<React.SetStateAction<user_type>>,
     setChatData: React.Dispatch<React.SetStateAction<chatData_type>>
-}
-
-export interface message {
-    sender: user_type,
-    content: string,
-    _id: string,
-    createdAt: string,
-    chat: chat
 }

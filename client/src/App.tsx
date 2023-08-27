@@ -24,7 +24,10 @@ export const chatContext = createContext<chatContext_types>({
     id: '',
   },
   openSearch: false,
+  socket: null,
+  messages: [],
   updateChats: false,
+  setMessages: () => [],
   setUpdateChats: () => false,
   setOpenSearch: () => false,
   setOpenChat: () => false,
@@ -44,6 +47,11 @@ function App() {
       _id: '',
       image: '',
       name: ''
+    },
+    chat: {
+      _id: '',
+      name: '',
+      pictureUrl: ''
     },
     content: '',
     _id: '',
@@ -141,7 +149,21 @@ function App() {
   }, [chatData.id, socket]);
   
 
-  const values = {setOpenChat, openChat, user, setUser, chatData, setChatData, chats, openSearch, setOpenSearch, updateChats, setUpdateChats, socket, messages, setMessages}
+  const values = {
+    setOpenChat, 
+    openChat, 
+    user, 
+    setUser, 
+    chatData, 
+    setChatData, 
+    chats, 
+    openSearch, 
+    setOpenSearch, 
+    updateChats, 
+    setUpdateChats, 
+    socket, 
+    messages, 
+    setMessages}
 
   return (
     <div className='App'>
