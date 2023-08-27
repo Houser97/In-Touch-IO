@@ -52,17 +52,11 @@ exports.findUserChats = async(req, res) => {
 //Controlador que busca en paralelo al Chat y sus mensajes
 exports.ChatAndMessages = async(req, res) => {
     const chatId = req.params.chatId
-    const [chatRaw, messages] = await Promise.all([
+    const [chat, messages] = await Promise.all([
         Chat.findOne({_id: chatId}).populate("users", "-password")
         .populate("lastMsg"),
         Message.find({chat: chatId}).populate('sender', 'name pictureUrl email')
         .populate('chat')
     ])
-
-    const chat = await User.populate(chatRaw, {
-        path: 'lastMsg.sender',
-        select: 'name pictureUrl email'
-    })
-
     return res.json({messages, chat})
 };
