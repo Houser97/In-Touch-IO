@@ -1,8 +1,8 @@
 import '../styles/Loading.css'
 
-const Loading = ({width='200px', height='30px'}) => {
+const Loading = ({width='200px', height='30px', owner=false}) => {
   return (
-    <span className="loader" style={{width, height}}></span>
+    <span className={`loader ${owner ? 'right' : 'left'}`} style={{width, height}}></span>
   )
 }
 
