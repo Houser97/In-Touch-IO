@@ -17,6 +17,21 @@ const ChatCard = ({picture, name, chatId, lastMessage}: ChatCard_props) => {
 
     const retrieveChatData = async() => {
         if(!socket) return
+        setMessages([{   
+            sender: {
+              _id: '',
+              image: '',
+              name: ''
+            },
+            chat: {
+              _id: '',
+              name: '',
+              pictureUrl: ''
+            },
+            content: '',
+            _id: '',
+            createdAt: ''
+          }])
         setOpenChat(true);
         setChatData({image: picture, name, id: chatId})
         const token = JSON.parse(localStorage.getItem('token') || '')
