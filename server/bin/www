@@ -42,12 +42,10 @@ io.on('connection', (socket) => {
   // New room using id of user.
   socket.on('setup', (userId) => {
     socket.join(userId);
-    socket.emit('connected')
   })
   // New room using id of user.
   socket.on('join chat', (room) => {
     socket.join(room);
-    console.log('User joined Room:' + room)
   })
 
   socket.on('new message', (newMessage) => {
@@ -57,9 +55,12 @@ io.on('connection', (socket) => {
 
     chat.users.forEach(user => {
       socket.in(user._id).emit('message received', newMessage)
-      console.log('veamos')
     })
   })
+
+  socket.off("setup", () => {
+    socket.leave(userData._id);
+  });
 })
 
 
