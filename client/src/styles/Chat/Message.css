@@ -1,26 +1,28 @@
 .message__container{
     flex-direction: column;
-    color: white;
-    max-width: 200px;
+    color: rgb(0, 0, 0);
+    max-width: 300px;
+    min-width: 150px;
+    width: max-content;
 }
 
 .left,
 .right{
     position: relative;
-    width: 90%;
     margin: 10px 0px;
     font-size: 0.9rem;
     padding: 20px;
+    padding-bottom: 25px;
     border-radius: 10px;
 }
 
 .left {
-    background-color: rgb(48, 48, 48);
+    background-color: rgb(83, 119, 234);
     align-self: flex-start;
 }
 
 .right {
-    background-color: rgb(38, 43, 174); 
+    background-color: rgb(154, 210, 126); 
     align-self: flex-end;
 }
 
@@ -33,5 +35,5 @@
 .message__hour {
     position: absolute;
     bottom: 5px;
-    right: 5px;
+    right: 15px;
 }

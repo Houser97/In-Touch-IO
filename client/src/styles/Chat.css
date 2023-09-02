@@ -5,7 +5,7 @@
     flex-direction: column;
     align-items: center;
     width: 100%;
-    background-color: rgb(146, 181, 146);
+    background-color: rgb(203, 203, 203);
     position: fixed; /*Ayuda a mantener el Chat siempre dentro del campo de vista de la aplicación.*/
     top: 0;
     transform: translateY(100%);
@@ -13,7 +13,12 @@
     z-index: 1005;
 }
 
-.styles_scrollable-div__prSCv {
+.loading__container{
+    overflow: auto;
+}
+
+.styles_scrollable-div__prSCv,
+.loading__container {
     flex: 1;
     width: 100%;
     display: flex;
