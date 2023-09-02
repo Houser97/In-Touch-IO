@@ -6,7 +6,7 @@ import '../../styles/Chat/MessageInput.css'
 const MessageInput = ({chatId = ''}) => {
 
   const [message, setMessage] = useState('');
-  const { socket, setMessages } = useContext(chatContext)
+  const { socket, setMessages, setChats } = useContext(chatContext)
 
   const sendMessage = (e:FormEvent) => {
     e.preventDefault();
@@ -23,6 +23,10 @@ const MessageInput = ({chatId = ''}) => {
       socket.emit('new message', message)
       // Los mensajes se actualizan para el usuario que lo envía, los demás usuarios lo reciben por medio de socket.
       setMessages(prev => [...prev, message])
+      // Se actualiza el último mensaje.
+      setChats(prevChats => prevChats.map((chat) => {
+        return chat._id === chatId ? {...chat, lastMsg: message} : chat
+      }))
     });
   }
 

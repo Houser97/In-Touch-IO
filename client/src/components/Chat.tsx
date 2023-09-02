@@ -5,6 +5,7 @@ import '../styles/Chat.css'
 import Header from './Chat/Header'
 import Message from './Chat/Message'
 import MessageInput from './Chat/MessageInput'
+import { DateTime } from 'luxon';
 
 const Chat = () => {
   
@@ -16,8 +17,9 @@ const Chat = () => {
         <Header />
         <ScrollableFeed>
           {messages.length ? messages.map(({sender, content, createdAt, _id}) => {
+            const formattedTime = DateTime.fromISO(createdAt).toLocaleString(DateTime.TIME_SIMPLE);
             return(
-              <Message owner={userId === sender._id} hour={createdAt} content={content} key={_id}/>
+              <Message owner={userId === sender._id} hour={formattedTime} content={content} key={_id}/>
             )
           }) : ''}
         </ ScrollableFeed>
