@@ -36,10 +36,8 @@ exports.sendMessage = async(req, res) => {
 
 exports.chatMessages = async(req, res) => {
     try {
-        const messages = await Message.find({chat: {$eq: body.params.chatId}})
+        const messages = await Message.find({chat: req.params.chatId})
         .populate('sender', 'name pictureUrl email')
-        .populate('chat')
-
         return res.json(messages)
     } catch (error) {
         return res.json(error)

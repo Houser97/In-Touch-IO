@@ -45,18 +45,6 @@ exports.accessChat = async(req, res) => {
 
 
 exports.findUserChats = async(req, res) => {
-    const Chats = await Chat.find({ users: { $elemMatch: { $eq:req.userId }}}).populate("users", "-password")
+    const Chats = await Chat.find({ users: { $elemMatch: { $eq:req.userId }}}).populate("users", "-password").populate('lastMsg')
     return res.json(Chats);
 }
-
-//Controlador que busca en paralelo al Chat y sus mensajes
-exports.ChatAndMessages = async(req, res) => {
-    const chatId = req.params.chatId
-    const [chat, messages] = await Promise.all([
-        Chat.findOne({_id: chatId}).populate("users", "-password")
-        .populate("lastMsg"),
-        Message.find({chat: chatId}).populate('sender', 'name pictureUrl email')
-        .populate('chat')
-    ])
-    return res.json({messages, chat})
-};

@@ -42,7 +42,7 @@ const ChatCard = ({picture, name, chatId, lastMessage}: ChatCard_props) => {
                 'Authorization': `Bearer ${token}`
             }
         });
-        const {messages} = await response.json()
+        const messages = await response.json()
         setMessages(messages)
         socket.emit('join chat', chatId)
     }
