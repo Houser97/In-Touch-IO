@@ -3,9 +3,9 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from 'react-slick';
 import Contact from './Contact';
-import { images } from '../assets/constants';
 import { useContext } from 'react';
 import { chatContext } from '../App';
+import { user_type } from '../TypeScript/typesApp';
 
 let settings = {
     infinite: false,
@@ -22,7 +22,7 @@ const ContactsCarousel = () => {
 
   return (
     <div className='contacts__carousel main__container'>
-        {chats.length ? 
+        {Object.keys(chats).length ? 
                 <Slider {...settings} className='carousel'>
                 <div className="contact" onClick={() => setOpenSearch(true)}>
                     <div className='contact__picture'>
@@ -30,11 +30,12 @@ const ContactsCarousel = () => {
                     </div>
                     <div className="contact__name">Search</div>
                 </div>
-                {chats.map(({_id, users}) => {
-                    const friendData = users.filter(user => user._id !== userId)
+                {Object.keys(chats).map((chatId) => {
+                    const { users  } = chats[chatId]
+                    const friendData = users.filter((user: user_type) => user._id !== userId)
                     const {name, pictureUrl, _id: friendId} = friendData[0]
                     return (
-                        <Contact key={`ContactCarousel-${_id}`} name={name} picture={pictureUrl} id={friendId}/>
+                        <Contact key={`ContactCarousel-${chatId}`} name={name} picture={pictureUrl} id={friendId}/>
                     )
                 })}
             </Slider>

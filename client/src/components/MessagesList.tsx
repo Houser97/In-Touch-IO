@@ -1,6 +1,7 @@
 import { useContext } from 'react'
 import { chatContext } from '../App'
 import '../styles/MessagesList.css'
+import { user_type } from '../TypeScript/typesApp'
 import ChatCard from './ChatCard'
 
 const MessagesList = () => {
@@ -10,11 +11,14 @@ const MessagesList = () => {
 
   return (
     <section className='message__list main__container'>
-        {chats.length ? chats.map(({_id, users}) => {
-          const friendData = users.filter(user => user._id !== userId)
+        {Object.keys(chats).length ? Object.keys(chats).map((key) => {
+          const chat = chats[key]
+          const {_id, users} = chat
+          const lastMessage = chat.lastMsg ? chat.lastMsg.content : ''
+          const friendData = users.filter((user: user_type) => user._id !== userId)
           const {name, pictureUrl} = friendData[0]
             return(
-                <ChatCard key={`ChatCard-${_id}`} name={name} picture={pictureUrl} chatId={_id}/>
+                <ChatCard key={`ChatCard-${_id}`} name={name} picture={pictureUrl} chatId={_id} lastMessage={lastMessage}/>
             )
         }) : 'No Chats'}
         <div className='create__chat'>
