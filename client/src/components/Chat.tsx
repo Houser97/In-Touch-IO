@@ -16,9 +16,9 @@ const Chat = () => {
     const isLoading = messages[0].sender._id === '';
 
     const LoadingSection = () => 
-      loadingParams.map((params) => {
+      loadingParams.map((params, index) => {
         return(
-          <Loading {...params} />
+          <Loading {...params} key={index}/>
         )
     })
 
