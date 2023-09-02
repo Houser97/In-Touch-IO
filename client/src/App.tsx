@@ -3,16 +3,20 @@ import { useNavigate } from 'react-router-dom'
 import { io, Socket } from 'socket.io-client'
 import './App.css'
 import { API } from './assets/constants'
+import { useSocket } from './assets/socket'
 import Chat from './components/Chat'
 import ContactsCarousel from './components/ContactsCarousel'
 import HeaderMain from './components/HeaderMain'
 import MessagesList from './components/MessagesList'
 import Search from './components/Search'
-import { chatContext_types, message } from './TypeScript/typesApp'
+import { chat, chatContext_types, chat_object, message } from './TypeScript/typesApp'
 
 export const chatContext = createContext<chatContext_types>({
   openChat: false,
-  chats: [],
+  chats: {
+    users:[],
+    lastMsg: {content: ''}
+  },
   user: {
     image: '',
     name: '',
@@ -32,14 +36,15 @@ export const chatContext = createContext<chatContext_types>({
   setOpenSearch: () => false,
   setOpenChat: () => false,
   setUser: () => false,
-  setChatData: () => false
+  setChatData: () => false,
+  setChats: () => {},
 })
 
 function App() {
 
   const navigate = useNavigate();
 
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const socket = useSocket()
   const [openChat, setOpenChat] = useState(false);
   const [openSearch, setOpenSearch] = useState(false);
   const [messages, setMessages] = useState([{   
@@ -71,7 +76,7 @@ function App() {
     _id: '',
   })
 
-  const [chats, setChats] = useState([])
+  const [chats, setChats] = useState({})
 
   useEffect(() => {
     const token = JSON.parse(localStorage.getItem('token') || "");
@@ -109,27 +114,16 @@ function App() {
     .then(response => response.json())
     .then(chats => {
       if(!chats.length) return undefined
-      setChats(chats);
+      const chatsObject = chats.reduce((acc: chat_object, chat: chat) => {
+        if(!acc[chat._id]){
+          acc[chat._id] = chat
+        }
+        return acc
+      }, {})
+      console.log(chatsObject)
+      setChats(chatsObject);
     })
   }, [updateChats])
-
-  useEffect(() => {
-    const userId = JSON.parse(localStorage.getItem('idInTouch') || '');
-    const newSocket = io("http://localhost:3000", {
-      transports: ['websocket', 'polling', 'flashsocket']
-    });
-
-    newSocket.emit("setup", userId);
-    newSocket.on("connection", () => {
-      console.log('Cui cui');
-    });
-
-    setSocket(newSocket);
-
-    return () => {
-      newSocket.disconnect(); // Asegurarse de desconectar el socket cuando el componente se desmonte
-    };
-  }, []);
 
   useEffect(() => {
     if (!socket) return; // Si el socket no está listo, no hacemos nada en este efecto
@@ -163,7 +157,8 @@ function App() {
     setUpdateChats, 
     socket, 
     messages, 
-    setMessages}
+    setMessages,
+    setChats}
 
   return (
     <div className='App'>
