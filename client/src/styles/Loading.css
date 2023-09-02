@@ -1,13 +1,33 @@
 .loader{
     background:
-        linear-gradient(0.25turn, transparent, rgb(220, 220, 220), transparent),
-        linear-gradient(rgb(186, 186, 186), rgb(186, 186, 186));
+        linear-gradient(0.25turn, transparent, rgb(165, 165, 165), transparent),
+        linear-gradient(rgb(145, 145, 145), rgb(145, 145, 145));
     background-color: #fff;
     background-repeat: no-repeat;
     background-position: -315px 0, 0 0, 15px 140px, 65px 145px;
     animation: loading 1.5s infinite;
     border-radius: 10px;
     overflow: hidden;
+}
+
+.left,
+.right{
+    position: relative;
+    margin: 10px 0px;
+    font-size: 0.9rem;
+    padding: 20px;
+    padding-bottom: 25px;
+    border-radius: 10px;
+}
+
+.left {
+    align-self: flex-start;
+    margin-left: 10px;
+}
+
+.right {
+    align-self: flex-end;
+    margin-right: 10px;
 }
 
 @keyframes loading {
