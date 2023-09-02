@@ -129,7 +129,17 @@ function App() {
     if (!socket) return; // Si el socket no está listo, no hacemos nada en este efecto
   
     const messageReceivedHandler = (newMessage: message) => {
-      if (chatData.id !== newMessage.chat._id || chatData.id === '') {
+      const messageChatId = newMessage.chat._id
+      if(!(messageChatId in chats)) {
+        setUpdateChats(prev => !prev)
+        return;
+      }
+      if (chatData.id !== messageChatId || chatData.id === '') {
+        setChats(prevChats  => {
+          const chat = {...prevChats[messageChatId]}
+          const updatedChat = {...chat, lastMsg: newMessage}
+          return {...prevChats, [messageChatId]: updatedChat}
+        })
         return;
       }
       setMessages(prev => [...prev, newMessage]);
@@ -140,6 +150,7 @@ function App() {
     return () => {
       socket.off('message received', messageReceivedHandler);
     };
+    // Se debe cambiar con el id del chat, ya que de lo contrario el valor del id en la lógica no se actualiza
   }, [chatData.id, socket]);
   
 
