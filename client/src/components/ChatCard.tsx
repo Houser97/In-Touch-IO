@@ -8,21 +8,17 @@ interface ChatCard_props {
     picture: string,
     name: string,
     chatId: string,
+    lastMessage: string
 }
 
-interface User {
-    _id: string,
-    name: string
-}
-
-const ChatCard = ({picture, name, chatId}: ChatCard_props) => {
+const ChatCard = ({picture, name, chatId, lastMessage}: ChatCard_props) => {
 
     const { setOpenChat, setChatData, socket, setMessages } = useContext(chatContext)
 
-    const userId = JSON.parse(localStorage.getItem('idInTouch') || "");
-
     const retrieveChatData = async() => {
         if(!socket) return
+        setOpenChat(true);
+        setChatData({image: picture, name, id: chatId})
         const token = JSON.parse(localStorage.getItem('token') || '')
         const response = await fetch(`${API}/message/${chatId}`, {
             method: 'GET', 
@@ -31,12 +27,8 @@ const ChatCard = ({picture, name, chatId}: ChatCard_props) => {
                 'Authorization': `Bearer ${token}`
             }
         });
-        const {chat, messages} = await response.json()
-        const friendData = chat.users.filter((user: User) => user._id !== userId)
-        const {name} = friendData[0]
-        setChatData({image: picture, name, id: chatId})
+        const {messages} = await response.json()
         setMessages(messages)
-        setOpenChat(true);
         socket.emit('join chat', chatId)
     }
 
@@ -45,7 +37,7 @@ const ChatCard = ({picture, name, chatId}: ChatCard_props) => {
         <Contact picture={picture}/>
         <section className='chat__data'>
             <h3 className='chat__card-name'>{name}</h3>
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quo, harum? Nesciunt quasi facere expedita quisquam assumenda aliquid nostrum dolorum cumque est cum officia perferendis sint vel odio, sed doloremque adipisci!
+            {lastMessage}
         </section>
         <section className='chat__extra-data'>
             <span className='chat__hour'>12:21</span>
