@@ -20,7 +20,8 @@ interface chat {
 
 interface chats_type {
     _id: string,
-    users: chat[]
+    users: chat[],
+    lastMsg: message
 }
 
 export interface message {
