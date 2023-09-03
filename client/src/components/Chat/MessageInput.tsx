@@ -17,16 +17,19 @@ const MessageInput = ({chatId = ''}) => {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       }, 
-      body: JSON.stringify({content: message, chatId})
+      body: JSON.stringify({content: message, chatId, isSeen: false})
     }).then(data => data.json()).then((message) => {
       if(!socket) return undefined
       socket.emit('new message', message)
       // Los mensajes se actualizan para el usuario que lo envía, los demás usuarios lo reciben por medio de socket.
       setMessages(prev => [...prev, message])
-      // Se actualiza el último mensaje.
-      setChats(prevChats => prevChats.map((chat) => {
-        return chat._id === chatId ? {...chat, lastMsg: message} : chat
-      }))
+      // Se actualiza el último mensaje para mostrarlo en la lista de los chats.
+      setChats(prevChats  => {
+        const chat = {...prevChats[chatId]}
+        const updatedChat = {...chat, lastMsg: message}
+        const updatedChats = { ...prevChats, [chatId]: updatedChat };
+        return {[chatId]: updatedChat, ...updatedChats}
+      })
     });
   }
 
