@@ -38,6 +38,12 @@ export interface message {
     chat: chat
 }
 
+export interface unseenMessage {
+    _id: string,
+    chat: string,
+    sender: string
+}
+
 export interface chatContext_types {
     openChat: boolean,
     user: user_type,
