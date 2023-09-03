@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import { FormEvent, useContext, useState } from 'react'
 import { chatContext } from '../../App';
 import { API } from '../../assets/constants';
@@ -23,10 +24,11 @@ const MessageInput = ({chatId = ''}) => {
       socket.emit('new message', message)
       // Los mensajes se actualizan para el usuario que lo envía, los demás usuarios lo reciben por medio de socket.
       setMessages(prev => [...prev, message])
-      // Se actualiza el último mensaje para mostrarlo en la lista de los chats.
+      // Se actualiza el último mensaje para mostrarlo en la lista de los chats así como la hora en la que se creó.
       setChats(prevChats  => {
+        const { createdAt } = message
         const chat = {...prevChats[chatId]}
-        const updatedChat = {...chat, lastMsg: message}
+        const updatedChat = {...chat, lastMsg: message, updatedAt: createdAt}
         const updatedChats = { ...prevChats, [chatId]: updatedChat };
         return {[chatId]: updatedChat, ...updatedChats}
       })

@@ -133,6 +133,7 @@ function App() {
       const messageChatId = newMessage.chat._id
       const messageId = newMessage._id
       const senderId = newMessage.sender._id
+      const messageCreatedAt = newMessage.createdAt
       // Si el chat del mensaje es nuevo, entonces se recuperan todos los mensajes desde la base de datos.
       if(!(messageChatId in chats)) {
         setUpdateChats(prev => !prev)
@@ -143,7 +144,7 @@ function App() {
       if (chatData.id !== messageChatId || chatData.id === '') {
         setChats((prevChats: chat_object)  => {
           const chat = {...prevChats[messageChatId]}
-          const updatedChat = {...chat, lastMsg: newMessage, unseen: [...chat['unseen'], {_id: messageId, chat: messageChatId, sender: senderId}]}
+          const updatedChat = {...chat, lastMsg: newMessage, updatedAt: messageCreatedAt,unseen: [...chat['unseen'], {_id: messageId, chat: messageChatId, sender: senderId}]}
           const updatedChats = { ...prevChats, [messageChatId]: updatedChat };
           return {[messageChatId]: updatedChat, ...updatedChats}
         })
