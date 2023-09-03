@@ -18,3 +18,16 @@ export const AccessChat = async(token = '', id = '') => {
     const chat = await response.json();
     return chat;
 }
+
+export const loadingParams = [
+    {width:'300px', height:'30px', owner:true},
+    {width:'250px', height:'80px', owner:true},
+    {width:'250px', height:'30px', owner:false},
+    {width:'200px', height:'50px', owner:false},
+    {width:'310px', height:'100px', owner:false},
+    {width:'300px', height:'30px', owner:true},
+    {width:'250px', height:'80px', owner:true},
+    {width:'250px', height:'30px', owner:false},
+    {width:'300px', height:'30px', owner:true},
+    {width:'250px', height:'80px', owner:true},
+  ]
