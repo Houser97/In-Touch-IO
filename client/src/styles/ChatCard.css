@@ -12,6 +12,7 @@
     overflow: hidden;
     white-space: nowrap;
     font-size: 0.87rem;
+    width: 100%;
 }
 
 .chat__card-container .contact {
@@ -28,7 +29,7 @@
 }
 
 .chat__extra-data {
-    width: 100px;
+    width: 130px;
     font-size: 0.9rem;
     display: flex;
     flex-direction: column;
