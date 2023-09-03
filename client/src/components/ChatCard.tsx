@@ -10,12 +10,15 @@ interface ChatCard_props {
     chatId: string,
     lastMessage: string,
     unseen: {_id: string, chat: string, sender: string}[],
-    hour: string
+    hour: string,
+    senderId: string,
 }
 
-const ChatCard = ({picture, name, chatId, lastMessage, unseen, hour}: ChatCard_props) => {
+const ChatCard = ({picture, name, chatId, lastMessage, unseen, hour, senderId}: ChatCard_props) => {
 
     const { setOpenChat, setChatData, socket, setMessages, setChats } = useContext(chatContext)
+    const userId = JSON.parse(localStorage.getItem('idInTouch') || "");
+    const isOwner = userId === senderId
     
     const retrieveChatData = async() => {
         if(!socket) return
@@ -62,7 +65,7 @@ const ChatCard = ({picture, name, chatId, lastMessage, unseen, hour}: ChatCard_p
         <Contact picture={picture}/>
         <section className='chat__data'>
             <h3 className='chat__card-name'>{name}</h3>
-            {lastMessage}
+            {isOwner && 'you: '}{lastMessage}
         </section>
         <section className='chat__extra-data'>
             <span className='chat__hour'>{hour}</span>

@@ -16,6 +16,7 @@ const MessagesList = () => {
           const chat = chats[key]
           const {_id, users, updatedAt} = chat
           const lastMessage = chat.lastMsg ? chat.lastMsg.content : ''
+          const senderID = chat.lastMsg ? chat.lastMsg.sender : ''
           const friendData = users.filter((user: user_type) => user._id !== userId)
           const {name, pictureUrl} = friendData[0]
           // Se recuperan solos los ids de los mensajes no leídos que no fueron creados por el usuario actual
@@ -26,7 +27,7 @@ const MessagesList = () => {
           // Se formatea el tiempo en el que el chat se actualizó por última vez
           const formattedTime = DateTime.fromISO(updatedAt).toLocaleString(DateTime.TIME_SIMPLE);
             return(
-                <ChatCard key={`ChatCard-${_id}`} name={name} picture={pictureUrl} chatId={_id} lastMessage={lastMessage} unseen={unseen} hour={formattedTime}/>
+                <ChatCard key={`ChatCard-${_id}`} name={name} picture={pictureUrl} chatId={_id} lastMessage={lastMessage} unseen={unseen} hour={formattedTime} senderId={senderID}/>
             )
         }) : 'No Chats'}
         <div className='create__chat'>
