@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import { useContext } from 'react'
 import { chatContext } from '../App'
 import '../styles/MessagesList.css'
@@ -13,7 +14,7 @@ const MessagesList = () => {
     <section className='message__list main__container'>
         {Object.keys(chats).length ? Object.keys(chats).map((key) => {
           const chat = chats[key]
-          const {_id, users} = chat
+          const {_id, users, updatedAt} = chat
           const lastMessage = chat.lastMsg ? chat.lastMsg.content : ''
           const friendData = users.filter((user: user_type) => user._id !== userId)
           const {name, pictureUrl} = friendData[0]
@@ -22,8 +23,10 @@ const MessagesList = () => {
           const unseen = chat.unseen
           .filter((msg: unseenMessage) => msg.sender !== userId)
           .map((msg: unseenMessage) => msg._id)
+          // Se formatea el tiempo en el que el chat se actualizó por última vez
+          const formattedTime = DateTime.fromISO(updatedAt).toLocaleString(DateTime.TIME_SIMPLE);
             return(
-                <ChatCard key={`ChatCard-${_id}`} name={name} picture={pictureUrl} chatId={_id} lastMessage={lastMessage} unseen={unseen}/>
+                <ChatCard key={`ChatCard-${_id}`} name={name} picture={pictureUrl} chatId={_id} lastMessage={lastMessage} unseen={unseen} hour={formattedTime}/>
             )
         }) : 'No Chats'}
         <div className='create__chat'>
