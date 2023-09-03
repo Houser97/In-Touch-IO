@@ -45,6 +45,7 @@ exports.accessChat = async(req, res) => {
 
 
 exports.findUserChats = async(req, res) => {
-    const Chats = await Chat.find({ users: { $elemMatch: { $eq:req.userId }}}).populate("users", "-password").populate('lastMsg')
+    const Chats = await Chat.find({ users: { $elemMatch: { $eq:req.userId }}})
+    .populate("users", "-password").populate('lastMsg', '-chat -_id -createdAt -updatedAt').sort({ updatedAt: -1 })
     return res.json(Chats);
 }
