@@ -1,4 +1,3 @@
-import { DateTime } from 'luxon';
 import { FormEvent, useContext, useState } from 'react'
 import { chatContext } from '../../App';
 import { API } from '../../assets/constants';
@@ -11,6 +10,8 @@ const MessageInput = ({chatId = ''}) => {
 
   const sendMessage = (e:FormEvent) => {
     e.preventDefault();
+    if(!message.length) return
+    setMessage('')
     const token = JSON.parse(localStorage.getItem('token') || '')
     fetch(`${API}/message`, {
       method: 'POST',
@@ -37,8 +38,10 @@ const MessageInput = ({chatId = ''}) => {
 
   return (
     <form className='message__form' onSubmit={sendMessage}>
-        <input type="text" className='message__input' name='message' onChange={(e) => setMessage(e.target.value)}/>
-        <button type='submit' className='send__message'></button>
+        <input type="text" className='message__input' name='message' onChange={(e) => setMessage(e.target.value)} value={message}/>
+        <button type='submit' className='send__message'>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>send-circle</title><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M8,7.71V11.05L15.14,12L8,12.95V16.29L18,12L8,7.71Z" /></svg>
+        </button>
     </form>
   )
 }
