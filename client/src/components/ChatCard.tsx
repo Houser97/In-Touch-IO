@@ -9,10 +9,11 @@ interface ChatCard_props {
     name: string,
     chatId: string,
     lastMessage: string,
-    unseen: {_id: string, chat: string, sender: string}[]
+    unseen: {_id: string, chat: string, sender: string}[],
+    hour: string
 }
 
-const ChatCard = ({picture, name, chatId, lastMessage, unseen}: ChatCard_props) => {
+const ChatCard = ({picture, name, chatId, lastMessage, unseen, hour}: ChatCard_props) => {
 
     const { setOpenChat, setChatData, socket, setMessages, setChats } = useContext(chatContext)
     
@@ -64,7 +65,7 @@ const ChatCard = ({picture, name, chatId, lastMessage, unseen}: ChatCard_props) 
             {lastMessage}
         </section>
         <section className='chat__extra-data'>
-            <span className='chat__hour'>12:21</span>
+            <span className='chat__hour'>{hour}</span>
             {unseen.length !== 0 && <div className='new__messages-number'>{unseen.length}</div>}
         </section>
     </div>
