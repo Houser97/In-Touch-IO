@@ -1,7 +1,7 @@
 import { useContext } from 'react'
 import { chatContext } from '../App'
 import '../styles/MessagesList.css'
-import { user_type } from '../TypeScript/typesApp'
+import { unseenMessage, user_type } from '../TypeScript/typesApp'
 import ChatCard from './ChatCard'
 
 const MessagesList = () => {
@@ -17,8 +17,13 @@ const MessagesList = () => {
           const lastMessage = chat.lastMsg ? chat.lastMsg.content : ''
           const friendData = users.filter((user: user_type) => user._id !== userId)
           const {name, pictureUrl} = friendData[0]
+          // Se recuperan solos los ids de los mensajes no leídos que no fueron creados por el usuario actual
+          // para solo tomar en la cuenta los mensajes de la otra persona en el chat.
+          const unseen = chat.unseen
+          .filter((msg: unseenMessage) => msg.sender !== userId)
+          .map((msg: unseenMessage) => msg._id)
             return(
-                <ChatCard key={`ChatCard-${_id}`} name={name} picture={pictureUrl} chatId={_id} lastMessage={lastMessage}/>
+                <ChatCard key={`ChatCard-${_id}`} name={name} picture={pictureUrl} chatId={_id} lastMessage={lastMessage} unseen={unseen}/>
             )
         }) : 'No Chats'}
         <div className='create__chat'>
