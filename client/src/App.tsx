@@ -1,6 +1,5 @@
 import { createContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { io, Socket } from 'socket.io-client'
 import './App.css'
 import { API } from './assets/constants'
 import { useSocket } from './assets/socket'
@@ -9,7 +8,7 @@ import ContactsCarousel from './components/ContactsCarousel'
 import HeaderMain from './components/HeaderMain'
 import MessagesList from './components/MessagesList'
 import Search from './components/Search'
-import { chat, chatContext_types, chat_object, message } from './TypeScript/typesApp'
+import { chat, chatContext_types, chat_object, message, unseenMessage } from './TypeScript/typesApp'
 
 export const chatContext = createContext<chatContext_types>({
   openChat: false,
@@ -112,15 +111,17 @@ function App() {
       }
     })
     .then(response => response.json())
-    .then(chats => {
+    .then(data => {
+      const { chats, unseenMessages } = data
       if(!chats.length) return undefined
+      // Se crea objeto usando los id de los chats y se agrega campo para guardar mensajes no leídos para cada chat.
       const chatsObject = chats.reduce((acc: chat_object, chat: chat) => {
         if(!acc[chat._id]){
-          acc[chat._id] = chat
+          const messages = unseenMessages.filter((msg: unseenMessage) => msg.chat === chat._id)
+          acc[chat._id] = {...chat, unseen: messages}
         }
         return acc
       }, {})
-      console.log(chatsObject)
       setChats(chatsObject);
     })
   }, [updateChats])
@@ -130,18 +131,25 @@ function App() {
   
     const messageReceivedHandler = (newMessage: message) => {
       const messageChatId = newMessage.chat._id
+      const messageId = newMessage._id
+      const senderId = newMessage.sender._id
+      // Si el chat del mensaje es nuevo, entonces se recuperan todos los mensajes desde la base de datos.
       if(!(messageChatId in chats)) {
         setUpdateChats(prev => !prev)
         return;
       }
+      // Si el mensaje proviene de otro chat el cual no se está seleccionado actualmente o no se tiene ningún chat
+      // abierto, entonces se actualiza el último mensaje mostrado para ese chat.
       if (chatData.id !== messageChatId || chatData.id === '') {
-        setChats(prevChats  => {
+        setChats((prevChats: chat_object)  => {
           const chat = {...prevChats[messageChatId]}
-          const updatedChat = {...chat, lastMsg: newMessage}
-          return {...prevChats, [messageChatId]: updatedChat}
+          const updatedChat = {...chat, lastMsg: newMessage, unseen: [...chat['unseen'], {_id: messageId, chat: messageChatId, sender: senderId}]}
+          const updatedChats = { ...prevChats, [messageChatId]: updatedChat };
+          return {[messageChatId]: updatedChat, ...updatedChats}
         })
         return;
       }
+      // Se agrega el nuevo mensaje a los mensajes del chat abierto.
       setMessages(prev => [...prev, newMessage]);
     };
   
@@ -151,7 +159,7 @@ function App() {
       socket.off('message received', messageReceivedHandler);
     };
     // Se debe cambiar con el id del chat, ya que de lo contrario el valor del id en la lógica no se actualiza
-  }, [chatData.id, socket]);
+  }, [chatData.id, socket, Object.keys(chats).length]);
   
 
   const values = {
