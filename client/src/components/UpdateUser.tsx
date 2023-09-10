@@ -26,11 +26,13 @@ const UpdateUser = () => {
     };
 
     const uploadImage = async (image: string | ArrayBuffer | null) => {
+        const token = JSON.parse(localStorage.getItem('token') || "");
         try {
             const response = await fetch(`${API}/user/upload_image/${id}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({image})
             })
