@@ -45,7 +45,15 @@ exports.accessChat = async(req, res) => {
 
 
 exports.findUserChats = async(req, res) => {
-    const Chats = await Chat.find({ users: { $elemMatch: { $eq:req.userId }}})
-    .populate("users", "-password").populate('lastMsg', '-chat -_id -createdAt -updatedAt').sort({ updatedAt: -1 })
-    return res.json(Chats);
+    /*
+    const [chats, unseenMessages] = await Promise.all([
+        Chat.find({ users: { $elemMatch: { $eq:req.userId }}})
+        .populate("users", "-password").populate('lastMsg', '-chat -_id -createdAt').sort({ updatedAt: -1 }),
+        Message.find({isSeen: false}).select('_id chat sender')
+    ])*/
+    const chats = await Chat.find({ users: { $elemMatch: { $eq:req.userId }}})
+    .populate("users", "-password").populate('lastMsg', '-chat -_id -createdAt').sort({ updatedAt: -1 });
+    const chatsId = chats.map(chat => chat._id)
+    const unseenMessages = await Message.find({isSeen: false, chat: {$in:chatsId}}).select('_id chat sender')
+    return res.json({chats, unseenMessages});
 }
