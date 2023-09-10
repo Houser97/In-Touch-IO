@@ -44,7 +44,7 @@ const MessagesList = () => {
           const lastMessage = chat.lastMsg ? chat.lastMsg.content : ''
           // Si el mensaje se acaba de enviar (MessageInput) entonces sender es un objeto, de lo contrario contiene un string.
           let senderId = chat.lastMsg ? chat.lastMsg.sender : ''
-          senderId = senderId._id ? senderId._id : senderId
+          senderId = typeof senderId === 'object' ? senderId._id : senderId
           const friendData = users.filter((user: user_type) => user._id !== userId)
           const {name, pictureUrl} = friendData[0]
           // Se recuperan solos los ids de los mensajes no leídos que no fueron creados por el usuario actual
