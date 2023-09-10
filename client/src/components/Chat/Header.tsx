@@ -9,7 +9,7 @@ const Header = () => {
 
     const clearChat = () => {
       setOpenChat(false)
-      setChatData({id: '', name: '', image: ''})
+      setChatData(prevData => {return{...prevData, id: ''}})
     }
 
   return (
