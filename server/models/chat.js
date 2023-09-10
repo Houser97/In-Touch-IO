@@ -8,7 +8,7 @@ const ChatSchema = Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
     }],
-    lastMsg: {type:mongoose.Schema.Types.ObjectId, ref:"Message"},
+    lastMsg: {type:mongoose.Schema.Types.ObjectId, ref:"Message", default: null},
     groupAdmin: {type: mongoose.Schema.Types.ObjectId, ref: "User"}
 },
 {
