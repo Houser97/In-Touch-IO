@@ -8,9 +8,12 @@ const UpdateUser = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
+    const userData = JSON.parse(localStorage.getItem('userData') || "");
+
     const [fileInputState, setFileInputState] = useState('');
-    const [previewSource, setPreviewSource] = useState('');
+    const [previewSource, setPreviewSource] = useState(userData.pictureUrl);
     const [selectedFile, setSelectedFile] = useState<Blob | null>(null)
+    const [newUsername, setNewUsername] = useState(userData.name)
 
     const updateUser = async (e: FormEvent) => {
         e.preventDefault();
@@ -86,11 +89,14 @@ const UpdateUser = () => {
                 <img className='preview__update-user' src={previewSource} alt="preview" />
             )}
         </label>
-        <div className='change__username'>
+        <div className='change__username form__section-container'>
             <label htmlFor="username">Username</label>
-            <input type="text" name='username' id='username'/>
+            <div className="form__section-container">
+                <input type="text" name='username' id='username' value={newUsername} onChange={e => setNewUsername(e.target.value)} required/>
+                <div className="topline"></div>
+                <div className="underline"></div>
+            </div>
         </div>
-
             <button className="authentication__submit">Update</button>
         </form>
     </div>
