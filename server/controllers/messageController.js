@@ -34,10 +34,14 @@ exports.sendMessage = async(req, res) => {
     }
 }
 
+// El controlador se encarga de retornar los mensajes para un chat y de colocar
 exports.chatMessages = async(req, res) => {
     try {
-        const messages = await Message.find({chat: req.params.chatId})
-        .populate('sender', 'name pictureUrl email')
+        const messagesToUpdate = req.body.unseenMessages
+        const [messages] = await Promise.all([
+            Message.find({chat: req.params.chatId}).populate('sender', 'name pictureUrl email'),
+            Message.updateMany({_id: {$in: messagesToUpdate}}, {$set: {isSeen: true}})
+        ])
         return res.json(messages)
     } catch (error) {
         return res.json(error)
