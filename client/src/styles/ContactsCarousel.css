@@ -35,3 +35,7 @@
     display: flex;
     overflow: hidden;
 }
+
+.svg__search-container{
+    background-color: rgb(211, 211, 211);
+}
