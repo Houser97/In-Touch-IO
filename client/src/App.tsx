@@ -96,6 +96,8 @@ function App() {
       }
       const { name, pictureUrl, _id } = user
       const image = pictureUrl
+      // Se guarda la imagen y el nombre de usuario para poder usarlos en el componente UpdateUser
+      localStorage.setItem('userData', JSON.stringify({name, pictureUrl}));
       setUser({name, image, _id})
     })
   }, [])
