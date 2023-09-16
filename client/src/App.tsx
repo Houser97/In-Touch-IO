@@ -6,6 +6,7 @@ import { useSocket } from './assets/socket'
 import Chat from './components/Chat'
 import ContactsCarousel from './components/ContactsCarousel'
 import HeaderMain from './components/HeaderMain'
+import ChatLoader from './components/Loaders/ChatLoader'
 import MessagesList from './components/MessagesList'
 import Search from './components/Search'
 import { chat, chatContext_types, chat_object, message, unseenMessage } from './TypeScript/typesApp'
@@ -44,6 +45,7 @@ function App() {
   const navigate = useNavigate();
 
   const socket = useSocket()
+  const [chatsLoading, setChatsLoading] = useState(true)
   const [openChat, setOpenChat] = useState(false);
   const [openSearch, setOpenSearch] = useState(false);
   const [messages, setMessages] = useState([{   
@@ -103,6 +105,9 @@ function App() {
       // Se guarda la imagen y el nombre de usuario para poder usarlos en el componente UpdateUser
       localStorage.setItem('userData', JSON.stringify({name, pictureUrl}));
       setUser({name, image, _id})
+      setTimeout(() => {
+        setChatsLoading(false);
+      }, 1000);
     })
   }, [])
 
@@ -193,11 +198,15 @@ function App() {
   return (
     <div className='App'>
       <chatContext.Provider value={values}>
+        { chatsLoading 
+        ? <ChatLoader />
+        : <>
         <HeaderMain />
         <ContactsCarousel />
         <MessagesList />
         <Chat />
         <Search />
+        </>}
       </chatContext.Provider>
     </div>
   )
