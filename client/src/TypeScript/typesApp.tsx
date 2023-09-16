@@ -53,6 +53,8 @@ export interface chatContext_types {
     updateChats: boolean,
     socket: null | Socket,
     messages: message[],
+    idUnseenMessages: string[],
+    setIdUnseenMessages: React.Dispatch<React.SetStateAction<string[]>>,
     setMessages: React.Dispatch<React.SetStateAction<message[]>>
     setUpdateChats: React.Dispatch<React.SetStateAction<boolean>>,
     setOpenSearch: React.Dispatch<React.SetStateAction<boolean>>,
