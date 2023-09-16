@@ -31,6 +31,8 @@ export const chatContext = createContext<chatContext_types>({
   socket: null,
   messages: [],
   updateChats: false,
+  idUnseenMessages: [],
+  setIdUnseenMessages: () => [],
   setMessages: () => [],
   setUpdateChats: () => false,
   setOpenSearch: () => false,
@@ -78,6 +80,8 @@ function App() {
   })
 
   const [chats, setChats] = useState({})
+  // Arreglo que guarda Id de mensajes que se reciben estando en el Chat para poder cambiarlos a visto en base de datos al cerrar chat.
+  const [idUnseenMessages, setIdUnseenMessages] = useState<string[]>([])
 
   useEffect(() => {
     if(!localStorage.getItem('token')) {
@@ -165,6 +169,15 @@ function App() {
         })
         return;
       }
+      // Se actualiza el último mensaje del Chat
+      setChats((prevChats: chat_object)  => {
+        const chat = {...prevChats[messageChatId]}
+        const updatedChat = {...chat, lastMsg: newMessage, updatedAt: messageCreatedAt}
+        const updatedChats = { ...prevChats, [messageChatId]: updatedChat };
+        return {[messageChatId]: updatedChat, ...updatedChats}
+      })
+      // Se agrega ID de mensaje en estado
+      setIdUnseenMessages(prev => [...prev, messageId])
       // Se agrega el nuevo mensaje a los mensajes del chat abierto.
       setMessages(prev => [...prev, newMessage]);
     };
@@ -192,6 +205,8 @@ function App() {
     setUpdateChats, 
     socket, 
     messages, 
+    idUnseenMessages,
+    setIdUnseenMessages,
     setMessages,
     setChats}
 
