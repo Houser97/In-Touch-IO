@@ -17,27 +17,30 @@ const UpdateUser = () => {
 
     const updateUser = async (e: FormEvent) => {
         e.preventDefault();
-        if(!selectedFile) return;
+        if(!selectedFile) {
+            update_user(userData.pictureUrl, newUsername);
+            return;
+        };
         const reader = new FileReader();
         reader.readAsDataURL(selectedFile);
         reader.onloadend = () => {
-            uploadImage(reader.result);
+            update_user(reader.result, newUsername);
         }
         reader.onerror = () => {
             console.log('Error')
         }
     };
 
-    const uploadImage = async (image: string | ArrayBuffer | null) => {
+    const update_user = async (image: string | ArrayBuffer | null, username: string) => {
         const token = JSON.parse(localStorage.getItem('token') || "");
         try {
-            const response = await fetch(`${API}/user/upload_image/${id}`, {
+            const response = await fetch(`${API}/user/update_user/${id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({image})
+                body: JSON.stringify({image, username})
             })
             const data = await response.json()
             if(data) {
