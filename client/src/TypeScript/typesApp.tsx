@@ -45,21 +45,27 @@ export interface unseenMessage {
 }
 
 export interface chatContext_types {
-    openChat: boolean,
     user: user_type,
     chatData: chatData_type,
     chats: chat_object,
-    openSearch: boolean,
-    updateChats: boolean,
-    socket: null | Socket,
+    setUser: React.Dispatch<React.SetStateAction<user_type>>,
+    setChatData: React.Dispatch<React.SetStateAction<chatData_type>>,
+    setChats: React.Dispatch<React.SetStateAction<chat_object>>
+}
+
+export interface messagesContext_type {
     messages: message[],
     idUnseenMessages: string[],
     setIdUnseenMessages: React.Dispatch<React.SetStateAction<string[]>>,
     setMessages: React.Dispatch<React.SetStateAction<message[]>>
+}
+
+export interface generalContext_type {
+    openChat: boolean,
+    openSearch: boolean,
+    updateChats: boolean,
+    socket: null | Socket,
     setUpdateChats: React.Dispatch<React.SetStateAction<boolean>>,
     setOpenSearch: React.Dispatch<React.SetStateAction<boolean>>,
     setOpenChat: React.Dispatch<React.SetStateAction<boolean>>,
-    setUser: React.Dispatch<React.SetStateAction<user_type>>,
-    setChatData: React.Dispatch<React.SetStateAction<chatData_type>>,
-    setChats: React.Dispatch<React.SetStateAction<chat_object>>
 }
