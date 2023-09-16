@@ -17,8 +17,8 @@
     border-radius: 10px;
 }
 
-.left::before,
-.right::before{
+.message__container.left::before,
+.message__container.right::before{
     content: '';
     position: absolute;
     box-sizing: border-box;
@@ -26,13 +26,13 @@
     top: 0px;
 }
 
-.left::before{
+.message__container.left::before{
     border-top: 25px solid rgb(83, 119, 234);
     transform: rotate(0deg);
     left: -10px;
 }
 
-.right::before{
+.message__container.right::before{
     border-top: 26px solid rgb(154, 210, 126);
     transform: rotate(0deg);
     right: -10px;
