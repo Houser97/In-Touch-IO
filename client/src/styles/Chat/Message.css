@@ -4,6 +4,7 @@
     max-width: 300px;
     min-width: 150px;
     width: max-content;
+    position: relative;
 }
 
 .left,
@@ -14,6 +15,27 @@
     padding: 20px;
     padding-bottom: 25px;
     border-radius: 10px;
+}
+
+.left::before,
+.right::before{
+    content: '';
+    position: absolute;
+    box-sizing: border-box;
+    border: 15px solid transparent;
+    top: 0px;
+}
+
+.left::before{
+    border-top: 25px solid rgb(83, 119, 234);
+    transform: rotate(0deg);
+    left: -10px;
+}
+
+.right::before{
+    border-top: 26px solid rgb(154, 210, 126);
+    transform: rotate(0deg);
+    right: -10px;
 }
 
 .left {
