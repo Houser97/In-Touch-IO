@@ -1,15 +1,25 @@
 import { useContext } from 'react'
 import { chatContext } from '../../App'
+import { API } from '../../assets/constants'
 import '../../styles/Chat/Header.css'
 import Contact from '../Contact'
 
 const Header = () => {
 
-    const { chatData, setOpenChat, setChatData } = useContext(chatContext)
+    const { chatData, setOpenChat, setChatData, idUnseenMessages, setIdUnseenMessages } = useContext(chatContext)
 
     const clearChat = () => {
+      const token = JSON.parse(localStorage.getItem('token') || "");
       setOpenChat(false)
       setChatData(prevData => {return{...prevData, id: ''}})
+      fetch(`${API}/message/update_messages_to_seen`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({unseenMessages: idUnseenMessages})
+      }).then(() => setIdUnseenMessages([]))
     }
 
   return (
