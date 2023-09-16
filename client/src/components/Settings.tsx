@@ -5,14 +5,18 @@ const Settings = () => {
 
     const id = JSON.parse(localStorage.getItem('idInTouch') || "");
 
+    const logout = () => {
+      localStorage.removeItem('token')
+    }
+
   return (
     <div className='settings__container'>
         <Link className='logout__btn' to={`/settings/${id}`}>
             <span>Settings</span>
         </Link>
-        <button className='logout__btn'>
+        <Link className='logout__btn' to={`/`} onClick={logout}>
             <span>Lot Out</span>
-        </button>
+        </Link>
     </div>
   )
 }
