@@ -78,6 +78,10 @@ function App() {
   const [chats, setChats] = useState({})
 
   useEffect(() => {
+    if(!localStorage.getItem('token')) {
+      navigate('/')
+      return undefined
+    }
     const token = JSON.parse(localStorage.getItem('token') || "");
     const id = JSON.parse(localStorage.getItem('idInTouch') || "");
     fetch(`${API}/user/get_user_data`, {
@@ -103,6 +107,10 @@ function App() {
   }, [])
 
   useEffect(() => {
+    if(!localStorage.getItem('token')) {
+      navigate('/')
+      return undefined
+    }
     const token = JSON.parse(localStorage.getItem('token') || "");
     if(!token.length) return undefined;
     fetch(`${API}/chat/getChats`, {
