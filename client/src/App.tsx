@@ -9,10 +9,9 @@ import HeaderMain from './components/HeaderMain'
 import ChatLoader from './components/Loaders/ChatLoader'
 import MessagesList from './components/MessagesList'
 import Search from './components/Search'
-import { chat, chatContext_types, chat_object, message, unseenMessage } from './TypeScript/typesApp'
+import { chat, chatContext_types, chat_object, generalContext_type, message, messagesContext_type, unseenMessage } from './TypeScript/typesApp'
 
 export const chatContext = createContext<chatContext_types>({
-  openChat: false,
   chats: {
     users:[],
     lastMsg: {content: ''}
@@ -27,19 +26,26 @@ export const chatContext = createContext<chatContext_types>({
     image: '',
     id: '',
   },
-  openSearch: false,
-  socket: null,
-  messages: [],
-  updateChats: false,
-  idUnseenMessages: [],
-  setIdUnseenMessages: () => [],
-  setMessages: () => [],
-  setUpdateChats: () => false,
-  setOpenSearch: () => false,
-  setOpenChat: () => false,
   setUser: () => false,
   setChatData: () => false,
   setChats: () => {},
+})
+
+export const messagesContext = createContext<messagesContext_type>({
+  messages: [],
+  idUnseenMessages: [],
+  setIdUnseenMessages: () => [],
+  setMessages: () => [],
+})
+
+export const generalContext = createContext<generalContext_type>({
+  openChat: false,
+  openSearch: false,
+  socket: null,
+  updateChats: false,
+  setUpdateChats: () => false,
+  setOpenSearch: () => false,
+  setOpenChat: () => false,
 })
 
 function App() {
@@ -191,28 +197,36 @@ function App() {
   }, [chatData.id, socket, Object.keys(chats).length]);
   
 
-  const values = {
-    setOpenChat, 
-    openChat, 
+  const valuesChat = {
     user, 
     setUser, 
     chatData, 
     setChatData, 
     chats, 
-    openSearch, 
-    setOpenSearch, 
-    updateChats, 
-    setUpdateChats, 
-    socket, 
-    messages, 
+    setChats}
+
+  const valuesMessage = {
+    messages,
     idUnseenMessages,
     setIdUnseenMessages,
     setMessages,
-    setChats}
+  }
+
+  const valuesGeneral = {
+    openChat,
+    openSearch,
+    socket,
+    updateChats,
+    setUpdateChats,
+    setOpenSearch,
+    setOpenChat,
+  }
 
   return (
     <div className='App'>
-      <chatContext.Provider value={values}>
+      <generalContext.Provider value={valuesGeneral}>
+      <chatContext.Provider value={valuesChat}>
+        <messagesContext.Provider value={valuesMessage}>
         { chatsLoading 
         ? <ChatLoader />
         : <>
@@ -222,7 +236,9 @@ function App() {
         <Chat />
         <Search />
         </>}
+        </messagesContext.Provider>
       </chatContext.Provider>
+      </generalContext.Provider>
     </div>
   )
 }

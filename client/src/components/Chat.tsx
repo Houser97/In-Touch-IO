@@ -1,6 +1,6 @@
 import { useContext } from 'react'
 import ScrollableFeed from 'react-scrollable-feed'
-import { chatContext } from '../App'
+import { chatContext, generalContext, messagesContext } from '../App'
 import '../styles/Chat.css'
 import Header from './Chat/Header'
 import Message from './Chat/Message'
@@ -11,9 +11,12 @@ import Loading from './Loading'
 
 const Chat = () => {
   
-    const { openChat, messages, chatData } = useContext(chatContext);
+    const { chatData } = useContext(chatContext);
+    const { messages } = useContext(messagesContext)
+    const { openChat } = useContext(generalContext)
     const userId = JSON.parse(localStorage.getItem('idInTouch') || "");
-    const isLoading = messages[0].sender._id === '';
+    // Se comprueba que haya mensajes para verificar que no se trate de un chat nuevo.
+    const isLoading = messages.length && messages[0].sender._id === '';
 
     const LoadingSection = () => 
       loadingParams.map((params, index) => {

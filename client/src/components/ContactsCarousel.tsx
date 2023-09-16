@@ -4,7 +4,7 @@ import "slick-carousel/slick/slick-theme.css";
 import Slider from 'react-slick';
 import Contact from './Contact';
 import { useContext } from 'react';
-import { chatContext } from '../App';
+import { chatContext, generalContext } from '../App';
 import { user_type } from '../TypeScript/typesApp';
 
 let settings = {
@@ -17,7 +17,8 @@ let settings = {
 
 const ContactsCarousel = () => {
 
-    const { chats, setOpenSearch } = useContext(chatContext);
+    const { chats } = useContext(chatContext);
+    const { setOpenSearch } = useContext(generalContext);
     const userId = JSON.parse(localStorage.getItem('idInTouch') || "");
 
     const Contacts = () => {

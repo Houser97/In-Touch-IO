@@ -1,12 +1,14 @@
 import { FormEvent, useContext, useState } from 'react'
-import { chatContext } from '../../App';
+import { chatContext, generalContext, messagesContext } from '../../App';
 import { API } from '../../assets/constants';
 import '../../styles/Chat/MessageInput.css'
 
 const MessageInput = ({chatId = ''}) => {
 
   const [message, setMessage] = useState('');
-  const { socket, setMessages, setChats } = useContext(chatContext)
+  const { setChats } = useContext(chatContext);
+  const { setMessages } = useContext(messagesContext);
+  const { socket } = useContext(generalContext);
 
   const sendMessage = (e:FormEvent) => {
     e.preventDefault();

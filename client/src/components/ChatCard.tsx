@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { chatContext } from '../App'
+import { chatContext, generalContext, messagesContext } from '../App'
 import { API } from '../assets/constants'
 import '../styles/ChatCard.css'
 import Contact from './Contact'
@@ -16,7 +16,9 @@ interface ChatCard_props {
 
 const ChatCard = ({picture, name, chatId, lastMessage, unseen, hour, senderId}: ChatCard_props) => {
 
-    const { setOpenChat, setChatData, socket, setMessages, setChats } = useContext(chatContext)
+    const { setChatData, setChats } = useContext(chatContext)
+    const { setMessages } = useContext(messagesContext)
+    const { setOpenChat, socket } = useContext(generalContext)
     const userId = JSON.parse(localStorage.getItem('idInTouch') || "");
     const isOwner = userId === senderId
     

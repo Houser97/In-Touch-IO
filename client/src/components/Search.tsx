@@ -1,12 +1,12 @@
 import { FormEvent, useContext, useState } from 'react'
-import { chatContext } from '../App'
+import { generalContext } from '../App'
 import { API } from '../assets/constants'
 import '../styles/Search.css'
 import Contact from './Contact'
 
 const Search = () => {
 
-  const { openSearch, setOpenSearch } = useContext(chatContext)
+  const { openSearch, setOpenSearch } = useContext(generalContext)
 
   const [userSearchResult, setUserSearchResult] = useState([]);
   const [query, setQuery] = useState('');
