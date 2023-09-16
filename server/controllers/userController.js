@@ -73,7 +73,7 @@ exports.login = [
             if(!user) return res.json([{msg: 'Email does not exist.'}])
             bcryptjs.compare(req.body.pwd, user.password, (err, passwordMatch) => {
                 if(passwordMatch){
-                    jwt.sign({user}, `${process.env.SECRET_KEY}`, {expiresIn: '180s'} ,(err, token) => {
+                    jwt.sign({user}, `${process.env.SECRET_KEY}`, {expiresIn: '3600s'} ,(err, token) => {
                         if(err) return res.json(err)
                         return res.json({token, id: user._id})
                     })
@@ -101,17 +101,18 @@ exports.get_user_data = [
     }
 ]
 
-exports.upload_image = async (req, res) => {
+exports.update_user = async (req, res) => {
     try {
-        const fileStr = req.body.image;
-        const data = await cloudinary.uploader.upload(fileStr, {
+        const { image, username } = req.body;
+        const data = await cloudinary.uploader.upload(image, {
             upload_preset: CLOUDINARY_PRESET
         })
         const savedImg = await User.updateOne({_id: req.params.id},
             {
                 $set: {
                     pictureUrl: data.url,
-                    publicId: data.public_id
+                    publicId: data.public_id,
+                    name: username
                 }
             })
         res.json({pictureUrl: data.url})
@@ -130,7 +131,6 @@ exports.searchUser = async(req, res) => {
         ]
     }
     : {}
-    const users = await User.find(keyword, {'password': 0, '_id': 0, 'publicId': 0}).find({ _id: { $ne: req.userId }})
-    console.log(req.userId)
+    const users = await User.find(keyword, {'password': 0, 'publicId': 0}).find({ _id: { $ne: req.userId }})
     return res.json(users)
 }
