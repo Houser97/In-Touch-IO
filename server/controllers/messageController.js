@@ -47,3 +47,14 @@ exports.chatMessages = async(req, res) => {
         return res.json(error)
     }
 }
+
+// El controlador se encarga de retornar los mensajes para un chat y de colocar
+exports.updateMsgsToSeen = async(req, res) => {
+    try {
+        const messagesToUpdate = req.body.unseenMessages
+        const updatedMsgs = await Message.updateMany({_id: {$in: messagesToUpdate}}, {$set: {isSeen: true}})
+        return res.json(true)
+    } catch (error) {
+        return res.json(error)
+    }
+}
