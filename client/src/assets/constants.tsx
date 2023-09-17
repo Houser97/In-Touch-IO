@@ -1,3 +1,5 @@
+import { NavigateFunction } from "react-router-dom";
+
 export const API = 'http://localhost:3000/api'
 
 export const AccessChat = async(token = '', id = '') => {
@@ -31,3 +33,8 @@ export const loadingParams = [
     {width:'300px', height:'30px', owner:true},
     {width:'250px', height:'80px', owner:true},
   ]
+
+export const checkLocalStorage = () => {
+    if(!localStorage.getItem('token') || !localStorage.getItem('idInTouch')) return false
+    return true
+}

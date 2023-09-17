@@ -24,8 +24,8 @@ const ContactsCarousel = () => {
     const { setOpenSearch } = useContext(generalContext);
     if(!checkLocalStorage()) {
         navigate('/')
-        return undefined
-      }
+        return <></>
+    }
     const userId = JSON.parse(localStorage.getItem('idInTouch') || "");
 
     const Contacts = () => {

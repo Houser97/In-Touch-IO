@@ -13,7 +13,7 @@ const MessagesList = () => {
   const { chats } = useContext(chatContext);
   if(!checkLocalStorage()) {
     navigate('/')
-    return undefined
+    return <></>
   }
   const userId = JSON.parse(localStorage.getItem('idInTouch') || "");
 

@@ -19,7 +19,7 @@ const Chat = () => {
     const { openChat } = useContext(generalContext)
     if(!checkLocalStorage()) {
       navigate('/')
-      return undefined
+      return <></>
     }
     const userId = JSON.parse(localStorage.getItem('idInTouch') || "");
     // Se comprueba que haya mensajes para verificar que no se trate de un chat nuevo.
