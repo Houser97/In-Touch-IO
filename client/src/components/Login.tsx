@@ -1,6 +1,7 @@
-import { FormEvent, SetStateAction, useState } from 'react'
+import { FormEvent, SetStateAction, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { API } from '../assets/constants'
+import { API, checkLocalStorage } from '../assets/constants'
+import ChatLoader from './Loaders/ChatLoader'
 
 interface Login_type {
   setIsLogin: React.Dispatch<SetStateAction<boolean>>,
@@ -18,6 +19,34 @@ const Login = ({setIsLogin, setValidationErrors}: Login_type) => {
 
   const [email, setEmail] = useState('');
   const [pwd, setPwd] = useState('');
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    if(!checkLocalStorage()) {
+      setIsLoading(false);
+      return;
+    }
+
+    const token = JSON.parse(localStorage.getItem('token') || "");
+    const id = JSON.parse(localStorage.getItem('idInTouch') || "");
+    fetch(`${API}/user/get_user_data`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({id})
+    })
+    .then(response => response.json())
+    .then(user => {
+      if(user) {
+        navigate('/chats')
+        return undefined
+      }
+      setIsLoading(false)
+    })
+  }, [])
+  
 
   const login = async (e: FormEvent) => {
     e.preventDefault();
@@ -49,7 +78,11 @@ const Login = ({setIsLogin, setValidationErrors}: Login_type) => {
   }
 
   return (
-    <form className='authentication__form' onSubmit={(e) => login(e)}>
+    <>
+      {isLoading 
+      ? <ChatLoader /> 
+      :
+      <form className='authentication__form' onSubmit={(e) => login(e)}>
         <div className="email__container form__section-container">
             <label htmlFor="email" className="authentication__label">E-mail</label>
             <div className="form__section-container">
@@ -78,7 +111,8 @@ const Login = ({setIsLogin, setValidationErrors}: Login_type) => {
           <span>Don't have an account?</span> 
           <button className='authentication__swap' onClick={() => handleSwap()}>Sign-up</button>
         </div>
-    </form>
+    </form>}
+  </>
   )
 }
 
