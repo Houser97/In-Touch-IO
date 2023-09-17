@@ -53,6 +53,7 @@ const SignUp = ({setIsLogin, setValidationErrors}: SignUp_type) => {
         const { token, id } = data;
         localStorage.setItem('token', JSON.stringify(token));
         localStorage.setItem('idInTouch', JSON.stringify(id));
+        localStorage.setItem('userData', JSON.stringify({name:username, pictureUrl:''}));
         setEmail('');
         setPwd('');
         setValidationErrors([]);
