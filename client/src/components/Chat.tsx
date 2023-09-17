@@ -6,15 +6,21 @@ import Header from './Chat/Header'
 import Message from './Chat/Message'
 import MessageInput from './Chat/MessageInput'
 import { DateTime } from 'luxon';
-import { loadingParams } from '../assets/constants'
+import { checkLocalStorage, loadingParams } from '../assets/constants'
 import Loading from './Loading'
 import ImagePreview from './Chat/ImagePreview'
+import { useNavigate } from 'react-router-dom'
 
 const Chat = () => {
   
+    const navigate = useNavigate()
     const { chatData } = useContext(chatContext);
     const { messages } = useContext(messagesContext)
     const { openChat } = useContext(generalContext)
+    if(!checkLocalStorage()) {
+      navigate('/')
+      return undefined
+    }
     const userId = JSON.parse(localStorage.getItem('idInTouch') || "");
     // Se comprueba que haya mensajes para verificar que no se trate de un chat nuevo.
     const isLoading = messages.length && messages[0].sender._id === '';

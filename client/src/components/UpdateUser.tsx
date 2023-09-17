@@ -1,6 +1,6 @@
 import { ChangeEvent, FormEvent, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { API } from '../assets/constants';
+import { API, checkLocalStorage } from '../assets/constants';
 import '../styles/UpdateUser.css'
 
 const UpdateUser = () => {
@@ -8,6 +8,10 @@ const UpdateUser = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
+    if(!checkLocalStorage() || !localStorage.getItem('userData')) {
+      navigate('/')
+      return undefined
+    }
     const userData = JSON.parse(localStorage.getItem('userData') || "");
 
     const [fileInputState, setFileInputState] = useState('');

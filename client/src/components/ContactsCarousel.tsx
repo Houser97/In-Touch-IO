@@ -6,6 +6,8 @@ import Contact from './Contact';
 import { useContext } from 'react';
 import { chatContext, generalContext } from '../App';
 import { user_type } from '../TypeScript/typesApp';
+import { checkLocalStorage } from '../assets/constants';
+import { useNavigate } from 'react-router-dom';
 
 let settings = {
     infinite: false,
@@ -17,8 +19,13 @@ let settings = {
 
 const ContactsCarousel = () => {
 
+    const navigate = useNavigate()
     const { chats } = useContext(chatContext);
     const { setOpenSearch } = useContext(generalContext);
+    if(!checkLocalStorage()) {
+        navigate('/')
+        return undefined
+      }
     const userId = JSON.parse(localStorage.getItem('idInTouch') || "");
 
     const Contacts = () => {

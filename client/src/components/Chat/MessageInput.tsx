@@ -1,7 +1,7 @@
 import { ChangeEvent, FormEvent, useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { chatContext, generalContext, messagesContext } from '../../App';
-import { API } from '../../assets/constants';
+import { API, checkLocalStorage } from '../../assets/constants';
 import '../../styles/Chat/MessageInput.css'
 
 interface MsgInput_type {
@@ -62,6 +62,10 @@ const previewFile = (file: File) => {
     setPreviewSource('');
     setSelectedFile(null);
     setFileInputState('');
+    if(!checkLocalStorage()) {
+      navigate('/')
+      return undefined
+    }
     const token = JSON.parse(localStorage.getItem('token') || '')
     fetch(`${API}/message`, {
       method: 'POST',

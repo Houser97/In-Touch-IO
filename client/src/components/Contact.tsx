@@ -1,13 +1,19 @@
 import { useContext } from 'react'
-import { chatContext } from '../App'
-import { AccessChat } from '../assets/constants'
+import { useNavigate } from 'react-router-dom'
+import { generalContext } from '../App'
+import { AccessChat, checkLocalStorage } from '../assets/constants'
 import '../styles/Contact.css'
 
 const Contact = ({picture = '', name = '', id = ''}) => {
 
-  const { setUpdateChats } = useContext(chatContext)
+  const { setUpdateChats } = useContext(generalContext)
+  const navigate = useNavigate()
 
   const handleClick = async() => {
+    if(!checkLocalStorage()) {
+      navigate('/')
+      return undefined
+    }
     const token = JSON.parse(localStorage.getItem('token') || '');
     const userId = JSON.parse(localStorage.getItem('idInTouch') || "");
     if(userId === id) return

@@ -1,7 +1,7 @@
 import { FormEvent, useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { generalContext } from '../App'
-import { API } from '../assets/constants'
+import { API, checkLocalStorage } from '../assets/constants'
 import '../styles/Search.css'
 import Contact from './Contact'
 
@@ -16,6 +16,10 @@ const Search = () => {
 
   const searchUsers = async(e: FormEvent) => {
     e.preventDefault();
+    if(!checkLocalStorage()) {
+      navigate('/')
+      return undefined
+    }
     const token = JSON.parse(localStorage.getItem("token") || '');
     const response =await fetch(`${API}/user/searchUser?search=${query}`, {
         method: 'GET',

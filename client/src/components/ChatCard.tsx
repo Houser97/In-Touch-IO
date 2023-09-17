@@ -1,7 +1,7 @@
 import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { chatContext, generalContext, messagesContext } from '../App'
-import { API } from '../assets/constants'
+import { API, checkLocalStorage } from '../assets/constants'
 import '../styles/ChatCard.css'
 import Contact from './Contact'
 
@@ -51,6 +51,10 @@ const ChatCard = ({picture, name, chatId, lastMessage, unseen, hour, senderId}: 
           }])
         setOpenChat(true);
         setChatData({image: picture, name, id: chatId})
+        if(!checkLocalStorage()) {
+          navigate('/')
+          return undefined
+        }
         const token = JSON.parse(localStorage.getItem('token') || '')
         const response = await fetch(`${API}/message/${chatId}`, {
             method: 'POST', 

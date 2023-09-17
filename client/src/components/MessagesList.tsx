@@ -1,13 +1,20 @@
 import { DateTime } from 'luxon'
 import { useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { chatContext } from '../App'
+import { checkLocalStorage } from '../assets/constants'
 import '../styles/MessagesList.css'
 import { unseenMessage, user_type } from '../TypeScript/typesApp'
 import ChatCard from './ChatCard'
 
 const MessagesList = () => {
 
+  const navigate = useNavigate()
   const { chats } = useContext(chatContext);
+  if(!checkLocalStorage()) {
+    navigate('/')
+    return undefined
+  }
   const userId = JSON.parse(localStorage.getItem('idInTouch') || "");
 
   const convertTimeStamp = (timestamp: string) => {

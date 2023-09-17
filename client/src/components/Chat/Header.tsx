@@ -1,6 +1,7 @@
 import { useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { chatContext, generalContext, messagesContext } from '../../App'
-import { API } from '../../assets/constants'
+import { API, checkLocalStorage } from '../../assets/constants'
 import '../../styles/Chat/Header.css'
 import Contact from '../Contact'
 
@@ -9,8 +10,13 @@ const Header = () => {
     const { chatData, setChatData }  = useContext(chatContext)
     const { idUnseenMessages, setIdUnseenMessages } = useContext(messagesContext)
     const { setOpenChat } = useContext(generalContext)
+    const navigate = useNavigate()
 
     const clearChat = () => {
+      if(!checkLocalStorage()) {
+        navigate('/')
+        return undefined
+      }
       const token = JSON.parse(localStorage.getItem('token') || "");
       setOpenChat(false)
       setChatData(prevData => {return{...prevData, id: ''}})
