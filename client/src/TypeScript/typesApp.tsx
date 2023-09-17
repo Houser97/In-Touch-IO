@@ -35,7 +35,8 @@ export interface message {
     content: string,
     _id: string,
     createdAt: string,
-    chat: chat
+    chat: chat,
+    image: string
 }
 
 export interface unseenMessage {
