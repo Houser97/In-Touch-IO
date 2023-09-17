@@ -2,7 +2,7 @@ import { useState } from 'react'
 import '../styles/Authentication.css'
 import Login from './Login'
 import SignUp from './SignUp'
-import UpdateUser from './UpdateUser'
+import authImg from '../assets/images/Login.jpg'
 
 export interface validationError_type {
   msg: string
@@ -15,18 +15,22 @@ const Authentication = () => {
     const [validationErrors, setValidationErrors] = useState<validationError_type[]>([])
 
   return (
-    <div className="authentication__container">
-      {isLogin ? <Login setIsLogin={setIsLogin} setValidationErrors={setValidationErrors} /> : <SignUp setIsLogin={setIsLogin} setValidationErrors={setValidationErrors} />}
-        
-        <div>
-        <ul className="errors">
-          {validationErrors.map(({msg}, index) => {
-            return(
-              <li key={`validationError-${index}`}>{msg}</li>
-            )
-          })}
-        </ul>
-        </div>
+    <div className="auth__container">
+      <img src={authImg} className='auth__img'></img>
+
+      <div className="authentication__container">
+        {isLogin ? <Login setIsLogin={setIsLogin} setValidationErrors={setValidationErrors} /> : <SignUp setIsLogin={setIsLogin} setValidationErrors={setValidationErrors} />}
+          
+          <div>
+          <ul className="errors">
+            {validationErrors.map(({msg}, index) => {
+              return(
+                <li key={`validationError-${index}`}>{msg}</li>
+              )
+            })}
+          </ul>
+          </div>
+      </div>
     </div>
   )
 }
