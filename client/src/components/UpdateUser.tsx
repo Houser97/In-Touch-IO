@@ -18,7 +18,7 @@ const UpdateUser = () => {
     const updateUser = async (e: FormEvent) => {
         e.preventDefault();
         if(!selectedFile) {
-            update_user(userData.pictureUrl, newUsername);
+            update_user('', newUsername);
             return;
         };
         const reader = new FileReader();
@@ -43,11 +43,13 @@ const UpdateUser = () => {
                 body: JSON.stringify({image, username})
             })
             const data = await response.json()
-            if(data) {
-                setFileInputState('');
-                setPreviewSource('');
-                navigate('/chats')
+            setFileInputState('');
+            setPreviewSource('');
+            if(!data){
+                navigate('/')
+                return;
             }
+            navigate('/chats')
         } catch (error) {
             console.log(error);
         }

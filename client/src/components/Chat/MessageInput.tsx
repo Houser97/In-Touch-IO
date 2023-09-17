@@ -20,6 +20,7 @@ const MessageInput = ({chatId = '', fileInputState = '', previewSource = '', sel
   const { setChats } = useContext(chatContext);
   const { setMessages } = useContext(messagesContext);
   const { socket } = useContext(generalContext);
+  const navigate = useNavigate()
 
   const handleMessageCreation = (e:FormEvent) => {
     e.preventDefault();
@@ -39,8 +40,6 @@ const MessageInput = ({chatId = '', fileInputState = '', previewSource = '', sel
     
   }
 
-  //-------
-
 const handleFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const target = e.target as HTMLInputElement;
     const file = target.files && target.files[0]
@@ -57,7 +56,6 @@ const previewFile = (file: File) => {
         setPreviewSource(reader.result as string);
     }
 }
-  //-------
 
   const sendMessage = (image: string | ArrayBuffer | null) => {
     setMessage('');
@@ -74,6 +72,10 @@ const previewFile = (file: File) => {
       body: JSON.stringify({content: message, chatId, isSeen: false, image})
     }).then(data => data.json()).then((message) => {
       if(!socket) return undefined
+      if(!message) {
+        navigate('/')
+        return
+      }
       socket.emit('new message', message)
       // Los mensajes se actualizan para el usuario que lo envía, los demás usuarios lo reciben por medio de socket.
       setMessages(prev => [...prev, message])

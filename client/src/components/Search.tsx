@@ -1,4 +1,5 @@
 import { FormEvent, useContext, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { generalContext } from '../App'
 import { API } from '../assets/constants'
 import '../styles/Search.css'
@@ -10,6 +11,8 @@ const Search = () => {
 
   const [userSearchResult, setUserSearchResult] = useState([]);
   const [query, setQuery] = useState('');
+
+  const navigate = useNavigate()
 
   const searchUsers = async(e: FormEvent) => {
     e.preventDefault();
@@ -23,6 +26,10 @@ const Search = () => {
       }
     })
     const users = await response.json()
+    if(users === false){
+      navigate('/')
+      return;
+    }
     setUserSearchResult(users)
   }
 

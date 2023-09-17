@@ -1,4 +1,5 @@
 import { useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { chatContext, generalContext, messagesContext } from '../App'
 import { API } from '../assets/constants'
 import '../styles/ChatCard.css'
@@ -21,6 +22,8 @@ const ChatCard = ({picture, name, chatId, lastMessage, unseen, hour, senderId}: 
     const { setOpenChat, socket } = useContext(generalContext)
     const userId = JSON.parse(localStorage.getItem('idInTouch') || "");
     const isOwner = userId === senderId
+
+    const navigate = useNavigate()
     
     const retrieveChatData = async() => {
         if(!socket) return
@@ -43,7 +46,8 @@ const ChatCard = ({picture, name, chatId, lastMessage, unseen, hour, senderId}: 
             },
             content: '',
             _id: '',
-            createdAt: ''
+            createdAt: '',
+            image: ''
           }])
         setOpenChat(true);
         setChatData({image: picture, name, id: chatId})
@@ -58,6 +62,10 @@ const ChatCard = ({picture, name, chatId, lastMessage, unseen, hour, senderId}: 
             body: JSON.stringify({unseenMessages: unseen})
         });
         const messages = await response.json()
+        if(!messages) {
+          navigate('/')
+          return;
+        }
         setMessages(messages)
         socket.emit('join chat', chatId)
     }
