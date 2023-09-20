@@ -2,20 +2,29 @@
     box-sizing: border-box;
 }
 
-.authentication__container {
-    width: 100%;
-    height: 100vh;
-    height: 100vh;
+.auth__container {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    max-height: 100vh;
+    height: 100vh;
     align-items: center;
     justify-content: center;
-    background-color: white;
-    color: black;
-    overflow-x: hidden;
-    overflow-y: scroll;
-    padding: 30px 0px;
+    overflow: hidden;
+}
+
+.auth__container img {
+    height: 100%;
+    width: auto;
+    min-width: 200px;
+}
+
+.authentication__container {
+    width: 100%;
+    height: 100%;
+    display: flex;
     position: relative;
+    overflow: hidden;
+    overflow-y: auto;
 }
 
 .authentication__form {
@@ -23,6 +32,7 @@
     /*background: linear-gradient(rgb(244, 244, 244), white) padding-box,
                 linear-gradient(135deg, transparent 25%,#0B2447, #124791) border-box;
     border: 4px solid transparent;*/
+    height: 100%;
     padding: 10px 30px;
     font-size: 14px;
     font-family: inherit;
@@ -32,8 +42,9 @@
     align-items: center;
     justify-content: center;
     gap: 40px;
-    box-sizing: border-box;
     position: relative;
+    min-width: 300px;
+    overflow: hidden;
 }
 
 .authentication__form div {
@@ -191,7 +202,7 @@ label {
     position: absolute; /*Junto con TOP ayuda a que el contenido crezca hacia abajo y que no se mueva el formulario*/
     top: 90%;
     left: 25px;
-
+    color: black;
 }
 
 .errors li {
