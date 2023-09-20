@@ -6,7 +6,6 @@ const validate_token = function(req, res, next){
 
     // Get auth header value
     const bearerHeader = req.headers['authorization']
-
     if(typeof bearerHeader !== 'undefined'){
         // Separar usando el espacio.
         const bearer = bearerHeader.split(' ')
@@ -14,14 +13,14 @@ const validate_token = function(req, res, next){
         const bearerToken = bearer[1]
 
         jwt.verify(bearerToken, `${process.env.SECRET_KEY}`, (err, authData) => {
-            if(err) return res.json(err)
+            if(err) return res.json(false)
             else {
                 req.userId = authData.user._id
                 next()
             }
         })
     } else {
-        return res.json('forbidden')
+        return res.json(false)
     }
 }
 
