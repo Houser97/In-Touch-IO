@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './App.css'
-import { API } from './assets/constants'
+import { API, checkLocalStorage } from './assets/constants'
 import { useSocket } from './assets/socket'
 import Chat from './components/Chat'
 import ContactsCarousel from './components/ContactsCarousel'
@@ -69,7 +69,8 @@ function App() {
     },
     content: '',
     _id: '',
-    createdAt: ''
+    createdAt: '',
+    image: ''
   }],)
   // Estado que llama a API de chats cuando se crea un nuevo chat.
   const [updateChats, setUpdateChats] = useState(false)
@@ -89,8 +90,9 @@ function App() {
   // Arreglo que guarda Id de mensajes que se reciben estando en el Chat para poder cambiarlos a visto en base de datos al cerrar chat.
   const [idUnseenMessages, setIdUnseenMessages] = useState<string[]>([])
 
+  //useEffect para recuperar datos del usuario en base de datos.
   useEffect(() => {
-    if(!localStorage.getItem('token')) {
+    if(!checkLocalStorage()) {
       navigate('/')
       return undefined
     }
@@ -121,6 +123,7 @@ function App() {
     })
   }, [])
 
+  // useEffect para recuperar chats de base de datos cuando se crea un nuevo chat.
   useEffect(() => {
     if(!localStorage.getItem('token')) {
       navigate('/')
@@ -151,14 +154,12 @@ function App() {
     })
   }, [updateChats])
 
+  //useEffect para establecer recepción de mensajes usando socket.
   useEffect(() => {
     if (!socket) return; // Si el socket no está listo, no hacemos nada en este efecto
   
     const messageReceivedHandler = (newMessage: message) => {
-      const messageChatId = newMessage.chat._id
-      const messageId = newMessage._id
-      const senderId = newMessage.sender._id
-      const messageCreatedAt = newMessage.createdAt
+      const { chat: { _id: messageChatId }, _id: messageId, sender: { _id: senderId}, createdAt: messageCreatedAt } = newMessage;
       // Si el chat del mensaje es nuevo, entonces se recuperan todos los mensajes desde la base de datos.
       if(!(messageChatId in chats)) {
         setUpdateChats(prev => !prev)
