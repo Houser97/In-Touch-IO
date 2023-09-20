@@ -1,16 +1,33 @@
 const Message = require('../models/message');
 const User = require('../models/user');
 const Chat = require('../models/chat');
+const { cloudinary } = require('../services/cloudinary');
+
+const CLOUDINARY_PRESET = 'InTouch';
+
+const uploadImgCloudinary = async(image) => {
+    try {
+        const data = await cloudinary.uploader.upload(image, {
+            upload_preset: CLOUDINARY_PRESET
+        })
+        return data
+    } catch (error) {
+        return ''
+    }
+}
 
 exports.sendMessage = async(req, res) => {
-    const { content, chatId } = req.body
+    const { content, chatId, image } = req.body
 
-    if(!content || !chatId) return res.json(false);
+    if(!chatId) return res.json(false);
+
+    const img = await uploadImgCloudinary(image)
 
     const newMessage = {
         content,
         chat: chatId,
-        sender: req.userId
+        sender: req.userId,
+        image: img.url
     }
 
     try {
