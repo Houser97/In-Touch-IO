@@ -1,5 +1,5 @@
 .message__form {
-    max-width: 250px;
+    max-width: 300px;
     overflow: hidden;
     display: flex;
     flex-direction: row;
@@ -9,6 +9,9 @@
     outline: none;
     margin: 10px 0px;
     gap: 10px;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
 }
 
 .message__input {
@@ -26,11 +29,30 @@
 }
 
 .send__message{
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
     border: none;
+    background-color: transparent;
+}
+
+.send__message svg {
+    height: 100%;
+    width: 100%;
+}
+
+.image_svg {
+    width: 50px;
+    height: auto;
+}
+
+.input__image-msg {
+    display: none;
+}
+
+.message__img-label {
+    height: 100%;
+    display: flex;
 }
