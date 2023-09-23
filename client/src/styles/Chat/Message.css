@@ -63,3 +63,10 @@
 .message__container img {
     margin-bottom: 16px;
 }
+
+@media (min-width: 500px) {
+    .message__container{
+        max-width: 30vw;
+        min-width: 320px;
+    }
+}
