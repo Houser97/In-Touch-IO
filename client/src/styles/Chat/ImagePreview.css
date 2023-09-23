@@ -22,8 +22,8 @@
 }
 
 .preview__message-img {
-    height: auto;
-    max-width: 400px;
+    max-height: 70vh;
+    width: auto;
     display: flex;
     flex-direction: column;
     align-items: space-between;
