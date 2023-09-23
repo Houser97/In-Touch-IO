@@ -22,15 +22,13 @@
 }
 
 .preview__message-img {
-    max-height: 70vh;
+    max-height: 98%;
+    max-width: 100%;
     width: auto;
+    object-fit: cover;
     display: flex;
     flex-direction: column;
     align-items: space-between;
-    gap: 20px;
-    cursor: pointer;
-    align-items: center;
-    justify-content: center;
     border: 2px solid #cacaca;
     background-color: rgba(255, 255, 255, 1);
     padding: 1.5rem;
