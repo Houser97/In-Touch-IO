@@ -15,7 +15,7 @@
 .auth__container img {
     height: 100%;
     width: auto;
-    min-width: 200px;
+    min-width: 150px;
     display: none;
 }
 
@@ -44,7 +44,7 @@
     justify-content: center;
     gap: 40px;
     position: relative;
-    min-width: 300px;
+    min-width: 230px;
     overflow: hidden;
 }
 
