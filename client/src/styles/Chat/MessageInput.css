@@ -56,3 +56,8 @@
     height: 100%;
     display: flex;
 }
+
+.hide__input-img {
+    opacity: 0.5;
+    pointer-events: none;
+}
