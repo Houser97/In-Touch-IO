@@ -1,14 +1,28 @@
-import { FormEvent, useContext, useState } from 'react'
+import { FormEvent, useContext, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { generalContext } from '../App'
+import { chatContext, generalContext } from '../App'
 import { API, checkLocalStorage } from '../assets/constants'
+import { user_type } from '../TypeScript/typesApp'
 import '../styles/Search.css'
 import Contact from './Contact'
 
 const Search = () => {
 
   const { openSearch, setOpenSearch } = useContext(generalContext)
+  const { chats, user } = useContext(chatContext);
 
+  const AddedFriends = useMemo(() => {
+    const ChatsIdsList = Object.keys(chats);
+    const UserId = user._id;
+    const friendList = ChatsIdsList.reduce((acc: string[], chatId) => {
+      const { users } = chats[chatId];
+      const FriendId = users.find((user: user_type) => user._id !== UserId)?._id;
+      
+      return [...acc, FriendId];
+    }, []);
+    return friendList;
+  }, [Object.keys(chats).length, user._id]);
+  
   const [userSearchResult, setUserSearchResult] = useState([]);
   const [query, setQuery] = useState('');
 
@@ -49,7 +63,7 @@ const Search = () => {
             userSearchResult.length
             ? userSearchResult.map(({name, pictureUrl, _id}) => {
               return(
-                <Contact name={name} picture={pictureUrl} id={_id} key={_id} />
+                <Contact name={name} picture={pictureUrl} id={_id} key={_id} added={AddedFriends.includes(_id)} />
               )
             })
             
