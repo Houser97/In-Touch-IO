@@ -50,14 +50,15 @@ const Chat = () => {
 
       const MessageInputProps = {fileInputState, previewSource, selectedFile, setFileInputState, setPreviewSource, setSelectedFile, chatId: chatData.id }
     
-  if(isEmpty) return <EmptyChat />
-
   return (
     <div className={`chat__container ${openChat && 'show-chat'}`}>
-        <Header />
-        <ImagePreview previewSource={previewSource} setPreviewSource={setPreviewSource} setSelectedFile={setSelectedFile} setFileInputState={setFileInputState}/>
-        {isLoading ? <div className='loading__container'>{LoadingSection()}</div> : messagesSection()}
-        <MessageInput {...MessageInputProps}/>
+        {isEmpty ? <EmptyChat />
+        : <>
+          <Header />
+          <ImagePreview previewSource={previewSource} setPreviewSource={setPreviewSource} setSelectedFile={setSelectedFile} setFileInputState={setFileInputState}/>
+          {isLoading ? <div className='loading__container'>{LoadingSection()}</div> : messagesSection()}
+          <MessageInput {...MessageInputProps}/>
+        </>}
     </div>
   )
 }
