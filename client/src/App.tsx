@@ -54,6 +54,7 @@ function App() {
   const socket = useSocket()
   const [chatsLoading, setChatsLoading] = useState(true)
   const [openChat, setOpenChat] = useState(false);
+  const [isOpenForTheFirstTime, setIsOpenForTheFirstTime] = useState(true) //Estado que ayuda a colocar Empty Chat si la aplicación se abrió por primera vez.
   const [openSearch, setOpenSearch] = useState(false);
   const [messages, setMessages] = useState([{   
     sender: {
@@ -220,6 +221,8 @@ function App() {
     setUpdateChats,
     setOpenSearch,
     setOpenChat,
+    isOpenForTheFirstTime,
+    setIsOpenForTheFirstTime
   }
 
   return (

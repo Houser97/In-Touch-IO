@@ -10,13 +10,14 @@ import { checkLocalStorage, loadingParams } from '../assets/constants'
 import Loading from './Loading'
 import ImagePreview from './Chat/ImagePreview'
 import { useNavigate } from 'react-router-dom'
+import EmptyChat from './Chat/EmptyChat'
 
 const Chat = () => {
   
     const navigate = useNavigate()
     const { chatData } = useContext(chatContext);
     const { messages } = useContext(messagesContext)
-    const { openChat } = useContext(generalContext)
+    const { openChat, isOpenForTheFirstTime } = useContext(generalContext)
     if(!checkLocalStorage()) {
       navigate('/')
       return <></>
@@ -24,6 +25,7 @@ const Chat = () => {
     const userId = JSON.parse(localStorage.getItem('idInTouch') || "");
     // Se comprueba que haya mensajes para verificar que no se trate de un chat nuevo.
     const isLoading = messages.length && messages[0].sender._id === '';
+    const isEmpty = chatData.id === '' && isOpenForTheFirstTime
 
     const [fileInputState, setFileInputState] = useState('');
     const [previewSource, setPreviewSource] = useState('');
@@ -47,6 +49,8 @@ const Chat = () => {
       </ ScrollableFeed>
 
       const MessageInputProps = {fileInputState, previewSource, selectedFile, setFileInputState, setPreviewSource, setSelectedFile, chatId: chatData.id }
+    
+  if(isEmpty) return <EmptyChat />
 
   return (
     <div className={`chat__container ${openChat && 'show-chat'}`}>

@@ -19,7 +19,7 @@ const ChatCard = ({picture, name, chatId, lastMessage, unseen, hour, senderId}: 
 
     const { setChatData, setChats } = useContext(chatContext)
     const { setMessages } = useContext(messagesContext)
-    const { setOpenChat, socket } = useContext(generalContext)
+    const { setOpenChat, socket, setIsOpenForTheFirstTime } = useContext(generalContext)
     const userId = JSON.parse(localStorage.getItem('idInTouch') || "");
     const isOwner = userId === senderId
 
@@ -27,6 +27,8 @@ const ChatCard = ({picture, name, chatId, lastMessage, unseen, hour, senderId}: 
     
     const retrieveChatData = async() => {
         if(!socket) return
+        // Se pone en falso el estado que establece que la aplicación se abrió por primera vez.
+        setIsOpenForTheFirstTime(false)
         // Se limpia de forma local el número de mensajes no vistos al abrir el chat.
         setChats(prevChats => {
           const chat = {...prevChats[chatId]}
