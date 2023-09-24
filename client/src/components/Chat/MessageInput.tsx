@@ -102,6 +102,7 @@ const previewFile = (file: File) => {
               type="file" 
               id='file'
               name='image'
+              accept="image/png, image/gif, image/jpeg, image/jpg"
               onChange={(e) => handleFileInputChange(e)}
               value={fileInputState}
               className='input__image-msg'/>
