@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './App.css'
-import { API, checkLocalStorage } from './assets/constants'
+import { API, checkLocalStorage, updateUnseenMessages } from './assets/constants'
 import { useSocket } from './assets/socket'
 import Body from './components/Body'
 import ContactsCarousel from './components/ContactsCarousel'
@@ -100,6 +100,10 @@ function App() {
     }
     const token = JSON.parse(localStorage.getItem('token') || "");
     const id = JSON.parse(localStorage.getItem('idInTouch') || "");
+    const idUnseenMessages = localStorage.getItem('idUnseenMessages') ? JSON.parse(localStorage.getItem('idUnseenMessages') || "") : '';
+    if(idUnseenMessages.length){
+      updateUnseenMessages(idUnseenMessages, setIdUnseenMessages, token)
+    } 
     fetch(`${API}/user/get_user_data`, {
       method: 'POST',
       headers: {
@@ -198,6 +202,11 @@ function App() {
     };
     // Se debe cambiar con el id del chat, ya que de lo contrario el valor del id en la lógica no se actualiza
   }, [chatData.id, socket, Object.keys(chats).length]);
+
+  useEffect(() => {
+    localStorage.setItem('idUnseenMessages', JSON.stringify(idUnseenMessages));
+  }, [idUnseenMessages.length])
+  
   
 
   const valuesChat = {
