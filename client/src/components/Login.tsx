@@ -77,6 +77,31 @@ const Login = ({setIsLogin, setValidationErrors}: Login_type) => {
     setValidationErrors([])
   }
 
+  const demoUser = async (e: FormEvent) => {
+    e.preventDefault();
+    const pwd = 'ReactPassword97'
+    const email = 'InTouchDemo@gmail.com'
+    const response = await fetch(`${API}/user/login`, {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({pwd,email})
+    })
+    const data = await response.json();
+    if(Array.isArray(data)){
+      setValidationErrors(data)
+    } else {
+      const { token, id } = data
+      localStorage.setItem('token', JSON.stringify(token));
+      localStorage.setItem('idInTouch', JSON.stringify(id));
+      setEmail('');
+      setPwd('');
+      setValidationErrors([]);
+      navigate('/chats')
+    }
+  }
+
   return (
     <>
       {isLoading 
@@ -106,6 +131,14 @@ const Login = ({setIsLogin, setValidationErrors}: Login_type) => {
           <span className="circle4"></span>
           <span className="circle5"></span>
           <span className="text">Login</span>
+        </button>
+        <button className="authentication__submit demo-user__button" onClick={demoUser}>
+          <span className="circle1"></span>
+          <span className="circle2"></span>
+          <span className="circle3"></span>
+          <span className="circle4"></span>
+          <span className="circle5"></span>
+          <span className="text">Demo User</span>
         </button>
         <div className="create__account-btn">
           <span>Don't have an account?</span> 
