@@ -3,11 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import './App.css'
 import { API, checkLocalStorage } from './assets/constants'
 import { useSocket } from './assets/socket'
-import Chat from './components/Chat'
+import Body from './components/Body'
 import ContactsCarousel from './components/ContactsCarousel'
 import HeaderMain from './components/HeaderMain'
 import ChatLoader from './components/Loaders/ChatLoader'
-import MessagesList from './components/MessagesList'
 import Search from './components/Search'
 import { chat, chatContext_types, chat_object, generalContext_type, message, messagesContext_type, unseenMessage } from './TypeScript/typesApp'
 
@@ -233,8 +232,7 @@ function App() {
         : <>
         <HeaderMain />
         <ContactsCarousel />
-        <MessagesList />
-        <Chat />
+        <Body />
         <Search />
         </>}
         </messagesContext.Provider>
