@@ -1,0 +1,11 @@
+@media (min-width: 1200px) {
+    .chats-msgList {
+        display: grid;
+        grid-template-columns: 0.5fr 1fr;
+        overflow: hidden;
+    }
+
+    .chats-msgList .chat__container {
+        position: relative;
+    }
+}
