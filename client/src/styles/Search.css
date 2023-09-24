@@ -5,13 +5,17 @@
     padding: 10px 20px;
     background-color: #212121;
     min-height: 100vh;
+    max-height: 100vh;
     width: 100%;
-    position: absolute;
+    position: fixed;
     z-index: 1010;
     left: 0px;
     top: 0px;
     transform: translateX(-100%);
     transition: transform 250ms ease-in-out;
+    z-index: 1250;
+    padding-top: 50px;
+    overflow: hidden;
 }
 
 .search__form {
@@ -56,12 +60,23 @@
 }
 
 .search__result {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min-content, 250px));
     width: 100%;
-    overflow-x: auto;
     padding: 20px;
+    padding-top: 40px;
     gap: 30px;
+    overflow-y: auto;
+    justify-content: center;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.search__container .arrow-left {
+    position: absolute;
+    left: 30px;
+    top: 30px;
 }
    
 /*Estilos para ajustar componente Contact*/
@@ -84,4 +99,18 @@
 
 .show-search {
     transform: translateX(0%);
+}
+
+.tick {
+    display: none;
+    fill: rgb(32, 183, 1);
+    position: absolute;
+    top: 2px;
+    right: 7px;
+    height: 20px;
+    width: 20px;
+}
+
+.show-added {
+    display: flex;
 }
