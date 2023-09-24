@@ -4,6 +4,12 @@
   box-sizing: border-box;
 }
 
+#root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .App {
   display: flex;
   flex-direction: column;
@@ -30,4 +36,10 @@ svg {
 img {
   height: auto;
   width: 100%;
+}
+
+@media (min-width: 1200px) {
+  .App{
+    overflow: hidden;
+  }
 }
