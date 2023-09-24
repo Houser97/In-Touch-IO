@@ -5,7 +5,9 @@ import { chatContext } from '../App'
 import { checkLocalStorage } from '../assets/constants'
 import '../styles/MessagesList.css'
 import { unseenMessage, user_type } from '../TypeScript/typesApp'
+import AddButton from './AddButton'
 import ChatCard from './ChatCard'
+import HeaderMain from './HeaderMain'
 
 const MessagesList = () => {
 
@@ -45,6 +47,8 @@ const MessagesList = () => {
 
   return (
     <section className='message__list main__container'>
+      <HeaderMain />
+      <AddButton text={'Add user'} />
         {Object.keys(chats).length ? Object.keys(chats).map((key) => {
           const chat = chats[key]
           const {_id, users, updatedAt} = chat
