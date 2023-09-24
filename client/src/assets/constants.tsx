@@ -1,3 +1,4 @@
+import React from "react";
 import { NavigateFunction } from "react-router-dom";
 
 export const API = 'http://localhost:3000/api'
@@ -37,4 +38,15 @@ export const loadingParams = [
 export const checkLocalStorage = () => {
     if(!localStorage.getItem('token') || !localStorage.getItem('idInTouch')) return false
     return true
+}
+
+export const updateUnseenMessages = (idUnseenMessages: string[], setIdUnseenMessages: React.Dispatch<React.SetStateAction<string[]>>, token: string) => {
+    fetch(`${API}/message/update_messages_to_seen`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({unseenMessages: idUnseenMessages})
+      }).then(() => setIdUnseenMessages([]))
 }
