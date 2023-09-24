@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { checkLocalStorage } from '../assets/constants'
 import '../styles/Settings.css'
@@ -6,10 +7,13 @@ const Settings = () => {
 
     const navigate = useNavigate()
 
-    if(!checkLocalStorage()) {
-      navigate('/')
-      return undefined
-    }
+    useEffect(() => {
+      if(!checkLocalStorage()) {
+        navigate('/')
+        return undefined
+      }
+    }, [])
+    
     const id = JSON.parse(localStorage.getItem('idInTouch') || "");
 
     const logout = () => {
