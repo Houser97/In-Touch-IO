@@ -42,6 +42,8 @@ export const generalContext = createContext<generalContext_type>({
   openSearch: false,
   socket: null,
   updateChats: false,
+  isOpenForTheFirstTime: false,
+  setIsOpenForTheFirstTime: () => false,
   setUpdateChats: () => false,
   setOpenSearch: () => false,
   setOpenChat: () => false,

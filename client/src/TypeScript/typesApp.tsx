@@ -1,3 +1,4 @@
+import React from "react";
 import { Socket } from "socket.io-client"
 
 export interface user_type {
@@ -66,6 +67,8 @@ export interface generalContext_type {
     openSearch: boolean,
     updateChats: boolean,
     socket: null | Socket,
+    isOpenForTheFirstTime: boolean,
+    setIsOpenForTheFirstTime: React.Dispatch<React.SetStateAction<boolean>>
     setUpdateChats: React.Dispatch<React.SetStateAction<boolean>>,
     setOpenSearch: React.Dispatch<React.SetStateAction<boolean>>,
     setOpenChat: React.Dispatch<React.SetStateAction<boolean>>,
