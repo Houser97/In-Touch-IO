@@ -1,7 +1,7 @@
 import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { chatContext, generalContext, messagesContext } from '../App'
-import { API, checkLocalStorage } from '../assets/constants'
+import { API, checkLocalStorage, updateUnseenMessages } from '../assets/constants'
 import '../styles/ChatCard.css'
 import Contact from './Contact'
 
@@ -18,7 +18,7 @@ interface ChatCard_props {
 const ChatCard = ({picture, name, chatId, lastMessage, unseen, hour, senderId}: ChatCard_props) => {
 
     const { setChatData, setChats } = useContext(chatContext)
-    const { setMessages } = useContext(messagesContext)
+    const { setMessages, idUnseenMessages, setIdUnseenMessages } = useContext(messagesContext)
     const { setOpenChat, socket, setIsOpenForTheFirstTime } = useContext(generalContext)
     const userId = JSON.parse(localStorage.getItem('idInTouch') || "");
     const isOwner = userId === senderId
@@ -58,6 +58,10 @@ const ChatCard = ({picture, name, chatId, lastMessage, unseen, hour, senderId}: 
           return undefined
         }
         const token = JSON.parse(localStorage.getItem('token') || '')
+        // Se actualizan a visto los mensajes que se recibieron del chat anterior (en large devices ya no está el botón de cierre en los chats)
+        if(idUnseenMessages.length){
+          updateUnseenMessages(idUnseenMessages, setIdUnseenMessages, token)
+        }
         const response = await fetch(`${API}/message/${chatId}`, {
             method: 'POST', 
             headers: {
