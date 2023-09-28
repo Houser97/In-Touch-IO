@@ -73,7 +73,7 @@ exports.login = [
             if(!user) return res.json([{msg: 'Email does not exist.'}])
             bcryptjs.compare(req.body.pwd, user.password, (err, passwordMatch) => {
                 if(passwordMatch){
-                    jwt.sign({user}, `${process.env.SECRET_KEY}`, {expiresIn: '3600s'} ,(err, token) => {
+                    jwt.sign({user}, `${process.env.SECRET_KEY}`, {expiresIn: '7200s'} ,(err, token) => {
                         if(err) return res.json(err)
                         return res.json({token, id: user._id})
                     })
@@ -102,8 +102,17 @@ exports.get_user_data = [
 ]
 
 exports.update_user = async (req, res) => {
+    const { image, username } = req.body; 
+    if(!image.length) {
+        const user = await User.updateOne({_id: req.params.id},
+            {
+                $set: {
+                    name: username
+                }
+            })
+        return res.json(true)
+    }
     try {
-        const { image, username } = req.body;
         const data = await cloudinary.uploader.upload(image, {
             upload_preset: CLOUDINARY_PRESET
         })
