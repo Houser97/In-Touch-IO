@@ -5,6 +5,7 @@
     font-size: 0.635rem;
     font-weight: 600;
     z-index: 1001;
+    position: relative;
 }
 
 .contact__picture {
