@@ -32,3 +32,13 @@
     fill: white;
     cursor: pointer;
 }
+
+@media (min-width: 1200px) {
+    .header__chat {
+        background-color: #f0f2f5;
+    }
+
+    .header__chat .contact {
+        color: black;
+    }
+}

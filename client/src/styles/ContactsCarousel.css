@@ -36,6 +36,8 @@
     overflow: hidden;
 }
 
-.svg__search-container{
-    background-color: rgb(211, 211, 211);
+@media (min-width: 1200px) {
+    .contacts__carousel {
+        display: none;
+    }
 }

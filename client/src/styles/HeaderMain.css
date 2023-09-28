@@ -27,4 +27,19 @@
     right: 5px;
     top: 5px;
     opacity: 0.5;
+    cursor: default;
+}
+
+@media (min-width: 1200px) {
+    .header {
+        display: none;
+    }
+
+    .chats-msgList .header{
+        display: flex;
+        position: sticky;
+        top: 0;
+        background-color: white;
+        z-index: 1100;
+    }
 }
