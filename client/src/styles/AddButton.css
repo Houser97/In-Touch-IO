@@ -1,3 +1,7 @@
+.add__btn {
+    cursor: pointer;
+}
+
 .svg__search-container{
     background-color: rgb(211, 211, 211);
 }
