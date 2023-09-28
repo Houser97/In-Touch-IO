@@ -1,7 +1,7 @@
 import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { chatContext, generalContext, messagesContext } from '../../App'
-import { API, checkLocalStorage } from '../../assets/constants'
+import { API, checkLocalStorage, updateUnseenMessages } from '../../assets/constants'
 import '../../styles/Chat/Header.css'
 import Contact from '../Contact'
 
@@ -21,14 +21,7 @@ const Header = () => {
       setOpenChat(false)
       setChatData(prevData => {return{...prevData, id: ''}})
       if(!idUnseenMessages.length) return;
-      fetch(`${API}/message/update_messages_to_seen`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({unseenMessages: idUnseenMessages})
-      }).then(() => setIdUnseenMessages([]))
+      updateUnseenMessages(idUnseenMessages, setIdUnseenMessages, token)
     }
 
   return (
