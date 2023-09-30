@@ -10,6 +10,7 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    width: 100%;
 }
 
 .auth__container img {
@@ -208,6 +209,11 @@ label {
 
 .errors li {
     font-size: 0.85rem;
+}
+
+.demo-user__button {
+    background-color: #f5c71a;
+    color: black;
 }
 
 @media (min-width: 600px) {
