@@ -24,7 +24,7 @@
     border: none;
     outline: none;
     width: 100%;
-    padding: 15px 8px;
+    padding: 10px 20px;
     border-radius: 20px;
     background-color: white;
     max-width: 300px;
@@ -41,13 +41,13 @@
 }
 
 .send__message svg {
-    height: 50px;
-    width: 50px;
+    height: 45px;
+    width: 45px;
     fill: rgb(58, 58, 58);
 }
 
 .image_svg {
-    width: 50px;
+    width: 45px;
     height: auto;
     fill: rgb(58, 58, 58);
 }
@@ -69,5 +69,23 @@
 @media (min-width: 1200px) {
     .message__input {
         max-width: 600px;
+    }
+}
+
+@media (max-width: 450px) {
+
+    .message__form {
+        padding: 0px 15px;
+    }
+
+    .message__input {
+        padding: 8px 15px;
+    }
+
+    .image_svg,
+    .send__message svg {
+        width: 40px;
+        height: auto;
+        fill: rgb(58, 58, 58);
     }
 }
