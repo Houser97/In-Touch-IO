@@ -30,6 +30,7 @@
 
 .chat__extra-data {
     width: 130px;
+    min-width: 80px;
     font-size: 0.9rem;
     display: flex;
     flex-direction: column;
