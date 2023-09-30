@@ -27,7 +27,7 @@ export function useSocket(userId = '') {
 
   useEffect(() => {
     const userId = JSON.parse(localStorage.getItem('idInTouch') || '');
-    const newSocket = io("http://localhost:3000", {
+    const newSocket = io(SocketURL, {
       transports: ['websocket', 'polling', 'flashsocket']
     });
 
