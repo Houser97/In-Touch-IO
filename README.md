@@ -1,6 +1,6 @@
-# Mern Messaging Application using Socket.IO, JSON Web Tokens (JWT) and Cloudinary
+# Mern Messaging Application using Socket.IO, JSON Web Token (JWT) and Cloudinary
 
-The application leverages the technologies of MongoDB, Express, Node and React, along with Socket.IO to deliver a complete reañ-time messaging application. Additionally, Cloudinary is employed to store user images which are used for profile pictures or within messages. The links returned by Cloudinary are saved in the user data within the database. 
+The application leverages the technologies of MongoDB, Express, Node and React, along with Socket.IO to deliver a complete real-time messaging application. Additionally, Cloudinary is employed to store user images which are used for profile pictures or within messages. The links returned by Cloudinary are saved in the user data within the database. 
 
 The application is fully responsive, enhancing the user experience on both large and small devices. Users can create an account or choose to use the demo user provided in the login component to begin interacting with the application's features. Moreover, the authentication process leverages JSON Web Tokens (JWT) to secure user data and protect the application's routes.
 
