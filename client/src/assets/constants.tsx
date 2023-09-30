@@ -1,7 +1,7 @@
 import React from "react";
-import { NavigateFunction } from "react-router-dom";
 
-export const API = 'http://localhost:3000/api'
+//export const API = 'http://localhost:3000/api'
+export const API = 'https://in-touch-io.onrender.com/api'
 
 export const AccessChat = async(token = '', id = '') => {
 
