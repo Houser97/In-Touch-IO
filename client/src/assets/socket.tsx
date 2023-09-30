@@ -2,11 +2,14 @@
 import { useState, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
 
+const SocketURL = 'https://in-touch-io.onrender.com'
+// const SocketURL = 'http://localhost:3000'
+
 export function useSocket(userId = '') {
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const newSocket = io("http://localhost:3000", {
+    const newSocket = io(SocketURL, {
       transports: ['websocket', 'polling', 'flashsocket']
     });
 
