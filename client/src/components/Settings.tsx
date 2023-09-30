@@ -26,7 +26,7 @@ const Settings = () => {
             <span>Settings</span>
         </Link>
         <Link className='logout__btn' to={`/`} onClick={logout}>
-            <span>Lot Out</span>
+            <span>Log Out</span>
         </Link>
     </div>
   )
