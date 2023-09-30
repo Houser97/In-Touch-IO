@@ -42,4 +42,5 @@
     left: 15px;
     width: 50px;
     fill: rgb(66, 66, 66);
+    z-index: 1500;
 }

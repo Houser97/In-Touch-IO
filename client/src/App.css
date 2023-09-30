@@ -10,6 +10,10 @@
   justify-content: center;
 }
 
+:root {
+  color-scheme: light only;
+}
+
 .App {
   display: flex;
   flex-direction: column;
