@@ -29,6 +29,7 @@ body {
   --message-input-bg: white;
   --input-login-color: #0B2447;
   --input-signup-color: #2dc000;
+  --svg-fill-color: rgb(58, 58, 58);
 }
 
 .dark {
@@ -44,6 +45,7 @@ body {
   --message-input-bg: #21262d;
   --input-login-color: #2176ff;
   --input-signup-color: #7db03a;
+  --svg-fill-color: #464e58;
 }
 
 *::-webkit-scrollbar {
