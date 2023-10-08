@@ -68,6 +68,8 @@ export interface generalContext_type {
     updateChats: boolean,
     socket: null | Socket,
     isOpenForTheFirstTime: boolean,
+    isDark: boolean,
+    setIsDark: React.Dispatch<React.SetStateAction<boolean>>,
     setIsOpenForTheFirstTime: React.Dispatch<React.SetStateAction<boolean>>
     setUpdateChats: React.Dispatch<React.SetStateAction<boolean>>,
     setOpenSearch: React.Dispatch<React.SetStateAction<boolean>>,
