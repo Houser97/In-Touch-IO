@@ -16,3 +16,35 @@ body {
   margin: 0;
   overflow: hidden;
 }
+
+.light {
+  --main-background-color: rgb(255, 255, 255);
+  --background-color: rgb(203, 203, 203);
+  --background-scroll: white;
+  --thumb-color: gray;
+  --text-color: rgb(60, 60, 60);
+  --name-color: black;
+  --header-large-chat: rgb(255, 255, 255);
+  --header-small-chat: #121212;
+  --message-input-bg: white;
+  --input-login-color: #0B2447;
+  --input-signup-color: #2dc000;
+}
+
+.dark {
+  --main-background-color: #171717;
+  --background-color: #141316;
+  --background-color: #1d1d1d;
+  --background-scroll: #21272e;
+  --thumb-color: white;
+  --text-color: rgb(170, 170, 170);
+  --name-color: rgb(224, 224, 224);
+  --header-large-chat: #0e1114;
+  --header-small-chat: #0e1114;
+  --message-input-bg: #21262d;
+  --input-login-color: #2176ff;
+  --input-signup-color: #7db03a;
+}
+
+
+
