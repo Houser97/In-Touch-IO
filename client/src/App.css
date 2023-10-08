@@ -18,11 +18,9 @@
   display: flex;
   flex-direction: column;
   width: 100%; /*No poner 100vw, ya que eso hace que el scrollbar ocupe espacio.*/
-  background-color: white;
+  background-color: var(--main-background-color);
   overflow: hidden;
   overflow-y: scroll;
-  --text-color: gray;
-  --name-color: black;
   font-family: 'Helvetica', 'Arial', sans-serif;
   position: relative;
   height: 100vh;
