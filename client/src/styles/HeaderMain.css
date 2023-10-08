@@ -28,7 +28,7 @@
     top: 5px;
     opacity: 0.5;
     cursor: default;
-    fill: gray;
+    fill: var(--name-color);
 }
 
 @media (min-width: 1200px) {
