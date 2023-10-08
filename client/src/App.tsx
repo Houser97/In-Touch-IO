@@ -8,6 +8,7 @@ import ContactsCarousel from './components/ContactsCarousel'
 import HeaderMain from './components/HeaderMain'
 import ChatLoader from './components/Loaders/ChatLoader'
 import Search from './components/Search'
+import useDarkMode from './hooks/useDarkMode'
 import { chat, chatContext_types, chat_object, generalContext_type, message, messagesContext_type, unseenMessage } from './TypeScript/typesApp'
 
 export const chatContext = createContext<chatContext_types>({
@@ -43,6 +44,8 @@ export const generalContext = createContext<generalContext_type>({
   socket: null,
   updateChats: false,
   isOpenForTheFirstTime: false,
+  isDark: false,
+  setIsDark: () => false,
   setIsOpenForTheFirstTime: () => false,
   setUpdateChats: () => false,
   setOpenSearch: () => false,
@@ -52,6 +55,7 @@ export const generalContext = createContext<generalContext_type>({
 function App() {
 
   const navigate = useNavigate();
+  const [isDark, setIsDark] = useDarkMode();
 
   const socket = useSocket()
   const [chatsLoading, setChatsLoading] = useState(true)
@@ -233,11 +237,13 @@ function App() {
     setOpenSearch,
     setOpenChat,
     isOpenForTheFirstTime,
-    setIsOpenForTheFirstTime
+    setIsOpenForTheFirstTime,
+    setIsDark,
+    isDark
   }
 
   return (
-    <div className='App'>
+    <div className={`App ${isDark ? 'dark' : 'light'}`}>
       <generalContext.Provider value={valuesGeneral}>
       <chatContext.Provider value={valuesChat}>
         <messagesContext.Provider value={valuesMessage}>

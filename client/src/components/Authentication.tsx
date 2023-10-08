@@ -3,6 +3,7 @@ import '../styles/Authentication.css'
 import Login from './Login'
 import SignUp from './SignUp'
 import authImg from '../assets/images/Login.jpg'
+import useDarkMode from '../hooks/useDarkMode'
 
 export interface validationError_type {
   msg: string
@@ -13,9 +14,10 @@ const Authentication = () => {
 
     const [isLogin, setIsLogin] = useState(true)
     const [validationErrors, setValidationErrors] = useState<validationError_type[]>([])
+    const [isDark, ] = useDarkMode()
 
   return (
-    <div className="auth__container">
+    <div className={`auth__container ${isDark ? 'dark' : 'light'}`}>
       <img src={authImg} className='auth__img'></img>
 
       <div className="authentication__container">
