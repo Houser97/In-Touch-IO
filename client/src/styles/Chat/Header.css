@@ -24,6 +24,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: white;
 }
 
 .arrow-left{
@@ -38,7 +39,7 @@
         background-color: var(--header-large-chat);
     }
 
-    .header__chat .contact {
+    .header__chat .contact .contact__name{
         color: var(--name-color);
     }
 }
