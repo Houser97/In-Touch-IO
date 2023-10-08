@@ -142,7 +142,7 @@ const Login = ({setIsLogin, setValidationErrors}: Login_type) => {
         </button>
         <div className="create__account-btn">
           <span>Don't have an account?</span> 
-          <button className='authentication__swap' onClick={() => handleSwap()}>Sign-up</button>
+          <button className='authentication__swap' onClick={() => handleSwap()}>Sign up</button>
         </div>
     </form>}
   </>
