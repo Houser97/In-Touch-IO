@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { checkLocalStorage } from '../assets/constants'
 import '../styles/Settings.css'
+import ToggleDarkBtn from './ToggleDarkBtn'
 
 const Settings = () => {
 
@@ -28,6 +29,7 @@ const Settings = () => {
         <Link className='logout__btn' to={`/`} onClick={logout}>
             <span>Log Out</span>
         </Link>
+        <ToggleDarkBtn />
     </div>
   )
 }
