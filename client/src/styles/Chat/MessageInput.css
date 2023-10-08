@@ -13,7 +13,7 @@
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    background-color: rgb(203, 203, 203);
+    background-color: var(--background-color);
 }
 
 .message__input {
@@ -26,7 +26,7 @@
     width: 100%;
     padding: 10px 20px;
     border-radius: 20px;
-    background-color: white;
+    background-color: var(--message-input-bg);
     max-width: 300px;
 }
 

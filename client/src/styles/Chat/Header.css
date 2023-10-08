@@ -1,7 +1,7 @@
 .header__chat {
     display: flex;
     flex-direction: row;
-    background-color: #121212;
+    background-color: var(--header-small-chat);
     padding: 10px;
     align-items: center;
     gap: 20px;
@@ -14,7 +14,7 @@
 .header__chat .contact {
     flex-direction: row;
     align-items: center;
-    color: white;
+    color: var(--name-color);
     gap: 10px;
 }
 
@@ -35,10 +35,10 @@
 
 @media (min-width: 1200px) {
     .header__chat {
-        background-color: #f0f2f5;
+        background-color: var(--header-large-chat);
     }
 
     .header__chat .contact {
-        color: black;
+        color: var(--name-color);
     }
 }

@@ -5,7 +5,7 @@
     flex-direction: column;
     align-items: center;
     width: 100%;
-    background-color: rgb(203, 203, 203);
+    background-color: var(--background-color);
     position: fixed; /*Ayuda a mantener el Chat siempre dentro del campo de vista de la aplicación. Si se quita, el chat aparece hasta abajo siempre incluso sin
     abrir un chat. */
     top: 0;

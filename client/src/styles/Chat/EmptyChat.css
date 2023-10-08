@@ -6,7 +6,7 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    color: black;
+    color: var(--text-color);
     font-size: 24px;
     font-weight: bold;
 }

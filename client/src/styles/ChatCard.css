@@ -5,6 +5,7 @@
     padding: 12px 0px;
     --space-elements: 8px;
     cursor: pointer;
+    color: var(--text-color);
 }
 
 .chat__data{
