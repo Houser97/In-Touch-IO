@@ -1,0 +1,43 @@
+.toggle {
+    --width-toggle: 50px;
+    --height-toggle: calc(var(--width-toggle)/2);
+    position: relative;
+    display: block;
+    width: var(--width-toggle);
+    height: var(--height-toggle);
+    border-radius: var(--width-toggle);
+    transition: 300ms ease-in-out;
+    cursor: pointer;
+    background-color: rgb(226, 226, 226);
+    box-shadow: inset 0 2px 60px rgba(0,0,0,0.1),
+                inset 0 2px 8px rgba(0, 0, 0, 0.1),
+                inset 0 -4px 4px rgba(0, 0, 0, 0.05);
+}
+
+.indicator {
+    position: absolute;
+    width: calc(var(--width-toggle)/2);
+    height: calc(var(--width-toggle)/2);
+    background: linear-gradient(to bottom, #eaeaea, #f9f9f9);
+    border-radius: 50%;
+    transform: scale(0.9);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1),
+                inset 0 4px 4px rgba(255, 255, 255, 1),
+                inset 0 -4px 4px rgba(255, 255, 255, 1);
+    transition: transform 300ms ease-in-out;
+}
+
+.toggle.active .indicator {
+    transform: translate(calc(var(--width-toggle)/2));
+    background: linear-gradient(to bottom, #444, #222);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5),
+                inset 0 4px 4px rgba(255, 255, 255, 0.2),
+                inset 0 -4px 4px rgba(255, 255, 255, 0.2);
+}
+
+.toggle.active {
+    background-color: #454648;
+    box-shadow: inset 0 8px 60px rgba(22,27,34,0.1),
+                inset 0 8px 8px rgba(0, 0, 0, 0.1),
+                inset 0 -4px 4px rgba(0, 0, 0, 0.1);
+}
