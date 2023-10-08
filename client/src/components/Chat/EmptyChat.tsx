@@ -5,7 +5,7 @@ const EmptyChat = () => {
   return (
     <div className='empty-chat__container'>
         <img src={messages} alt="" />
-        Select a Chat to see the whole conversation
+        Select a Chat to see the conversation
     </div>
   )
 }
