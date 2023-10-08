@@ -46,5 +46,16 @@ body {
   --input-signup-color: #7db03a;
 }
 
+*::-webkit-scrollbar {
+  width: 4px;          
+}
 
+*::-webkit-scrollbar-track {
+  background: var(--background-scroll);     
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--thumb-color);   
+  border-radius: 20px;    
+}
 
