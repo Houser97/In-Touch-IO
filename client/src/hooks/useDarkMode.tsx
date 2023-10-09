@@ -6,7 +6,7 @@ const useDarkMode = () => {
     const [isDark, setIsDark] = useState(() => {
         // Verifica si existe una variable en el Local Storage para determinar el valor inicial
         const localStorageValue = localStorage.getItem('isDark');
-        return localStorageValue ? JSON.parse(localStorageValue) : false;
+        return localStorageValue ? JSON.parse(localStorageValue) : true;
       });
 
     useEffect(() => {
