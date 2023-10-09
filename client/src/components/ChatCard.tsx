@@ -85,7 +85,9 @@ const ChatCard = ({picture, name, chatId, lastMessage, unseen, hour, senderId}: 
         <Contact picture={picture}/>
         <section className='chat__data'>
             <h3 className='chat__card-name'>{name}</h3>
-            {isOwner && 'you: '}{lastMessage}
+            {isOwner && 'you: '}{lastMessage.length === 0 
+            ? 'Photo'
+            : lastMessage}
         </section>
         <section className='chat__extra-data'>
             <span className='chat__hour'>{hour}</span>

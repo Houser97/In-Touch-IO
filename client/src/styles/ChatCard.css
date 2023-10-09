@@ -55,3 +55,15 @@
     justify-content: center;
     font-size: 0.76rem;
 }
+
+
+.chat__card-container .image_svg {
+    width: 25px;
+    height: auto;
+    align-self: flex-end;
+    justify-self: flex-end;
+    margin: 0;
+    margin-right: 3px;
+    position: relative;
+    bottom: -7px;
+}
