@@ -1,4 +1,4 @@
-import { FormEvent, useContext, useMemo, useState } from 'react'
+import { FormEvent, useContext, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { chatContext, generalContext } from '../App'
 import { API, checkLocalStorage } from '../assets/constants'
@@ -24,6 +24,8 @@ const Search = () => {
   const { openSearch, setOpenSearch } = useContext(generalContext)
   const { chats, user } = useContext(chatContext);
 
+  const navigate = useNavigate();
+
   const AddedFriends = useMemo(() => {
     const ChatsIdsList = Object.keys(chats);
     const UserId = user._id;
@@ -39,7 +41,19 @@ const Search = () => {
   const [userSearchResult, setUserSearchResult] = useState([]);
   const [query, setQuery] = useState('');
 
-  const navigate = useNavigate()
+  useEffect(() => {
+    const initialFetch = async() => {
+      const users = await fetchUsers('');
+      if(users === false){
+        navigate('/')
+        return;
+      }
+      setUserSearchResult(users)
+    }
+    
+    initialFetch();
+  }, [])
+  
 
   const searchUsers = async(e: FormEvent) => {
     e.preventDefault();
