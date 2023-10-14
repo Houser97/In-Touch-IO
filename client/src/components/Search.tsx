@@ -6,6 +6,19 @@ import { user_type } from '../TypeScript/typesApp'
 import '../styles/Search.css'
 import Contact from './Contact'
 
+const fetchUsers = async(query:string) => {
+  const token = JSON.parse(localStorage.getItem("token") || '');
+  const response =await fetch(`${API}/user/searchUser?search=${query}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      
+    }
+  })
+  return await response.json();
+}
+
 const Search = () => {
 
   const { openSearch, setOpenSearch } = useContext(generalContext)
@@ -34,16 +47,7 @@ const Search = () => {
       navigate('/')
       return undefined
     }
-    const token = JSON.parse(localStorage.getItem("token") || '');
-    const response =await fetch(`${API}/user/searchUser?search=${query}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        
-      }
-    })
-    const users = await response.json()
+    const users = await fetchUsers(query)
     if(users === false){
       navigate('/')
       return;
