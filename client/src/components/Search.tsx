@@ -50,8 +50,11 @@ const Search = () => {
       }
       setUserSearchResult(users)
     }
+
+    const timeoutId = setTimeout(initialFetch, 2000);
+
+    return () => clearTimeout(timeoutId);
     
-    initialFetch();
   }, [])
   
 
