@@ -14,7 +14,7 @@ import Cropper from 'react-easy-crop';
 import useWindowSize from '../../hooks/windowSizeHook';
 import getCroppedImg from './utils/cropImage';
 
-const CropEasy = ({ photoURL, setPreviewSourceCrop, setPreviewSource, setPhotoURL, setFile }) => {
+const CropEasy = ({ photoURL, setPreviewSourceParent, setPhotoURL, setFile }) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
@@ -38,8 +38,7 @@ const CropEasy = ({ photoURL, setPreviewSourceCrop, setPreviewSource, setPhotoUR
       );
       setPhotoURL(url);
       setFile(file);
-      setPreviewSource(url);
-      setPreviewSourceCrop('');
+      setPreviewSourceParent('');
     } catch (error) {
      
       console.log(error);
@@ -107,7 +106,7 @@ const CropEasy = ({ photoURL, setPreviewSourceCrop, setPreviewSource, setPhotoUR
           <Button
             variant="outlined"
             startIcon={<Cancel />}
-            onClick={() => setPreviewSourceCrop('')}
+            onClick={() => setPreviewSourceParent('')}
           >
             Cancel
           </Button>

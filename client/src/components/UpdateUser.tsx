@@ -118,9 +118,8 @@ const UpdateUser = () => {
             </div>
             <CropEasy 
             photoURL={previewSourceCrop} 
-            setPreviewSource={setPreviewSource}
-            setPreviewSourceCrop={setPreviewSourceCrop}
-            setPhotoURL={setPreviewSource}
+            setPreviewSourceParent={setPreviewSource}
+            setPhotoURL={setPreviewSourceCrop}
             setFile={setSelectedFile}/>
         </form>
     </div>
