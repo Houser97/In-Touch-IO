@@ -56,7 +56,7 @@ const Login = ({setIsLogin, setValidationErrors}: Login_type) => {
       headers: {
           'Content-Type': 'application/json'
       },
-      body: JSON.stringify({pwd,email})
+      body: JSON.stringify({pwd,email: email.trim()})
     })
     const data = await response.json();
     if(Array.isArray(data)){
