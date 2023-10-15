@@ -27,6 +27,7 @@
     max-width: 1800px;
     padding: 20px 60px;
     background-color: var(--main-background-color);
+    position: relative;
 }
 
 .custum-file-upload .icon {
@@ -83,6 +84,11 @@
 .change__username button {
     margin-top: 30px;
     width: 400px;
+}
+
+.reactEasyCrop_Image {
+    height: 95%;
+    width: auto;
 }
 
 @media (min-width: 1600px) {
