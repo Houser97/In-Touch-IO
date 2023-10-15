@@ -1,6 +1,7 @@
 // socket.js
 import { useState, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
+import { checkLocalStorage } from './constants';
 
 const SocketURL = 'https://in-touch-io.onrender.com'
 // const SocketURL = 'http://localhost:3000'
@@ -26,6 +27,7 @@ export function useSocket(userId = '') {
   }, []);
 
   useEffect(() => {
+    if(!checkLocalStorage()) return
     const userId = JSON.parse(localStorage.getItem('idInTouch') || '');
     const newSocket = io(SocketURL, {
       transports: ['websocket', 'polling', 'flashsocket']
