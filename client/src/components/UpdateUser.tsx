@@ -23,9 +23,9 @@ const UpdateUser = () => {
 
     const [fileInputState, setFileInputState] = useState('');
     const [previewSource, setPreviewSource] = useState(userData.pictureUrl);
+    const [previewSourceCrop, setPreviewSourceCrop] = useState('');
     const [selectedFile, setSelectedFile] = useState<Blob | null>(null)
     const [newUsername, setNewUsername] = useState(userData.name)
-    const [openCrop, setOpenCrop] = useState(false)
 
     const updateUser = async (e: FormEvent) => {
         e.preventDefault();
@@ -80,7 +80,7 @@ const UpdateUser = () => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onloadend = () => {
-            setPreviewSource(reader.result as string);
+            setPreviewSourceCrop(reader.result as string)
         }
     }
     
@@ -117,8 +117,9 @@ const UpdateUser = () => {
                 <button className="authentication__submit">Update</button>
             </div>
             <CropEasy 
-            photoURL={previewSource} 
-            setOpenCrop={setOpenCrop}
+            photoURL={previewSourceCrop} 
+            setPreviewSource={setPreviewSource}
+            setPreviewSourceCrop={setPreviewSourceCrop}
             setPhotoURL={setPreviewSource}
             setFile={setSelectedFile}/>
         </form>
