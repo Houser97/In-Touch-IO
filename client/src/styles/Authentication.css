@@ -207,7 +207,7 @@ label {
     position: absolute; /*Junto con TOP ayuda a que el contenido crezca hacia abajo y que no se mueva el formulario*/
     top: 90%;
     left: 25px;
-    color: black;
+    color: var(--text-color);
 }
 
 .errors li {
