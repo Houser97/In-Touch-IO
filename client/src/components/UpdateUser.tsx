@@ -86,41 +86,43 @@ const UpdateUser = () => {
     
 
   return (
-    <form className={`update__user-form authentication__form ${isDark ? 'dark' : 'light'}`} onSubmit={(e) => updateUser(e)}>
-        <label className="custum-file-upload" htmlFor="file">
-            <div className="icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>camera</title><path d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9Z" /></svg>
+    <div className={`update__user-container ${isDark ? 'dark' : 'light'}`}>
+        <form className="update__user-form authentication__form" onSubmit={(e) => updateUser(e)}>
+            <label className="custum-file-upload" htmlFor="file">
+                <div className="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>camera</title><path d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9Z" /></svg>
+                </div>
+                <div className="text">
+                    <span>Click to upload image</span>
+                </div>
+                <input 
+                    type="file" 
+                    id='file'
+                    name='image'
+                    accept="image/png, image/gif, image/jpeg, image/jpg"
+                    onChange={(e) => handleFileInputChange(e)}
+                    value={fileInputState}
+                    className='input__image'/>
+                {previewSource && (
+                    <img className='preview__update-user' src={previewSource} alt="preview" />
+                )}
+            </label>
+            <div className='change__username form__section-container'>
+                <label htmlFor="username">Username</label>
+                <div className="form__section-container">
+                    <input type="text" name='username' id='username' value={newUsername} onChange={e => setNewUsername(e.target.value)} required/>
+                    <div className="topline"></div>
+                    <div className="underline"></div>
+                </div>
+                <button className="authentication__submit">Update</button>
             </div>
-            <div className="text">
-                <span>Click to upload image</span>
-            </div>
-            <input 
-                type="file" 
-                id='file'
-                name='image'
-                accept="image/png, image/gif, image/jpeg, image/jpg"
-                onChange={(e) => handleFileInputChange(e)}
-                value={fileInputState}
-                className='input__image'/>
-            {previewSource && (
-                <img className='preview__update-user' src={previewSource} alt="preview" />
-            )}
-        </label>
-        <div className='change__username form__section-container'>
-            <label htmlFor="username">Username</label>
-            <div className="form__section-container">
-                <input type="text" name='username' id='username' value={newUsername} onChange={e => setNewUsername(e.target.value)} required/>
-                <div className="topline"></div>
-                <div className="underline"></div>
-            </div>
-            <button className="authentication__submit">Update</button>
-        </div>
-        <CropEasy 
-        photoURL={previewSource} 
-        setOpenCrop={setOpenCrop}
-        setPhotoURL={setPreviewSource}
-        setFile={setSelectedFile}/>
-    </form>
+            <CropEasy 
+            photoURL={previewSource} 
+            setOpenCrop={setOpenCrop}
+            setPhotoURL={setPreviewSource}
+            setFile={setSelectedFile}/>
+        </form>
+    </div>
   )
 }
 
