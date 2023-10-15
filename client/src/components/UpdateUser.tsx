@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { API, checkLocalStorage } from '../assets/constants';
 import useDarkMode from '../hooks/useDarkMode';
 import '../styles/UpdateUser.css'
+import CropEasy from './crop/CropEasy';
 
 const UpdateUser = () => {
 
@@ -24,6 +25,7 @@ const UpdateUser = () => {
     const [previewSource, setPreviewSource] = useState(userData.pictureUrl);
     const [selectedFile, setSelectedFile] = useState<Blob | null>(null)
     const [newUsername, setNewUsername] = useState(userData.name)
+    const [openCrop, setOpenCrop] = useState(false)
 
     const updateUser = async (e: FormEvent) => {
         e.preventDefault();
@@ -113,6 +115,11 @@ const UpdateUser = () => {
             </div>
             <button className="authentication__submit">Update</button>
         </div>
+        <CropEasy 
+        photoURL={previewSource} 
+        setOpenCrop={setOpenCrop}
+        setPhotoURL={setPreviewSource}
+        setFile={setSelectedFile}/>
     </form>
   )
 }
