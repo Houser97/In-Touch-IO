@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import Cropper from 'react-easy-crop';
+import useWindowSize from '../../hooks/windowSizeHook';
 import getCroppedImg from './utils/cropImage';
 
 const CropEasy = ({ photoURL, setPreviewSourceCrop, setPreviewSource, setPhotoURL, setFile }) => {
@@ -18,6 +19,10 @@ const CropEasy = ({ photoURL, setPreviewSourceCrop, setPreviewSource, setPhotoUR
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+
+  const windowSize = useWindowSize();
+
+  const DialogContentHeight = windowSize.width >= 600 ? 300 : 200;
 
   const cropComplete = (croppedArea, croppedAreaPixels) => {
     setCroppedAreaPixels(croppedAreaPixels);
@@ -49,7 +54,7 @@ const CropEasy = ({ photoURL, setPreviewSourceCrop, setPreviewSource, setPhotoUR
         sx={{
           background: '#333',
           position: 'relative',
-          height: 400,
+          height: DialogContentHeight,
           width: 'auto',
           minWidth: { sm: 500 },
         }}
@@ -96,6 +101,7 @@ const CropEasy = ({ photoURL, setPreviewSourceCrop, setPreviewSource, setPhotoUR
             display: 'flex',
             gap: 2,
             flexWrap: 'wrap',
+            justifyContent: 'center'
           }}
         >
           <Button
