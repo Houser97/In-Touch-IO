@@ -36,9 +36,9 @@ const CropEasy = ({ photoURL, setPreviewSourceParent, setPhotoURL, setFile }) =>
         croppedAreaPixels,
         rotation
       );
-      setPhotoURL(url);
+      setPreviewSourceParent(url);
       setFile(file);
-      setPreviewSourceParent('');
+      setPhotoURL('');
     } catch (error) {
      
       console.log(error);
@@ -106,7 +106,7 @@ const CropEasy = ({ photoURL, setPreviewSourceParent, setPhotoURL, setFile }) =>
           <Button
             variant="outlined"
             startIcon={<Cancel />}
-            onClick={() => setPreviewSourceParent('')}
+            onClick={() => setPhotoURL('')}
           >
             Cancel
           </Button>
