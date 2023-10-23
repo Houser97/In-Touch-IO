@@ -9,7 +9,7 @@ interface ChatCard_props {
     picture: string,
     name: string,
     chatId: string,
-    lastMessage: string,
+    lastMessage: string | boolean,
     unseen: {_id: string, chat: string, sender: string}[],
     hour: string,
     senderId: string,
