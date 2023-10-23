@@ -52,7 +52,7 @@ const MessagesList = () => {
         {Object.keys(chats).length ? Object.keys(chats).map((key) => {
           const chat = chats[key]
           const {_id, users, updatedAt} = chat
-          const lastMessage = chat.lastMsg ? chat.lastMsg.content : ''
+          const lastMessage = chat.lastMsg ? chat.lastMsg.content : false
           // Si el mensaje se acaba de enviar (MessageInput) entonces sender es un objeto, de lo contrario contiene un string.
           let senderId = chat.lastMsg ? chat.lastMsg.sender : ''
           senderId = typeof senderId === 'object' ? senderId._id : senderId
