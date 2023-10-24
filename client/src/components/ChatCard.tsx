@@ -80,14 +80,27 @@ const ChatCard = ({picture, name, chatId, lastMessage, unseen, hour, senderId}: 
         socket.emit('join chat', chatId)
     }
 
+    const LastMessage = () => {
+      if(typeof lastMessage === 'string') {
+        return (
+          lastMessage.length
+            ? <div><svg className='photo__msg' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>image</title><path d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z" /></svg>Photo</div>
+            : lastMessage
+        )
+      }
+
+      return ''
+
+    }
+
   return (
     <div className='chat__card-container main__container' onClick={retrieveChatData}>
         <Contact picture={picture}/>
         <section className='chat__data'>
             <h3 className='chat__card-name'>{name}</h3>
-            {isOwner && 'you: '}{lastMessage.length === 0 
-            ? 'Photo'
-            : lastMessage}
+            <div className="last-msg__container">
+              {isOwner && 'you: '}{LastMessage()}
+            </div>
         </section>
         <section className='chat__extra-data'>
             <span className='chat__hour'>{hour}</span>
