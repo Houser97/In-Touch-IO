@@ -67,3 +67,20 @@
     position: relative;
     bottom: -7px;
 }
+
+.last-msg__container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 3px;
+}
+
+.last-msg__container div {
+    display: inherit;
+}
+
+.photo__msg {
+    height: 16px;
+    width: auto;
+    fill: var(--text-color);
+}
