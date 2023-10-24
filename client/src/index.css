@@ -41,10 +41,10 @@ body {
   --name-color: rgb(224, 224, 224);
   --header-large-chat: #0e1114;
   --header-small-chat: #0e1114;
-  --message-input-bg: #21262d;
+  --message-input-bg: rgb(66, 66, 66);
   --input-login-color: #2176ff;
   --input-signup-color: #7db03a;
-  --svg-fill-color: #464e58;
+  --svg-fill-color: rgb(170, 170, 170);
 }
 
 *::-webkit-scrollbar {
