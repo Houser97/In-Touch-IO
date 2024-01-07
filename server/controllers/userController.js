@@ -1,5 +1,5 @@
 const User = require('../models/user');
-const {body, validationResult} = require('express-validator');
+const { body, validationResult } = require('express-validator');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { cloudinary } = require('../services/cloudinary');
@@ -8,9 +8,9 @@ const CLOUDINARY_PRESET = 'InTouch';
 
 exports.check_email = [
     body('email', 'E-mail must be a valid address.').isEmail()
-    .trim()
-    .escape()
-    .normalizeEmail(),
+        .trim()
+        .escape()
+        .normalizeEmail(),
 
     async (req, res, next) => {
         const errors = validationResult(req);
@@ -52,7 +52,7 @@ exports.create_user = [
                 name: req.body.username,
                 friends: []
             }).save();
-            res.json({id: user._id});
+            res.json({ id: user._id });
         } catch (err) {
             return res.json(err);
         }
@@ -61,21 +61,21 @@ exports.create_user = [
 
 exports.login = [
     body('email', 'E-mail must be a valid address.').isEmail()
-    .trim()
-    .escape()
-    .normalizeEmail(),
+        .trim()
+        .escape()
+        .normalizeEmail(),
 
     async (req, res) => {
         const errors = validationResult(req);
-        if(!errors.isEmpty()) return res.json(errors.array());
+        if (!errors.isEmpty()) return res.json(errors.array());
         try {
-            const user = await User.findOne({'email': req.body.email}).exec();
-            if(!user) return res.json([{msg: 'Email does not exist.'}])
+            const user = await User.findOne({ 'email': req.body.email }).exec();
+            if (!user) return res.json([{ msg: 'Email does not exist.' }])
             bcryptjs.compare(req.body.pwd, user.password, (err, passwordMatch) => {
-                if(passwordMatch){
-                    jwt.sign({user}, `${process.env.SECRET_KEY}`, {expiresIn: '7200s'} ,(err, token) => {
-                        if(err) return res.json(err)
-                        return res.json({token, id: user._id})
+                if (passwordMatch) {
+                    jwt.sign({ user }, `${process.env.SECRET_KEY}`, { expiresIn: '7200s' }, (err, token) => {
+                        if (err) return res.json(err)
+                        return res.json({ token, id: user._id })
                     })
                 } else {
                     return res.json([{ msg: 'Incorrect Password' }]);
@@ -89,22 +89,24 @@ exports.login = [
 
 exports.get_user_data = [
     body('email', 'E-mail must be a valid address.').isEmail()
-    .trim()
-    .escape()
-    .normalizeEmail(),
+        .trim()
+        .escape()
+        .normalizeEmail(),
 
     async (req, res, next) => {
-        const user = await User.findOne({_id: req.body.id})
-        if(!user) return res.json(false)
+        const userId = req.params.userId
+
+        const user = await User.findOne({ _id: userId })
+        if (!user) return res.json(false)
         const { _id, email, pictureUrl, publicId, name } = user
         return res.json({ _id, email, pictureUrl, publicId, name })
     }
 ]
 
 exports.update_user = async (req, res) => {
-    const { image, username } = req.body; 
-    if(!image.length) {
-        const user = await User.updateOne({_id: req.params.id},
+    const { image, username } = req.body;
+    if (!image.length) {
+        const user = await User.updateOne({ _id: req.params.userId },
             {
                 $set: {
                     name: username
@@ -116,7 +118,7 @@ exports.update_user = async (req, res) => {
         const data = await cloudinary.uploader.upload(image, {
             upload_preset: CLOUDINARY_PRESET
         })
-        const savedImg = await User.updateOne({_id: req.params.id},
+        const savedImg = await User.updateOne({ _id: req.params.userId },
             {
                 $set: {
                     pictureUrl: data.url,
@@ -124,22 +126,27 @@ exports.update_user = async (req, res) => {
                     name: username
                 }
             })
-        res.json({pictureUrl: data.url})
+        res.json({ pictureUrl: data.url })
     } catch (error) {
         console.log(error);
         res.status(500).json({ err: 'Something went wrong' })
     }
 }
 
-exports.searchUser = async(req, res) => {
-    const keyword = req.query.search 
-    ? {
-        $or: [
-            { name: { $regex: req.query.search, $options: "i"} },
-            { email: { $regex: req.query.search, $options: "i"} }
-        ]
+exports.searchUser = async (req, res) => {
+    try {
+        const keyword = req.query.search
+            ? {
+                $or: [
+                    { name: { $regex: '', $options: "i" } },
+                    { email: { $regex: '', $options: "i" } }
+                ]
+            }
+            : {}
+        const users = await User.find(keyword, { 'password': 0, 'publicId': 0 })
+        return res.json(users)
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ err: 'Something went wrong' });
     }
-    : {}
-    const users = await User.find(keyword, {'password': 0, 'publicId': 0}).find({ _id: { $ne: req.userId }})
-    return res.json(users)
 }
