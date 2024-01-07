@@ -1,14 +1,15 @@
-.message__container{
+.message__container {
     flex-direction: column;
     color: rgb(0, 0, 0);
     max-width: 300px;
     min-width: 200px;
     width: auto;
     position: relative;
+    word-wrap: break-word;
 }
 
 .left,
-.right{
+.right {
     position: relative;
     margin: 10px 0px;
     font-size: 0.9rem;
@@ -18,7 +19,7 @@
 }
 
 .message__container.left::before,
-.message__container.right::before{
+.message__container.right::before {
     content: '';
     position: absolute;
     box-sizing: border-box;
@@ -26,13 +27,13 @@
     top: 0px;
 }
 
-.message__container.left::before{
+.message__container.left::before {
     border-top: 25px solid rgb(83, 119, 234);
     transform: rotate(0deg);
     left: -10px;
 }
 
-.message__container.right::before{
+.message__container.right::before {
     border-top: 26px solid rgb(154, 210, 126);
     transform: rotate(0deg);
     right: -10px;
@@ -44,7 +45,7 @@
 }
 
 .right {
-    background-color: rgb(154, 210, 126); 
+    background-color: rgb(154, 210, 126);
     align-self: flex-end;
 }
 
@@ -65,7 +66,7 @@
 }
 
 @media (min-width: 500px) {
-    .message__container{
+    .message__container {
         max-width: 30vw;
         min-width: 320px;
     }
