@@ -1,7 +1,8 @@
 import React from "react";
 
 //export const API = 'http://localhost:3000/api'
-export const API = 'https://in-touch-io.onrender.com/api'
+//export const API = 'https://in-touch-io.onrender.com/api'
+export const API = "https://in-touch-io.vercel.app/";
 
 export const AccessChat = async (token = '', id = '') => {
 

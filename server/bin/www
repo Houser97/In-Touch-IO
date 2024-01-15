@@ -26,7 +26,8 @@ const io = require('socket.io')(server, {
   pingTimeout: 60000,
   cors: {
     //origin: "http://localhost:5173",
-    origin: "https://in-touch-io.onrender.com",
+    //origin: "https://in-touch-io.onrender.com",
+    origin: "https://in-touch-io.vercel.app"
   }
 })
 
@@ -52,7 +53,7 @@ io.on('connection', (socket) => {
   socket.on('new message', (newMessage) => {
     const chat = newMessage.chat
 
-    if(!chat.users.length) return
+    if (!chat.users.length) return
 
     chat.users.forEach(user => {
       socket.in(user._id).emit('message received', newMessage)
