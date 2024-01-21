@@ -17,13 +17,15 @@
 .App {
   display: flex;
   flex-direction: column;
-  width: 100%; /*No poner 100vw, ya que eso hace que el scrollbar ocupe espacio.*/
+  width: 100%;
+  /*No poner 100vw, ya que eso hace que el scrollbar ocupe espacio.*/
   background-color: var(--main-background-color);
   overflow: hidden;
   overflow-y: scroll;
   font-family: 'Helvetica', 'Arial', sans-serif;
   position: relative;
   height: 100vh;
+  height: 100svh;
 }
 
 .main__container {
@@ -41,7 +43,7 @@ img {
 }
 
 @media (min-width: 1200px) {
-  .App{
+  .App {
     overflow: hidden;
   }
 }
