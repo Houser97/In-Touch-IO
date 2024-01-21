@@ -1,18 +1,21 @@
-.chat__container{
+.chat__container {
     display: flex;
     height: 100vh;
     max-height: 100vh;
+    height: 100svh;
+    max-height: 100svh;
     flex-direction: column;
     align-items: center;
     width: 100%;
     background-color: var(--background-color);
-    position: fixed; /*Ayuda a mantener el Chat siempre dentro del campo de vista de la aplicación. Si se quita, el chat aparece hasta abajo siempre incluso sin
+    position: fixed;
+    /*Ayuda a mantener el Chat siempre dentro del campo de vista de la aplicación. Si se quita, el chat aparece hasta abajo siempre incluso sin
     abrir un chat. */
     top: 0;
     z-index: 1005;
 }
 
-.loading__container{
+.loading__container {
     overflow: auto;
 }
 
@@ -26,22 +29,22 @@
     overflow-x: hidden;
 }
 
-.chat__container .arrow-left{
+.chat__container .arrow-left {
     display: none;
 }
 
 
 @media (max-width: 1200px) {
-    .chat__container{
+    .chat__container {
         transform: translateY(100%);
         transition: transform 200ms ease-in-out;
     }
 
-    .show-chat{
+    .show-chat {
         transform: translateY(0%);
     }
 
-    .chat__container .arrow-left{
+    .chat__container .arrow-left {
         display: flex;
     }
 }
