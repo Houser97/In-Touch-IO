@@ -26,8 +26,8 @@ const io = require('socket.io')(server, {
   pingTimeout: 60000,
   cors: {
     //origin: "http://localhost:5173",
-    //origin: "https://in-touch-io.onrender.com",
-    origin: "https://in-touch-io.vercel.app"
+    origin: "https://in-touch-io.onrender.com",
+    //origin: "https://in-touch-io.vercel.app"
   }
 })
 
