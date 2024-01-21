@@ -1,9 +1,9 @@
 .chat__container {
     display: flex;
-    height: 100vh;
-    max-height: 100vh;
     height: 100svh;
     max-height: 100svh;
+    height: 100vh;
+    max-height: 100vh;
     flex-direction: column;
     align-items: center;
     width: 100%;
