@@ -1,6 +1,6 @@
 import { FormEvent, SetStateAction, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { API, checkLocalStorage } from '../assets/constants'
+import { API, checkLocalStorage } from '../../assets/constants'
 import ChatLoader from './Loaders/ChatLoader'
 
 interface Login_type {

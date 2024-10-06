@@ -1,7 +1,7 @@
 import { ChangeEvent, FormEvent, useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { chatContext, generalContext, messagesContext } from '../../App';
-import { API, checkLocalStorage } from '../../assets/constants';
+import { chatContext, generalContext, messagesContext } from '../../../App';
+import { API, checkLocalStorage } from '../../../assets/constants';
 import '../../styles/Chat/MessageInput.css'
 
 interface MsgInput_type {

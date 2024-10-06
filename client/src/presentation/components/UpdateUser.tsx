@@ -1,7 +1,7 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { API, checkLocalStorage } from '../assets/constants';
-import useDarkMode from '../hooks/useDarkMode';
+import { API, checkLocalStorage } from '../../assets/constants';
+import useDarkMode from '../../hooks/useDarkMode';
 import '../styles/UpdateUser.css'
 import CropEasy from './crop/CropEasy';
 

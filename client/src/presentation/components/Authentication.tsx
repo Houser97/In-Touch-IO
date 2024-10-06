@@ -3,7 +3,7 @@ import '../styles/Authentication.css'
 import Login from './Login'
 import SignUp from './SignUp'
 import authImg from '../assets/images/Login.jpg'
-import useDarkMode from '../hooks/useDarkMode'
+import useDarkMode from '../../hooks/useDarkMode'
 
 export interface validationError_type {
   msg: string
@@ -12,9 +12,9 @@ export interface validationError_type {
 // {isLogin ? <Login setIsLogin={setIsLogin} /> : <SignUp setIsLogin={setIsLogin} />}
 const Authentication = () => {
 
-    const [isLogin, setIsLogin] = useState(true)
-    const [validationErrors, setValidationErrors] = useState<validationError_type[]>([])
-    const [isDark, ] = useDarkMode()
+  const [isLogin, setIsLogin] = useState(true)
+  const [validationErrors, setValidationErrors] = useState<validationError_type[]>([])
+  const [isDark,] = useDarkMode()
 
   return (
     <div className={`auth__container ${isDark ? 'dark' : 'light'}`}>
@@ -22,16 +22,16 @@ const Authentication = () => {
 
       <div className="authentication__container">
         {isLogin ? <Login setIsLogin={setIsLogin} setValidationErrors={setValidationErrors} /> : <SignUp setIsLogin={setIsLogin} setValidationErrors={setValidationErrors} />}
-          
-          <div>
+
+        <div>
           <ul className="errors">
-            {validationErrors.map(({msg}, index) => {
-              return(
+            {validationErrors.map(({ msg }, index) => {
+              return (
                 <li key={`validationError-${index}`}>{msg}</li>
               )
             })}
           </ul>
-          </div>
+        </div>
       </div>
     </div>
   )
