@@ -6,7 +6,7 @@ const ChatSchema = new mongoose.Schema({
         ref: "User"
     }],
     lastMessage: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Message",
         default: null
     },
