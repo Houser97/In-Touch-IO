@@ -10,12 +10,17 @@ export class ChatService {
         private readonly messageService: MessageService
     ) { }
 
-    async getById(id: string) {
+    async getById(id: string, userId: string) {
         try {
-            const chat = await ChatModel.findById(id);
+            const chat = await ChatModel.findById(id)
+                .populate('users', 'name email pictureUrl pictureId')
+                .populate('lastMessage');
             if (!chat) throw CustomError.badRequest('Chat does not exist');
 
-            return chat;
+            const chatEntity = ChatEntity.fromObject(chat);
+            const messages = await this.messageService.getUnseenMessages([chatEntity.id], userId);
+
+            return { chat: chatEntity, unseenMessages: messages[chatEntity.id] };
         } catch (error) {
             throw CustomError.internalServer(`${error}`);
         }
@@ -32,7 +37,7 @@ export class ChatService {
 
             const ids = chatsEntity.map(chat => chat.id);
 
-            const messages = await this.messageService.getUnseenMessages(ids);
+            const messages = await this.messageService.getUnseenMessages(ids, userId);
 
             return { chats: chatsEntity, unseenMessages: messages };
         } catch (error) {
@@ -60,7 +65,9 @@ export class ChatService {
 
     async update(id: string, updateChatDto: UpdateChatDto) {
         try {
-            const chat = await ChatModel.findByIdAndUpdate(id, updateChatDto, { new: true });
+            const chat = await ChatModel.findByIdAndUpdate(id, updateChatDto, { new: true })
+                .populate('users', 'name email pictureUrl pictureId')
+                .populate('lastMessage');;
             return ChatEntity.fromObject(chat!.toObject());
         } catch (error) {
             throw CustomError.internalServer(`${error}`);
