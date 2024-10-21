@@ -1,11 +1,21 @@
 import { CloudinaryAdapter } from "../../config/cloudinary/cloudinary.adapter";
 import { UserModel } from "../../data/mongo/models/user.model";
 import { UpdateUserDto } from "../../domain/dtos/users/update-user.dto";
-import { UserEntity } from "../../domain/entities/user.entity";
+import { PartialUserEntity, UserEntity } from "../../domain/entities/user.entity";
 import { CustomError } from "../../domain/errors/custom.error";
+import { UsernameQuery } from "../../domain/interfaces/username-query.interface";
 
 export class UserService {
     constructor() { }
+
+    async getByNameOrEmail(name: UsernameQuery) {
+        try {
+            const users = await UserModel.find(name);
+            return users.map(PartialUserEntity.fromObject);
+        } catch (error) {
+            throw CustomError.internalServer(`${error}`);
+        }
+    }
 
     async update(id: string, updateUserDto: UpdateUserDto) {
 
