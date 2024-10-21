@@ -4,6 +4,7 @@ import { MessageModel } from "../../data/mongo/models/message.model";
 import { CreateMessageDto } from "../../domain/dtos/messages/create-message.dto";
 import { MessageEntity } from "../../domain/entities/message.entity";
 import { CustomError } from "../../domain/errors/custom.error";
+import { UpdateMessageDto } from "../../domain/dtos/messages/update-message.dto";
 
 export class MessageService {
     constructor() { }
@@ -35,11 +36,12 @@ export class MessageService {
         }
     }
 
-    async getUnseenMessages(chatIds: string[]) {
+    async getUnseenMessages(chatIds: string[], userId: string) {
         try {
             const messages = await MessageModel.find({
                 isSeen: false,
-                chat: { $in: chatIds }
+                chat: { $in: chatIds },
+                // sender: { $ne: userId }
             }).select('_id sender chat');
 
             const unseenMessagesByChat = messages.reduce((acc: { [key: string]: { id: string, sender: string }[] }, message) => {
@@ -58,8 +60,22 @@ export class MessageService {
         }
     }
 
+    async updateMessagesStatus(updateMessageDto: UpdateMessageDto) {
+        const { ids } = updateMessageDto
+        try {
+            const messages = await MessageModel.updateMany(
+                { _id: { $in: ids } },
+                { $set: { isSeen: true } }
+            );
+            return messages;
+        } catch (error) {
+            throw CustomError.internalServer(`${error}`);
+        }
+    }
+
     private async checkChatStatus(chatId: string) {
         const chatExists = await ChatModel.findById(chatId);
         if (!chatExists) throw CustomError.badRequest('Chat does not exists');
     }
+
 }
