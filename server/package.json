@@ -4,9 +4,8 @@
   "private": true,
   "scripts": {
     "deployment": "cd .. && cd client && npm run build && cd .. && cd server && cp -a ../client/dist/. ./public",
-    "dev": "ts-node src/app.ts",
-    "dev:nodemon": "nodemon",
     "build": "rimraf ./dist && tsc",
+    "dev": "tsnd --respawn --clear src/app.ts",
     "start": "npm run build && node dist/app.js"
   },
   "dependencies": {
@@ -19,20 +18,26 @@
     "ejs": "~2.6.1",
     "env-var": "^7.5.0",
     "express": "~4.16.1",
+    "express-fileupload": "^1.5.1",
     "express-validator": "^7.0.1",
     "http-errors": "~1.6.3",
     "jsonwebtoken": "^9.0.1",
     "mongoose": "^7.4.2",
     "morgan": "~1.9.1",
     "multer": "^1.4.5-lts.1",
-    "socket.io": "^4.7.2"
+    "socket.io": "^4.8.0"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/express": "^4.17.21",
+    "@types/express-fileupload": "^1.5.1",
+    "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^22.5.5",
+    "@types/socket.io": "^3.0.2",
     "nodemon": "^3.1.4",
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^5.6.2"
   }
 }
