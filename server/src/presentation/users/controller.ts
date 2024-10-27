@@ -22,11 +22,12 @@ export class UserController {
 
     updateUser = async (req: Request, res: Response) => {
         const [error, updateUserDto] = UpdateUserDto.create(req.body);
+        const { oldPublicId } = req.body;
         if (error) return res.status(400).json({ error });
 
         const id = req.params.id;
 
-        this.userService.update(id, updateUserDto!)
+        this.userService.update(id, oldPublicId, updateUserDto!)
             .then(user => res.json(user))
             .catch(error => this.handleError(error, res));
 
