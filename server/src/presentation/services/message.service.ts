@@ -15,9 +15,11 @@ export class MessageService {
         const id = new mongoose.Types.ObjectId(chatId)
 
         try {
-            const messages = await MessageModel.find({ chat: id });
+            const messages = await MessageModel.find({ chat: id })
+                .sort({ 'createdAt': 'desc' })
+                .limit(10);
 
-            return messages.map(MessageEntity.fromObject);
+            return messages.reverse().map(MessageEntity.fromObject);
         } catch (error) {
             throw CustomError.internalServer(`${error}`);
         }
