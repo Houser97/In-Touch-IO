@@ -10,7 +10,7 @@ export class CreateMessageDto {
         const { sender, content, chat, image } = props;
 
         if (!sender) return ['Missing sender'];
-        if (!content) return ['Missing content'];
+        if (!content && !image) return ['Missing content'];
         if (!chat) return ['Missing chat'];
         if (image !== undefined && typeof (image) !== 'string') return ['Missing must be a string'];
 
