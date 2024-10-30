@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { MessageService } from "../services/message.service";
 import { CreateMessageDto } from "../../domain/dtos/messages/create-message.dto";
 import { CustomError } from "../../domain/errors/custom.error";
+import { UpdateMessageDto } from "../../domain/dtos/messages/update-message.dto";
 
 export class MessageController {
     constructor(
@@ -32,6 +33,15 @@ export class MessageController {
         if (error) return res.status(400).json({ error });
 
         this.messageService.create(createMessageDto!)
+            .then(message => res.json(message))
+            .catch(error => this.handleError(error, res));
+    }
+
+    public updateMessagesStatus = (req: Request, res: Response) => {
+        const [error, updateMessageDto] = UpdateMessageDto.create(req.body);
+        if (error) return res.status(400).json({ error });
+
+        this.messageService.updateMessagesStatus(updateMessageDto!)
             .then(message => res.json(message))
             .catch(error => this.handleError(error, res));
     }
