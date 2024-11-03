@@ -5,21 +5,38 @@ import { CreateMessageDto } from "../../domain/dtos/messages/create-message.dto"
 import { MessageEntity } from "../../domain/entities/message.entity";
 import { CustomError } from "../../domain/errors/custom.error";
 import { UpdateMessageDto } from "../../domain/dtos/messages/update-message.dto";
+import { PaginationDto } from "../../domain/dtos/shared/pagination.dto";
 
 export class MessageService {
     constructor() { }
 
-    async getMessagesByChatId(chatId: string) {
+    async getMessagesByChatId(chatId: string, paginationDto: PaginationDto) {
         await this.checkChatStatus(chatId);
+
+        const { page, limit } = paginationDto;
 
         const id = new mongoose.Types.ObjectId(chatId)
 
         try {
-            const messages = await MessageModel.find({ chat: id })
+            const totalPromise = MessageModel.countDocuments({ chat: id });
+            const messagesPromise = MessageModel.find({ chat: id })
                 .sort({ 'createdAt': 'desc' })
-                .limit(10);
+                .skip((page - 1) * limit)
+                .limit(limit);
 
-            return messages.reverse().map(MessageEntity.fromObject);
+            const [total, messages] = await Promise.all([totalPromise, messagesPromise]);
+
+            const messageEntities = messages.reverse().map(MessageEntity.fromObject);
+
+            return {
+                page,
+                limit,
+                total,
+                totalPages: Math.ceil(total / limit),
+                next: (page * limit < total) ? `/api/messages/${chatId}?page=${page + 1}&limit=${limit}` : null,
+                prev: (page > 1) ? `/api/messages/${chatId}?page=${page - 1}&limit=${limit}` : null,
+                messages: messageEntities,
+            }
         } catch (error) {
             throw CustomError.internalServer(`${error}`);
         }
@@ -58,6 +75,7 @@ export class MessageService {
 
             return unseenMessagesByChat;
         } catch (error) {
+            console.log(error)
             throw CustomError.internalServer(`${error}`);
         }
     }

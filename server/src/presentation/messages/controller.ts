@@ -3,6 +3,7 @@ import { MessageService } from "../services/message.service";
 import { CreateMessageDto } from "../../domain/dtos/messages/create-message.dto";
 import { CustomError } from "../../domain/errors/custom.error";
 import { UpdateMessageDto } from "../../domain/dtos/messages/update-message.dto";
+import { PaginationDto } from "../../domain/dtos/shared/pagination.dto";
 
 export class MessageController {
     constructor(
@@ -22,8 +23,13 @@ export class MessageController {
     public getMessagesByChatId = (req: Request, res: Response) => {
 
         const chatId = req.params.chatId;
+        const { page = 1, limit = 10 } = req.query;
 
-        this.messageService.getMessagesByChatId(chatId)
+        const [error, paginationDto] = PaginationDto.create(+page, +limit);
+
+        if (error) return res.status(400).json({ error });
+
+        this.messageService.getMessagesByChatId(chatId, paginationDto!)
             .then(messages => res.json(messages))
             .catch(error => this.handleError(error, res));
     }
