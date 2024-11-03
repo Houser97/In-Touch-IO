@@ -21,7 +21,7 @@ export class ChatEntity {
         if (!updatedAt) throw CustomError.badRequest('Missing updatedAt from object');
 
         const partialUser = users.map(PartialUserEntity.fromObject);
-        if (typeof (lastMessage) == 'object') {
+        if (typeof (lastMessage) == 'object' && lastMessage) {
             messageEntity = MessageEntity.fromObject(lastMessage);
         }
 
