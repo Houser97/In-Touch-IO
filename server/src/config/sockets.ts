@@ -23,9 +23,14 @@ export class Sockets {
                 socket.join(userId);
             })
 
-            // New room using id of user.
+            // New room using chat id.
             socket.on('join-chat', (chatId) => {
                 socket.join(chatId);
+            })
+
+            // Leave room with chat id.
+            socket.on('leave-chat', (chatId) => {
+                socket.leave(chatId);
             })
 
             socket.on('personal-message', async (payload) => {
@@ -34,11 +39,17 @@ export class Sockets {
 
                 if (error) {
                     console.log(error);
-                    this.io.to(message.sender).emit('personal-message', error);
+                    this.io.to(message.sender).emit('personal-message-chat', error);
                     return;
                 }
 
                 try {
+                    const sockets = await this.io.in(chat.id).fetchSockets();
+                    const socketIds = sockets.map(socket => socket.id);
+                    if (socketIds.length > 1) {
+                        createMessageDto!.isSeen = true
+                    }
+
                     const message = await this.messageService.create(createMessageDto!);
 
                     const { id } = message;
@@ -48,8 +59,10 @@ export class Sockets {
                     const updatedChat = await this.chatService.getById(chat.id, friendId);
 
                     chat.users.forEach((user: any) => {
-                        this.io.to(user.id).emit('personal-message', { message, chat: updatedChat });
+                        this.io.to(user.id).emit('personal-message-chat', { chat: updatedChat });
                     });
+
+                    this.io.to(chat.id).emit('personal-message-local', { message });
 
                 } catch (error) {
                     console.log(error)
