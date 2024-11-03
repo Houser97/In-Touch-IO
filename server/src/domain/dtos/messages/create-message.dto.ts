@@ -4,6 +4,7 @@ export class CreateMessageDto {
         public readonly content: string,
         public readonly chat: string,
         public readonly image: string,
+        public isSeen?: boolean
     ) { }
 
     static create(props: { [key: string]: string }): [string?, CreateMessageDto?] {
@@ -14,6 +15,6 @@ export class CreateMessageDto {
         if (!chat) return ['Missing chat'];
         if (image !== undefined && typeof (image) !== 'string') return ['Missing must be a string'];
 
-        return [undefined, new CreateMessageDto(sender, content, chat, image)];
+        return [undefined, new CreateMessageDto(sender, content, chat, image, false)];
     }
 }
