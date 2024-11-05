@@ -20,7 +20,9 @@ export class ChatService {
             const chatEntity = ChatEntity.fromObject(chat);
             const messages = await this.messageService.getUnseenMessages([chatEntity.id], userId);
 
-            return { chat: chatEntity, unseenMessages: messages[chatEntity.id] };
+            const unseenMessages = messages[chatEntity.id] || []
+
+            return { chat: chatEntity, unseenMessages };
         } catch (error) {
             throw CustomError.internalServer(`${error}`);
         }
@@ -31,7 +33,8 @@ export class ChatService {
             const chats = await ChatModel.find({
                 users: { $in: userId }
             }).populate('users', 'name email pictureUrl pictureId')
-                .populate('lastMessage');
+                .populate('lastMessage')
+                .sort({ 'updatedAT': 'desc' });
 
             const chatsEntity = chats.map(ChatEntity.fromObject);
 
@@ -41,6 +44,7 @@ export class ChatService {
 
             return { chats: chatsEntity, unseenMessages: messages };
         } catch (error) {
+            console.log(error);
             throw CustomError.internalServer(`${error}`);
         }
     }
