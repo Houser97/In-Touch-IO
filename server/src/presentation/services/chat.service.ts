@@ -34,7 +34,7 @@ export class ChatService {
                 users: { $in: userId }
             }).populate('users', 'name email pictureUrl pictureId')
                 .populate('lastMessage')
-                .sort({ 'updatedAT': 'desc' });
+                .sort({ 'updatedAt': 'desc' });
 
             const chatsEntity = chats.map(ChatEntity.fromObject);
 
