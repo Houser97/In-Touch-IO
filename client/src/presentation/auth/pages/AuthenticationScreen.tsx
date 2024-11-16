@@ -1,10 +1,10 @@
 import { useContext, useEffect, useState } from 'react'
 import '../../styles/auth/pages/Authentication.css'
-import authImg from '../../assets/images/Login.jpg'
 import useDarkMode from '../../hooks/useDarkMode'
 import { LoginScreen } from './LoginScreen'
 import { RegisterScreen } from './RegisterScreen'
 import { AuthContext } from '../../providers/AuthProvider'
+import { images } from '../../assets/constants'
 
 // {isLogin ? <Login setIsLogin={setIsLogin} /> : <SignUp setIsLogin={setIsLogin} />}
 export const AuthenticationScreen = () => {
@@ -21,7 +21,7 @@ export const AuthenticationScreen = () => {
 
   return (
     <div className={`auth__container ${isDark ? 'dark' : 'light'}`}>
-      <img src={authImg} className='auth__img'></img>
+      <img src={images.auth} className='auth__img'></img>
 
       <div className="authentication__container">
         {isLogin ? <LoginScreen setIsLogin={setIsLogin} /> : <RegisterScreen setIsLogin={setIsLogin} />}
