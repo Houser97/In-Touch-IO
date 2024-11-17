@@ -6,6 +6,7 @@ import { Server as SocketIOServer } from 'socket.io';
 import { Sockets } from '../config/sockets';
 import { MessageService } from './services/message.service';
 import { ChatService } from './services/chat.service';
+import { envs } from '../config/envs';
 
 interface Options {
     port: number;
@@ -24,10 +25,11 @@ export class Server {
     private readonly httpServer = http.createServer(this.app);
     private readonly io = new SocketIOServer(this.httpServer, {
         cors: {
-            origin: "http://localhost:5173",
+            origin: envs.CORS_ORIGIN,
             methods: ["GET", "POST"],
             credentials: true
-        }
+        },
+        maxHttpBufferSize: 1e6 * 10
     });
 
     constructor(options: Options) {
@@ -42,9 +44,10 @@ export class Server {
             require('dotenv').config();
             const cors = require('cors');
             this.app.use(cors({
-                origin: "http://localhost:5173",
+                origin: envs.CORS_ORIGIN,
                 credentials: true,
-            }));
+            },
+            ));
         }
 
         //* Middlewares
