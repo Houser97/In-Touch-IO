@@ -5,7 +5,6 @@ import { cloudinary } from "./cloudinary.config";
 
 export class CloudinaryAdapter {
     static async uploadImage(image: string) {
-        console
         try {
             const data = await cloudinary.uploader.upload(image, {
                 upload_preset: envs.CLOUDINARY_PRESET

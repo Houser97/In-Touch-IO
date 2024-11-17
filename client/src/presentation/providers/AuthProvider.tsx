@@ -1,4 +1,4 @@
-import { createContext, Dispatch, PropsWithChildren, SetStateAction, useEffect, useState } from "react";
+import { createContext, Dispatch, PropsWithChildren, SetStateAction, useState } from "react";
 import inTouchIoApi from "../config/api/inTouchIoApi";
 import { UserMapper } from "../../infrastructure/mappers/user.mapper";
 import { User } from "../../domain/entities/user.entity";
@@ -46,10 +46,6 @@ export const AuthContext = createContext<AuthContextProps>({
 export const AuthProvider = ({ children }: PropsWithChildren) => {
 
     const [auth, setAuth] = useState(initialState)
-
-    useEffect(() => {
-        console.log(auth.errorMessage)
-    }, [auth.errorMessage])
 
     const login = async (email: string, password: string) => {
         try {
