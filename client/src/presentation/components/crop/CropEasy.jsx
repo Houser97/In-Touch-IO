@@ -11,8 +11,8 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import Cropper from 'react-easy-crop';
-import useWindowSize from '../../../hooks/windowSizeHook';
 import getCroppedImg from './utils/cropImage';
+import useWindowSize from '../../hooks/useWindowSize';
 
 const CropEasy = ({ photoURL, setPreviewSourceParent, setPhotoURL, setFile }) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
