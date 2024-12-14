@@ -17,7 +17,8 @@ export class ImageStorageAdapter {
         try {
             const { data } = await cloudinaryApi.post('', formData);
             const imageUrl = data.secure_url;
-            return imageUrl;
+            const publicId = data.public_id;
+            return { imageUrl, publicId };
         } catch (error) {
             console.error('Error al subir la imagen a Cloudinary:', error);
             throw CustomError.formatError(error);
