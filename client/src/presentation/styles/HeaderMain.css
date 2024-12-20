@@ -14,13 +14,13 @@
     font-size: 0.654rem;
 }
 
-.app__title{
+.app__title {
     color: var(--name-color);
     font-size: 1rem;
     letter-spacing: 0.2px;
 }
 
-.edit__svg{
+.edit__svg {
     position: absolute;
     width: 20px;
     height: 20px;
@@ -32,15 +32,16 @@
 }
 
 @media (min-width: 1200px) {
-    .header {
-        display: none;
-    }
 
-    .chats-msgList .header{
-        display: flex;
+    .chats-msgList .header {
+        display: flex !important;
         position: sticky;
         top: 0;
         background-color: var(--main-background-color);
         z-index: 1100;
+    }
+
+    .header {
+        display: none;
     }
 }
