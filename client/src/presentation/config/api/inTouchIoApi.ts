@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const inTouchIoApi = axios.create({
-    /*baseURL: 'http://localhost:3002/api'*/
-    baseURL: 'https://in-touch-io.onrender.com//api'
+    /* baseURL: 'http://localhost:3002/api'*/
+    baseURL: 'https://in-touch-io.onrender.com/api'
 });
 
 inTouchIoApi.interceptors.request.use(config => {
