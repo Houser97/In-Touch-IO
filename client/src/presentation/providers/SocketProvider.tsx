@@ -14,7 +14,7 @@ export const SocketContext = createContext<SocketContextProps>({
 });
 
 export const SocketProvider = ({ children }: PropsWithChildren) => {
-    const { socket, online, connect, disconnect } = useSocket('http://localhost:3002');
+    const { socket, online, connect, disconnect } = useSocket('https://in-touch-io.onrender.com');
     const { auth } = useContext(AuthContext);
 
     useEffect(() => {
