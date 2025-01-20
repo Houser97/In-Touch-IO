@@ -61,7 +61,10 @@ export class ChatService {
         try {
             const chat = new ChatModel(createChatDto);
             await chat.save();
-            return ChatEntity.fromObject(chat);
+            const populatedChat = await ChatModel.findById(chat._id).populate(
+                'users', 'name email pictureUrl pictureId'
+            )
+            return ChatEntity.fromObject(populatedChat!.toObject());
         } catch (error) {
             throw CustomError.internalServer(`${error}`);
         }
