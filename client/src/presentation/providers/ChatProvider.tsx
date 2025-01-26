@@ -78,7 +78,7 @@ export const ChatProvider = ({ children }: PropsWithChildren) => {
     const createChat = async (userIds: string[]) => {
         try {
             const chat = await chatRepositoryProvider.create(userIds);
-            setUserChats(prev => ({ ...prev, [chat.id]: chat }));
+            setUserChats(prev => ({ [chat.id]: chat, ...prev }));
         } catch (error: any | CustomError) {
             if (error.status === 401) {
                 logout();
