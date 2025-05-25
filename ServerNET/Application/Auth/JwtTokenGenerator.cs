@@ -17,9 +17,9 @@ public class JwtTokenGenerator(IOptions<JwtSettings> options)
     {
         var claims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, user.Email), // Importante que user.Id sea string
+            new Claim(ClaimTypes.NameIdentifier, user.Id!),
             new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Name, user.Username) // opcional
+            new Claim(ClaimTypes.Name, user.Name)
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Key));
