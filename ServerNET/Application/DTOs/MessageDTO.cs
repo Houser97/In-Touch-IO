@@ -38,7 +38,7 @@ public class MessageDTO(string id, string sender, string content, string chat, b
 
         return new MessageDTO(idObj.ToString(), senderOjb.ToString(), contentObj.ToString(), chatObj.ToString(), Convert.ToBoolean(isSeenObj.ToString()), imageObj.ToString(), DateTime.Parse(createdAtObj.ToString()!));
     }
-    
+
     public static MessageDTO FromBson(BsonDocument doc)
     {
         var id = doc.GetValue("_id", "").ToString();
@@ -51,4 +51,10 @@ public class MessageDTO(string id, string sender, string content, string chat, b
 
         return new MessageDTO(id!, sender!, content, chat!, isSeen, image, createdAt);
     }
+}
+
+public class UnseenMessageDTO
+{
+    public required  string Id { get; set; }
+    public required string Sender { get; set; }
 }
