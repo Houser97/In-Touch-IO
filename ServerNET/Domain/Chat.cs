@@ -12,12 +12,12 @@ public class Chat
     public string? Id { get; set; }
     [BsonElement("users")]
     [BsonRepresentation(BsonType.ObjectId)]
-    public required string[] Users { get; set; }
+    public required List<string> Users { get; set; }
     [BsonElement("lastMessage")]
     [BsonRepresentation(BsonType.ObjectId)]
     public string? LastMessage { get; set; }
     [BsonElement("createdAt")]
     public DateTime CreatedAt { get; set; }
-    [BsonElement("updateddAt")]
+    [BsonElement("updatedAt")]
     public DateTime? UpdatedAt { get; set; }
 }
