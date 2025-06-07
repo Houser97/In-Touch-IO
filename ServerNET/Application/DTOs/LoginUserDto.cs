@@ -5,9 +5,9 @@ namespace Application.DTOs;
 
 public class LoginUserDto
 {
-    [Required(ErrorMessage = "Name is required")]
-    [MinLength(3, ErrorMessage = "Name should have at least 3 characters")]
-    public string Name { get; set; } = null!;
+    [Required(ErrorMessage = "Email is required")]
+    [MinLength(3, ErrorMessage = "Email should have at least 3 characters")]
+    public string Email { get; set; } = null!;
 
     [Required(ErrorMessage = "Password is required")]
     [MinLength(6, ErrorMessage = "Password should have at least 6 characters")]
