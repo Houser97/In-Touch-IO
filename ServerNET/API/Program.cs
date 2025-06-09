@@ -68,7 +68,10 @@ builder.Services.AddAuthentication(options =>
 });
 
 // 3. Add authorization
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorizationBuilder()
+    .SetFallbackPolicy(new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
+    .RequireAuthenticatedUser()
+    .Build());
 
 builder.Services.AddSingleton<JwtTokenGenerator>();
 
