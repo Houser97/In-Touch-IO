@@ -17,6 +17,6 @@ public class RegisterUserDto
     [MinLength(6, ErrorMessage = "Password should have at least 6 characters")]
     public string Password { get; set; } = null!;
 
-    public string? PictureUrl { get; set; }
-    public string? PictureId { get; set; }
+    public string? PictureUrl { get; set; } = "https://res.cloudinary.com/dluwqcce9/image/upload/v1694961227/InTouch/qqaarw68ruwwluvcphkh.jpg";
+    public string? PictureId { get; set; } = "default";
 }
