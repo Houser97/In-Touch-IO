@@ -1,6 +1,7 @@
 using System;
 using Application.Core;
 using Application.DTOs;
+using Application.DTOs.Chats;
 using Application.Messages;
 using Domain;
 using Microsoft.Extensions.Options;
@@ -13,8 +14,6 @@ namespace Application.Chats;
 public class ChatsService(AppDbContext dbContext, IOptions<AppDbSettings> settings, MessageService messageService)
 {
     private readonly IMongoCollection<Chat> _chatsCollection = dbContext.Database.GetCollection<Chat>(settings.Value.ChatsCollectionName);
-    private readonly IMongoCollection<User> _usersCollection = dbContext.Database.GetCollection<User>(settings.Value.UsersCollectionName);
-    private readonly IMongoCollection<Message> _messagesCollection = dbContext.Database.GetCollection<Message>(settings.Value.MessagesCollectionName);
     private readonly MessageService _messageService = messageService;
 
     public async Task<Result<object>> GetById(string chatId, string userId)
@@ -108,6 +107,59 @@ public class ChatsService(AppDbContext dbContext, IOptions<AppDbSettings> settin
 
             return Result<object>.Success(new { chats });
 
+        }
+        catch (Exception ex)
+        {
+            return Result<object>.Failure($"Internal server error: {ex.Message}", 500);
+        }
+    }
+
+    public async Task<Result<object>> CreateChat(CreateChatDto createChatDto, string userId)
+    {
+        var userIds = createChatDto.UserIds;
+
+        var filter = Builders<Chat>.Filter.And(
+            Builders<Chat>.Filter.All(c => c.Users, userIds),
+            Builders<Chat>.Filter.Size(c => c.Users, userIds.Count)
+        );
+
+        var chatExists = await _chatsCollection.Find(filter).FirstOrDefaultAsync();
+
+        if (chatExists != null)
+            return Result<object>.Failure("Chat already exists", 400);
+
+        try
+        {
+            var newChat = new Chat
+            {
+                Users = userIds,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await _chatsCollection.InsertOneAsync(newChat);
+
+            return await GetById(newChat.Id!.ToString(), userId);
+        }
+        catch (Exception ex)
+        {
+            return Result<object>.Failure($"Internal server error: {ex.Message}", 500);
+        }
+    }
+
+    public async Task<Result<object>> UpdateChat(string id, string userId, UpdateChatDto updateChatDto)
+    {
+        try
+        {
+            var filter = Builders<Chat>.Filter.Eq(c => c.Id, id);
+            var update = Builders<Chat>.Update.Set(c => c.LastMessage, updateChatDto.LastMessage);
+
+            var result = await _chatsCollection.UpdateOneAsync(filter, update);
+
+            if (result.ModifiedCount == 0)
+                return Result<object>.Failure("Chat not found", 404);
+
+            return await GetById(id, userId);
         }
         catch (Exception ex)
         {
