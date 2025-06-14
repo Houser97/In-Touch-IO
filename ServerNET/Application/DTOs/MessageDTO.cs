@@ -1,4 +1,5 @@
 using System;
+using Domain;
 using MongoDB.Bson;
 
 namespace Application.DTOs;
@@ -50,6 +51,19 @@ public class MessageDTO(string id, string sender, string content, string chat, b
         var createdAt = doc.GetValue("createdAt", BsonNull.Value).ToUniversalTime();
 
         return new MessageDTO(id!, sender!, content, chat!, isSeen, image, createdAt);
+    }
+
+    public static MessageDTO FromEntity(Message message)
+    {
+        return new MessageDTO(
+            message.Id!.ToString(),
+            message.Sender,
+            message.Content,
+            message.Chat.ToString(),
+            message.IsSeen,
+            message.Image ?? string.Empty,
+            message.CreatedAt
+        );
     }
 }
 
