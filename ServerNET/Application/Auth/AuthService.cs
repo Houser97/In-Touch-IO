@@ -14,7 +14,7 @@ public class AuthService(JwtTokenGenerator tokenGenerator, AppDbContext dbContex
 
     public async Task<AuthResultDto> Login(LoginUserDto loginUserDto)
     {
-        var user = await _usersCollection.Find(u => u.Name == loginUserDto.Name).FirstOrDefaultAsync();
+        var user = await _usersCollection.Find(u => u.Email == loginUserDto.Email).FirstOrDefaultAsync();
 
         if (user == null)
         {
