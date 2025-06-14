@@ -1,12 +1,8 @@
 using System.Security.Claims;
 using Application.Auth;
 using Application.DTOs;
-using Domain;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using MongoDB.Driver;
-using Persistence;
 
 namespace API.Controllers
 {
@@ -18,6 +14,7 @@ namespace API.Controllers
         private readonly AuthService _authService = authService;
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginUserDto loginUserDto)
         {
             var result = await _authService.Login(loginUserDto);
@@ -35,6 +32,7 @@ namespace API.Controllers
         }
 
         [HttpPost("register")]
+        [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterUserDto registerUserDto)
         {
             var result = await _authService.Register(registerUserDto);
