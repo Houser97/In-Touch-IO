@@ -48,13 +48,16 @@ public class ChatsService(AppDbContext dbContext, IOptions<AppDbSettings> settin
             if (chat == null)
                 return Result<object>.Failure("Chat not found", 404);
 
-            var unseenMessages = await _messageService.GetUnseenMessages([chatId], userId);
+            var unseenMessagesResult = await _messageService.GetUnseenMessages([chatId], userId);
+
+            var unseenMessagesMap = unseenMessagesResult.Value as Dictionary<string, List<UnseenMessageDTO>>;
 
             var chatDto = new
             {
                 chat = ChatDTO.FromBson(chat),
-                unseenMessages = unseenMessages
+                unseenMessages = unseenMessagesMap?.GetValueOrDefault(chatId) ?? new List<UnseenMessageDTO>()
             };
+
 
             return Result<object>.Success(chatDto);
         }
@@ -105,7 +108,11 @@ public class ChatsService(AppDbContext dbContext, IOptions<AppDbSettings> settin
                 .Select(ChatDTO.FromBson)
                 .ToList();
 
-            return Result<object>.Success(new { chats });
+            var chatIds = chats.Select(c => c.Id).ToList();
+
+            var unseenMessages = await _messageService.GetUnseenMessages(chatIds, userId);
+
+            return Result<object>.Success(new { chats, unseenMessages });
 
         }
         catch (Exception ex)
