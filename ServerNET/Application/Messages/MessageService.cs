@@ -1,6 +1,7 @@
 using System;
 using Application.Core;
 using Application.DTOs;
+using Application.DTOs.Messages;
 using Domain;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
@@ -102,6 +103,31 @@ public class MessageService(AppDbContext dbContext, IOptions<AppDbSettings> sett
         catch (Exception ex)
         {
             return Result<object>.Failure($"Internal server error: {ex.Message}", 500);
+        }
+    }
+
+    public async Task<Result<Message>> Create(CreateMessageDto createMessageDto)
+    {
+        try
+        {
+            var message = new Message
+            {
+                Chat = createMessageDto.Chat,
+                Content = createMessageDto.Content,
+                Image = createMessageDto.Image,
+                IsSeen = createMessageDto.IsSeen,
+                Sender = createMessageDto.Sender,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await _messagesCollection.InsertOneAsync(message);
+
+            return Result<Message>.Success(await _messagesCollection.Find(m => m.Id == message.Id).FirstOrDefaultAsync());
+        }
+        catch (Exception ex)
+        {
+            return Result<Message>.Failure($"Internal server error: {ex.Message}", 500);
         }
     }
 }
