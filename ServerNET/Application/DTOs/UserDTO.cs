@@ -1,4 +1,5 @@
 using System;
+using Domain;
 using MongoDB.Bson;
 
 namespace Application.DTOs;
@@ -26,5 +27,16 @@ public class UserLikeDTO(string id, string name, string email, string pictureUrl
         var pictureId = doc.GetValue("pictureId", "").AsString;
 
         return new UserLikeDTO(id!, name, email, pictureUrl, pictureId);
+    }
+
+    public static UserLikeDTO FromEntity(User user)
+    {
+        return new UserLikeDTO(
+            user.Id!,
+            user.Name,
+            user.Email,
+            user.PictureUrl,
+            user.PictureId
+        );
     }
 }
