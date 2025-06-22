@@ -1,8 +1,10 @@
 using System;
+using System.Text.Json.Serialization;
 
 namespace Application.DTOs.Chats;
 
-public class CreateChatDto(List<string> userIds)
+public class CreateChatDto
 {
-    public List<string> UserIds { get; set; } = userIds;
+    [JsonPropertyName("users")]
+    public List<string> UserIds { get; set; } = [];
 }
