@@ -1,4 +1,5 @@
 using System;
+using System.Dynamic;
 using Application.Core;
 using Application.DTOs;
 using Application.DTOs.Chats;
@@ -49,17 +50,24 @@ public class ChatsService(AppDbContext dbContext, IOptions<AppDbSettings> settin
                 return Result<object>.Failure("Chat not found", 404);
 
             var unseenMessagesResult = await _messageService.GetUnseenMessages([chatId], userId);
-
             var unseenMessagesMap = unseenMessagesResult.Value as Dictionary<string, List<UnseenMessageDTO>>;
+            var unseenMessages = unseenMessagesMap?.GetValueOrDefault(chatId) ?? new List<UnseenMessageDTO>();
 
-            var chatDto = new
+            // Aplanar: Combina propiedades del DTO con unseenMessages
+            var chatDto = ChatDTO.FromBson(chat);
+
+            dynamic result = new ExpandoObject();
+            var resultDict = (IDictionary<string, object>)result;
+
+            foreach (var prop in chatDto.GetType().GetProperties())
             {
-                chat = ChatDTO.FromBson(chat),
-                unseenMessages = unseenMessagesMap?.GetValueOrDefault(chatId) ?? new List<UnseenMessageDTO>()
-            };
+                var camelCaseName = char.ToLowerInvariant(prop.Name[0]) + prop.Name[1..];
+                resultDict[camelCaseName] = prop.GetValue(chatDto)!;
+            }
 
+            result.unseenMessages = unseenMessages;
 
-            return Result<object>.Success(chatDto);
+            return Result<object>.Success(result);
         }
         catch (Exception ex)
         {
