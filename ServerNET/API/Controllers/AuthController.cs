@@ -68,17 +68,19 @@ namespace API.Controllers
 
             return Ok(new
             {
-                user = AuthResultDto.User
+                AuthResultDto.User,
             });
         }
 
-        [HttpGet("me")]
-        public IActionResult GetCurrentUser()
+        [HttpGet]
+        public async Task<IActionResult> GetCurrentUser()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var email = User.FindFirst(ClaimTypes.Email)?.Value;
 
-            return Ok(new { userId, email });
+            var user = await _authService.GetAuthenticatedUser(userId!);
+
+            return Ok(new { user.User, email });
         }
     }
 }
