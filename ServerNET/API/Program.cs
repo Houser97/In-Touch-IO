@@ -1,4 +1,7 @@
 using System.Text;
+using System.Text.Json;
+using API.SignalR;
+using Application;
 using Application.Auth;
 using Application.Chats;
 using Application.Messages;
@@ -39,6 +42,10 @@ builder.Services.AddSingleton<AppDbContext>();
 builder.Services.AddScoped<MessageService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ChatsService>();
+builder.Services.AddScoped<UserService>();
+
+// SignalR
+builder.Services.AddSignalR();
 
 // 1. JWT configuration
 builder.Services.Configure<JwtSettings>(
@@ -82,15 +89,25 @@ builder.Services.AddSingleton<JwtTokenGenerator>();
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    });
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod()
+    .AllowCredentials()
+    .WithOrigins("http://localhost:5173", "https://localhost:5173"));
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<ChatHub>("/signalR");
 
 app.Run();
