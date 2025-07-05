@@ -3,8 +3,8 @@ import { Chat } from "../../domain/entities/chat.entity";
 import { chatRepositoryProvider } from "./repositories/chat-repository.provider";
 import { ChatMapper } from "../../infrastructure/mappers/chat.mapper";
 import { AuthContext } from "./AuthProvider";
-import { SocketContext } from "./SocketProvider";
 import { CustomError } from "../../infrastructure/errors/custom.error";
+import { SocketContext } from "./SocketProvider";
 
 interface UserChats {
     [key: string]: Chat;
@@ -49,17 +49,17 @@ export const ChatContext = createContext<ChatContextProps>({
 export const ChatProvider = ({ children }: PropsWithChildren) => {
 
     const { auth, logout } = useContext(AuthContext);
-    const { socket } = useContext(SocketContext);
+    const { connection: socket } = useContext(SocketContext);
 
     const [chat, setChat] = useState<Chat>(chatInitialState);
     const [userChats, setUserChats] = useState<UserChats>({});
 
     const joinChat = (id: string) => {
-        socket?.emit('join-chat', id);
+        socket?.invoke('JoinChat', id);
     }
 
     const leaveChat = (id: string) => {
-        socket?.emit('leave-chat', id);
+        socket?.invoke('LeaveChat', id);
     }
 
     const getUserChats = async () => {
@@ -89,6 +89,7 @@ export const ChatProvider = ({ children }: PropsWithChildren) => {
     }
 
     const getUnseenMessageIds = (chat: Chat) => {
+        console.log(chat)
         return chat.unseenMessages
             .filter(message => message.sender != auth.user.id)
             .map((message) => message.id);
