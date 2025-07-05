@@ -1,6 +1,5 @@
 
 import { createContext, Dispatch, PropsWithChildren, SetStateAction, useContext, useEffect, useState } from "react";
-import { SocketContext } from "./SocketProvider";
 import { Message } from "../../domain/entities/message.entity";
 import { MessageMapper } from "../../infrastructure/mappers/message.mapper";
 import { ChatContext } from "./ChatProvider";
@@ -8,6 +7,7 @@ import { messageRepositoryProvider } from "./repositories/message-repository.pro
 import { ChatMapper } from "../../infrastructure/mappers/chat.mapper";
 import { AuthContext } from "./AuthProvider";
 import { CustomError } from "../../infrastructure/errors/custom.error";
+import { SocketContext } from "./SocketProvider";
 
 interface MessageContextProps {
     messages: Message[];
@@ -43,7 +43,7 @@ const limit = 20;
 export const MessageProvider = ({ children }: PropsWithChildren) => {
 
     const { logout } = useContext(AuthContext);
-    const { socket } = useContext(SocketContext);
+    const { connection: socket } = useContext(SocketContext);
     const { chat, setUserChats } = useContext(ChatContext);
 
     const [messages, setMessages] = useState<Message[]>([]);
@@ -55,26 +55,41 @@ export const MessageProvider = ({ children }: PropsWithChildren) => {
 
 
     useEffect(() => {
-        socket?.on('personal-message-chat', (payload) => {
-            const { chat: chatPayload } = payload;
+        if (!socket) return;
+        
+        const handleChatUpdate = (chatPayload: {
+            chat: any;
+            unseenMessages: any[];
+        }) => {
             const { chat: updatedChat, unseenMessages } = chatPayload;
             const chatEntity = ChatMapper.toEntity(updatedChat, unseenMessages);
 
-            setUserChats(prev => {
+            setUserChats((prev) => {
                 const updatedChats = { ...prev };
                 delete updatedChats[chatEntity.id];
                 return { [chatEntity.id]: chatEntity, ...updatedChats };
             });
-        });
+        };
+        socket.on('personal-message-chat', handleChatUpdate);
+
+        return () => {
+          socket.off("personal-message-chat", handleChatUpdate);
+        };
     }, [socket])
 
     useEffect(() => {
-        socket?.on('personal-message-local', (payload) => {
-            const { message } = payload;
-            const messageEntity = MessageMapper.toEntity(message);
-            setMessages(prev => [messageEntity, ...prev]);
+        if (!socket) return;
 
-        });
+        const handleNewMessage = (message: any) => {
+            const messageEntity = MessageMapper.toEntity(message);
+            setMessages((prev) => [messageEntity, ...prev]);
+        };
+
+        socket.on("personal-message-local", handleNewMessage);
+
+        return () => {
+            socket.off("PersonalMessageLocal", handleNewMessage);
+        };
     }, [socket])
 
     const sendMessage = (sender: string, content: string, image: string) => {
@@ -89,7 +104,7 @@ export const MessageProvider = ({ children }: PropsWithChildren) => {
             chat
         }
 
-        socket?.emit('personal-message', payload)
+        socket?.invoke("PersonalMessage", payload);
 
     }
 
