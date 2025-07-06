@@ -130,4 +130,28 @@ public class MessageService(AppDbContext dbContext, IOptions<AppDbSettings> sett
             return Result<Message>.Failure($"Internal server error: {ex.Message}", 500);
         }
     }
+
+    public async Task<Result<bool>> UpdateMessageStatus(UpdateMessageDto updateMessageDto)
+    {
+        try
+        {
+            var ids = updateMessageDto.MessageIds;
+
+            var filter = Builders<Message>.Filter.In(m => m.Id, ids);
+            var update = Builders<Message>.Update.Set(m => m.IsSeen, true);
+
+            var result = await _messagesCollection.UpdateManyAsync(filter, update);
+
+            if (result.ModifiedCount == 0)
+            {
+                return Result<bool>.Failure("No messages were updated", 404);
+            }
+
+            return Result<bool>.Success(true);
+        }
+        catch (Exception ex)
+        {
+            return Result<bool>.Failure($"Internal server error: {ex.Message}", 500);
+        }
+    }
 }
