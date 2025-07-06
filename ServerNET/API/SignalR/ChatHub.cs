@@ -73,9 +73,15 @@ public class ChatHub(
             var friendId = chat.Users.First(u => u.Id != messageResult.Value.Sender);
             var updatedChat = await chatService.GetById(chat.Id.ToString(), friendId.ToString()!);
 
+            var chatPayload = (dynamic)updatedChat.Value;
+
             foreach (var user in chat.Users)
             {
-                await Clients.Group(user.Id.ToString()!).SendAsync("personal-message-chat", updatedChat.Value);
+                await Clients.Group(user.Id.ToString()!).SendAsync("personal-message-chat", new
+                {
+                    chat = chatPayload,
+                    unseenMessages = chatPayload.unseenMessages
+                });
             }
 
             await Clients.Group(chat.Id.ToString()).SendAsync("personal-message-local",  messageResult.Value );
