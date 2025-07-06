@@ -118,7 +118,8 @@ public class ChatsService(AppDbContext dbContext, IOptions<AppDbSettings> settin
 
             var chatIds = chats.Select(c => c.Id).ToList();
 
-            var unseenMessages = await _messageService.GetUnseenMessages(chatIds, userId);
+            var unseenMessagesResult = await _messageService.GetUnseenMessages(chatIds, userId);
+            var unseenMessages = unseenMessagesResult.Value;
 
             return Result<object>.Success(new { chats, unseenMessages });
 
