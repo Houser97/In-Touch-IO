@@ -31,6 +31,29 @@ dotnet new gitignore
   - appsettings.json
   - bases de datos (reactivities.db)
 
+## Configuraciones
+### Campos con camelCase
+- En Program.cs
+
+```cs
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    });
+```
+
+- Cuando se usa ExpandoObject se tiene que hace de forma manual el mapeo de PascalCase a camelCase como fue el caso de la creacion de chat.
+ ```cs
+foreach (var prop in chatDto.GetType().GetProperties())
+{
+    var camelCaseName = char.ToLowerInvariant(prop.Name[0]) + prop.Name.Substring(1);
+    resultDict[camelCaseName] = prop.GetValue(chatDto);
+} 
+ ```
+
 ## 01. Creación de proyecto
 1. Crear archivo de solution usando la plantilla __Solution File__, el cual tiene como short name __sln__.
     - Es un contenedor para diferentes proyectos.
@@ -777,6 +800,43 @@ public class AuthService(JwtTokenGenerator tokenGenerator, AppDbContext dbContex
 ```
 ### Mensajes
 1. Crear __Application\Messages\MessageService.cs__.
+- En esta parte se hace notar que no se tiene __populate__ como en node, ya que esto se usaba con ayuda de __mongoose__.
+- En el código que retorna Result se especifica object, ya que el DTO que se reotrna es anónimo, es decir, no tiene una clase definida explícitamente.
+
+```c#
+var chatDto = new
+{
+    Chat = chat,
+    Users = users,
+    LastMessage = lastMessage,
+    UnseenMessages = unseenMessages
+};
+```
+
+Al usar un tipo anónimo con new { ... }, el compilador lo convierte en un tipo sin nombre. Entonces:
+
+- No puedes especificar directamente el tipo (porque no existe fuera del método).
+
+- Por eso, para poder retornarlo, lo declaras como object, que es el tipo base de todos en .NET.
+  - Se podría tener un DTO para no tener que usar object.
+
+- Uso de project.
+  - MongoDB .Project() te permite seleccionar solamente ciertos campos de un documento, como lo harías con .select('name email') en Mongoose.
+
+- Usa FilterDefinition con Builders<T>.Filter.AnyEq que está diseñado para trabajar con arrays en MongoDB:
+
+```c#
+var filter = Builders<Chat>.Filter.AnyEq(c => c.Users, userId);
+var chats = await _chatsCollection.Find(filter).ToListAsync();
+```
+
+Esto traduce correctamente a una consulta MongoDB como:
+
+```js
+{ users: { $in: [userId] } }
+```
+
+AnyEq verifica que el array Users contenga exactamente ese userId.
 
 2. Registrar servicio en Program.cs
   - Se registra como Scope ya que solo se usará en el contexto de cada petición.
@@ -787,3 +847,434 @@ builder.Services.AddScoped<MessageService>();
 
 3. Usar en controlador. 
 
+
+## 07. Política de autorización por defecto
+- En Program.cs
+```c#
+builder.Services.AddAuthorizationBuilder()
+    .SetFallbackPolicy(new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
+    .RequireAuthenticatedUser()
+    .Build());
+```
+
+
+## 08. SingalR
+1. Crear carpeta __SignalR__ en __API__.
+  - Al crear la carpeta, en el archivo de __API.csproj__ debe aparecer.
+
+```xml
+  <ItemGroup>
+    <Folder Include="SignalR\" />
+  </ItemGroup>
+```
+
+2. Creación del Hub para el chat.
+  1. Crear __ServerNET/API/SignalR/ChatHub.cs__.
+  
+3. Agregar servicio a Program.cs
+```c#
+// SignalR
+builder.Services.AddSignalR();
+```
+
+4. Agregar Middleware para indicarle al servidor API a dónde enviar las solicitudes que llegan a un endpoint en particular.
+```c#
+app.MapHub<ChatHub>("/chats");
+```
+
+### Frontend
+npm install @microsoft/signalr
+
+- Crear custom hook
+  - Este custom hook encapsula toda la lógica necesaria para conectarse, escuchar eventos, enviar mensajes y manejar reconexiones con un SignalR Hub en el backend
+```ts
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import * as signalR from "@microsoft/signalr";
+import { AuthContext } from "../providers/AuthProvider";
+
+export const useSocket = (serverUrl: string) => {
+  const { auth } = useContext(AuthContext);
+  const { user } = auth;
+
+  const connectionRef = useRef<signalR.HubConnection | null>(null);
+  const [connected, setConnected] = useState(false);
+
+  const connect = useCallback(async () => {
+    const token = localStorage.getItem("token");
+
+    const connection = new signalR.HubConnectionBuilder()
+      .withUrl(serverUrl, {
+        accessTokenFactory: () => token ?? "",
+        skipNegotiation: false,
+        transport: signalR.HttpTransportType.LongPolling,
+      })
+      .withAutomaticReconnect()
+      .configureLogging(signalR.LogLevel.Information)
+      .build();
+
+    connection.onclose(() => setConnected(false));
+    connection.onreconnecting(() => setConnected(false));
+    connection.onreconnected(() => setConnected(true));
+
+    try {
+      await connection.start();
+      setConnected(true);
+      connectionRef.current = connection;
+
+      console.log("[SignalR] Connected!");
+
+      if (user.id) {
+        await connection.invoke("Setup", user.id);
+      }
+    } catch (error) {
+      console.error("[SignalR] Connection failed:", error);
+    }
+  }, [serverUrl, user.id]);
+
+  const disconnect = useCallback(async () => {
+    try {
+      await connectionRef.current?.stop();
+      setConnected(false);
+    } catch (err) {
+      console.error("[SignalR] Disconnect failed:", err);
+    }
+  }, []);
+
+  const send = useCallback(async (method: string, ...args: any[]) => {
+    if (
+      !connectionRef.current ||
+      connectionRef.current.state !== signalR.HubConnectionState.Connected
+    ) {
+      console.warn("[SignalR] Not connected");
+      return;
+    }
+
+    try {
+      await connectionRef.current.invoke(method, ...args);
+    } catch (err) {
+      console.error(`[SignalR] Error calling ${method}:`, err);
+    }
+  }, []);
+
+  const on = useCallback(
+    (event: string, callback: (...args: any[]) => void) => {
+      if (!connectionRef.current) return;
+
+      connectionRef.current.on(event, callback);
+
+      return () => {
+        connectionRef.current?.off(event, callback);
+      };
+    },
+    []
+  );
+
+  return {
+    connection: connectionRef.current,
+    connected,
+    connect,
+    disconnect,
+    send,
+    on,
+  };
+};
+
+```
+
+- En este caso ya que el servidor de desarrollo usa https se colocó la siguiente configuracion, la cual debe cambiar cuando ya este en productivo a true, y usar WebSockets.
+
+```ts
+        skipNegotiation: false,
+        transport: signalR.HttpTransportType.LongPolling,
+```
+
+- connectionRef guarda la instancia de HubConnection y evita recrearla en cada render.
+- connected es un estado booleando para saber si estás conectado.
+
+```ts
+const connectionRef = useRef<signalR.HubConnection | null>(null);
+const [connected, setConnected] = useState(false);
+```
+
+- connect() inicia la conexion.
+  - Crea una instancia de SignalR con:
+
+    - withUrl(serverUrl): dirección del Hub, por ejemplo: https://localhost:5001/chatHub.
+
+    - accessTokenFactory: le pasa el JWT guardado en localStorage.
+
+    - skipNegotiation: false: permite el paso de "negociación" entre cliente y servidor (explicado abajo).
+
+    - LongPolling: usa HTTP largo, ideal cuando WebSocket no está disponible en desarrollo local (por CORS, proxies, o certificados no válidos).
+
+    - 🛠️ En producción, deberías usar WebSocket y skipNegotiation: true. Pero como estás en desarrollo usando HTTPS, puede haber conflictos con WebSocket si tu certificado no está bien configurado o aceptado por el navegador. Por eso LongPolling + skipNegotiation: false es lo seguro por ahora.
+    - Qué es skipNegotiation?
+      - skipNegotiation: true: solo funciona si usas WebSockets directamente, sin negociación previa. - 
+      - skipNegotiation: false: permite que el cliente y servidor "negocien" el transporte (WebSocket, Server-Sent Events, o LongPolling).  - 
+      - Si estás en entorno de desarrollo con HTTPS y el navegador no confía en tu certificado, WebSockets puede fallar, entonces LongPolling es una alternativa segura.
+```ts
+const connect = useCallback(async () => {
+  const token = localStorage.getItem("token");
+
+  const connection = new signalR.HubConnectionBuilder()
+    .withUrl(serverUrl, {
+      accessTokenFactory: () => token ?? "",
+      skipNegotiation: false,
+      transport: signalR.HttpTransportType.LongPolling,
+    })
+    .withAutomaticReconnect()
+    .configureLogging(signalR.LogLevel.Information)
+    .build();
+```
+
+- Manejadores de estado de conexión
+  - Actualiza el estado según el estado de la conexión. Muy útil para UI reactiva tipo “Online/Offline”.
+
+```ts
+connection.onclose(() => setConnected(false));
+connection.onreconnecting(() => setConnected(false));
+connection.onreconnected(() => setConnected(true));
+```
+
+- Iniciar conexion
+  - Llama a start() para iniciar la conexión.
+  - Luego, llama al método del backend "Setup" pasando el user.id.
+```ts
+await connection.start();
+setConnected(true);
+connectionRef.current = connection;
+console.log("[SignalR] Connected!");
+
+if (user.id) {
+  await connection.invoke("Setup", user.id);
+}
+```
+
+- disconnect() — Detiene la conexión
+```ts
+const disconnect = useCallback(async () => {
+  try {
+    await connectionRef.current?.stop();
+    setConnected(false);
+  } catch (err) {
+    console.error("[SignalR] Disconnect failed:", err);
+  }
+}, []);
+
+```
+
+- 📤 send() — Invocar métodos del Hub
+  - Invoca métodos en el servidor, como SendMessage, JoinRoom, etc.
+```ts
+const send = useCallback(async (method: string, ...args: any[]) => {
+  if (!connectionRef.current || connectionRef.current.state !== signalR.HubConnectionState.Connected) {
+    console.warn("[SignalR] Not connected");
+    return;
+  }
+
+  try {
+    await connectionRef.current.invoke(method, ...args);
+  } catch (err) {
+    console.error(`[SignalR] Error calling ${method}:`, err);
+  }
+}, []);
+```
+
+
+
+- 📥 on() — Escuchar eventos del servidor
+  - Suscribe el cliente a eventos emitidos desde el servidor, como "message-received".
+```ts
+const on = useCallback((event: string, callback: (...args: any[]) => void) => {
+  if (!connectionRef.current) return;
+
+  connectionRef.current.on(event, callback);
+
+  return () => {
+    connectionRef.current?.off(event, callback);
+  };
+}, []);
+
+```
+
+- Por ejemplo
+```ts
+useEffect(() => {
+  const unsubscribe = on("personal-message-chat", (data) => {
+    console.log("Mensaje recibido:", data);
+  });
+
+  return () => unsubscribe?.();
+}, []);
+```
+
+-  ¿Por qué usar ...args?
+Porque te da un wrapper universal. No necesitas crear funciones separadas para cada método del Hub. Ejemplo:
+
+❌ Sin ...args — menos flexible
+ts
+Copy
+Edit
+const sendMessage = async (chatId: string, content: string, image?: string) => {
+  await connectionRef.current?.invoke("SendMessage", chatId, content, image);
+};
+
+const updateStatus = async (userId: string, status: string) => {
+  await connectionRef.current?.invoke("UpdateUserStatus", userId, status);
+};
+Tienes que crear una función por cada método. 😓
+
+✅ Con ...args — ultra flexible
+ts
+Copy
+Edit
+send("SendMessage", chatId, content, image);
+send("UpdateUserStatus", userId, "online");
+send("JoinRoom", roomId);
+send("MarkAsSeen", chatId, messageId);
+¡Una función para gobernarlos a todos! 🧙‍♂️
+
+
+
+
+
+
+
+
+
+
+
+- Definir Socket provider.
+  - Aca se define el url de conexion y se usan los metodos de connect y disconnect
+
+```ts
+import { createContext, PropsWithChildren, useContext, useEffect } from "react";
+import { AuthContext } from "./AuthProvider";
+import { HubConnection } from "@microsoft/signalr";
+import { useSocket } from "../hooks/useSocket";
+
+interface SignalRContextProps {
+  connection: HubConnection | null;
+  connected: boolean;
+  send: (method: string, ...args: any[]) => Promise<void>;
+  on: (
+    event: string,
+    callback: (...args: any[]) => void
+  ) => (() => void) | void;
+}
+
+export const SocketContext = createContext<SignalRContextProps>({
+  connection: null,
+  connected: false,
+  send: async () => {},
+  on: () => {},
+});
+
+export const SocketProvider = ({ children }: PropsWithChildren) => {
+  const { connection, connected, connect, disconnect, send, on } = useSocket(
+    //"https://in-touch-io.onrender.com/chats"
+    "https://localhost:5001/signalR"
+  );
+  const { auth } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (auth.status === "authenticated") {
+      connect();
+    } else {
+      disconnect();
+    }
+  }, [auth.status]);
+
+  return (
+    <SocketContext.Provider value={{ connection, connected, send, on }}>
+      {children}
+    </SocketContext.Provider>
+  );
+};
+
+```
+
+- Se usan los nombres usados en los metodos del backend para invocarlos. Por ejemplo, para ChatProvider en donde se requiere hacer que el usuario se una o salga del chat.
+
+```ts
+    const joinChat = (id: string) => {
+        socket?.invoke('JoinChat', id);
+    }
+
+    const leaveChat = (id: string) => {
+        socket?.invoke('LeaveChat', id);
+    }
+```
+
+
+- Por otro lado, se escuchan eventos del backend por medio del useEffect. Esto se ve en MessageProvider.
+
+```ts
+    useEffect(() => {
+        if (!socket) return;
+        
+        const handleChatUpdate = (chatPayload: {
+            chat: any;
+            unseenMessages: any[];
+        }) => {
+            console.log(chatPayload);
+            const { chat: updatedChat, unseenMessages } = chatPayload;
+            const chatEntity = ChatMapper.toEntity(updatedChat, unseenMessages);
+
+            setUserChats((prev) => {
+                const updatedChats = { ...prev };
+                delete updatedChats[chatEntity.id];
+                return { [chatEntity.id]: chatEntity, ...updatedChats };
+            });
+        };
+        socket.on('personal-message-chat', handleChatUpdate);
+
+        return () => {
+          socket.off("personal-message-chat", handleChatUpdate);
+        };
+    }, [socket])
+
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleNewMessage = (message: any) => {
+            const messageEntity = MessageMapper.toEntity(message);
+            setMessages((prev) => [messageEntity, ...prev]);
+        };
+
+        socket.on("personal-message-local", handleNewMessage);
+
+        return () => {
+            socket.off("PersonalMessageLocal", handleNewMessage);
+        };
+    }, [socket])
+```
+
+# Pendientes
+- Al crear Chat se debe mostrar el chat creado para la segunda persona, ya que al crear un nuevo chat no se actualiza para la persona nueva solo hasta refrescar la app, ni aunque se reciban mensajes
+- Al refrescar navevagor revisar si no afecta que el usuario vuelva a unirse al chat de su id.
+
+- Agregar paginaciones en busqueda de usuarios.
+- Borrar imagen de usuario cuando actualice su foto.
+- Colocar IsSeen en true cuando el otro usuario este presente en el chat.
+  - No se tiene al igual que con node una forma de traer todos los sockets, cosa que se hizo con node para ver si el numero de sockets en el chat era mayor que 1 para saber si el otro usuario estaba en el chat.
+- Definir archivo de variables de entorno en Vite.
+  - Se debe ajustar el url en client/src/presentation/providers/SocketProvider.tsx.
+
+- Revisar mensaje de 'Wrong credentials' que sale el login del cliente.
+
+- 
+
+- El email debe venir siempre en minúsculas para autenticación. Revisar si se le da formato el email.
+  - Pendiente ver si hay una mejor forma de hacer en LoginUserDto.
+
+- Afinar endpoint que revisa la validez de la sesión y retorna la información del usuario.
+
+- Revisar validaciones en DTOs.
+  - Ver si se instala FluentValidation.
+
+## Terminado
+- Crear política de autenticación para evitar tener que poner [Authorize] en cada controlador. De esta forma solo se deberían especificar los que son accesibles sin autenticación.
+- infinite scroll no estéa funcionando en los chats. Solo funciona la primera vez en el primer chat que se abre.
+  - Sucedia que la variable page en custom hook no se reiniciaba al valor inicial al abrir un nuevo chat, por lo que se quedaba con el valor dado con otro chat. Ahora se recibe el page y la funcion setter como argumento en lugar de manejarlo en el custom hook.
+- Validar creacion de chats
