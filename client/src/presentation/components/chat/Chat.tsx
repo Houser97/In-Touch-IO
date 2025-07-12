@@ -1,4 +1,4 @@
-import { useCallback, useContext, useMemo, useState } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import '../../styles/Chat/Chat.css'
 import Header from './Header'
 import { DateTime } from 'luxon';
@@ -41,6 +41,12 @@ const Chat = () => {
   const [fileInputState, setFileInputState] = useState('');
   const [previewSource, setPreviewSource] = useState('');
   const [selectedFile, setSelectedFile] = useState<Blob | null>(null);
+  const [page, setPage] = useState(2);
+
+  useEffect(() => {
+    setPage(2);
+  }, [chat.id]);
+  
 
   const LoadingSection = useMemo(() => () => (
     loadingParams.map((params, index) => (
@@ -52,7 +58,7 @@ const Chat = () => {
     <div className='messages' id='messages'>
       <InfiniteScroll
         dataLength={messages.length}
-        next={() => getMessagesPagination(chat.id)}
+        next={() => getMessagesPagination(chat.id, page, setPage)}
         style={{ display: 'flex', flexDirection: 'column-reverse', overflow: 'hidden' }} //To put endMessage and loader to the top.
         inverse={true} //
         hasMore={hasMoreMessages}
