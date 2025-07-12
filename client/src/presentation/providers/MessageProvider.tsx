@@ -10,17 +10,21 @@ import { CustomError } from "../../infrastructure/errors/custom.error";
 import { SocketContext } from "./SocketProvider";
 
 interface MessageContextProps {
-    messages: Message[];
-    idUnseenMessages: string[];
-    isLoading: boolean;
-    hasMoreMessages: boolean;
-    sendMessage: (sender: string, content: string, image: string) => void;
-    setIdUnseenMessages: Dispatch<SetStateAction<string[]>>;
-    setMessages: Dispatch<SetStateAction<Message[]>>;
-    setHasMoreMessages: Dispatch<SetStateAction<boolean>>;
-    getMessages: (chatId: string) => void;
-    updateMessagesStatus: (ids: string[]) => void;
-    getMessagesPagination: (chatId: string) => void;
+  messages: Message[];
+  idUnseenMessages: string[];
+  isLoading: boolean;
+  hasMoreMessages: boolean;
+  sendMessage: (sender: string, content: string, image: string) => void;
+  setIdUnseenMessages: Dispatch<SetStateAction<string[]>>;
+  setMessages: Dispatch<SetStateAction<Message[]>>;
+  setHasMoreMessages: Dispatch<SetStateAction<boolean>>;
+  getMessages: (chatId: string) => void;
+  updateMessagesStatus: (ids: string[]) => void;
+  getMessagesPagination: (
+    chatId: string,
+    page: number,
+    setPage: Dispatch<SetStateAction<number>>
+  ) => void;
 }
 
 
@@ -51,8 +55,6 @@ export const MessageProvider = ({ children }: PropsWithChildren) => {
     const [isLoading, setIsLoading] = useState(true);
 
     const [hasMoreMessages, setHasMoreMessages] = useState(false);
-    const [page, setpage] = useState(2);
-
 
     useEffect(() => {
         if (!socket) return;
@@ -108,24 +110,30 @@ export const MessageProvider = ({ children }: PropsWithChildren) => {
 
     }
 
-    const getMessagesPagination = async (chatId: string) => {
-
-        try {
-            const { messages, next } = await messageRepositoryProvider.getMessages(chatId, page, limit);
-            const reversedMessage = messages.reverse()
-            setHasMoreMessages(next !== null);
-            setMessages(prev => [...prev, ...reversedMessage]);
-            setpage(prev => prev + 1);
-
-        } catch (error: any | CustomError) {
-            console.log(error.status);
-            if (error.status === 401) {
-                logout();
-            } else {
-                console.log(error);
-            }
+    const getMessagesPagination = async (
+      chatId: string,
+      page: number,
+      setPage: Dispatch<SetStateAction<number>>
+    ) => {
+      try {
+        const { messages, next } = await messageRepositoryProvider.getMessages(
+          chatId,
+          page,
+          limit
+        );
+        const reversedMessage = messages.reverse();
+        setHasMoreMessages(next !== null);
+        setMessages((prev) => [...prev, ...reversedMessage]);
+        setPage((prev) => prev + 1);
+      } catch (error: any | CustomError) {
+        console.log(error.status);
+        if (error.status === 401) {
+          logout();
+        } else {
+          console.log(error);
         }
-    }
+      }
+    };
 
     const getMessages = async (chatId: string) => {
         setIsLoading(true);
