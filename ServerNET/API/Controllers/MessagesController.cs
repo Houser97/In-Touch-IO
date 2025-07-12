@@ -1,8 +1,7 @@
 using Application.DTOs;
+using Application.DTOs.Messages;
 using Application.Messages;
 using Domain;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -34,6 +33,18 @@ namespace API.Controllers
                 return StatusCode(result.Code, new { message = result.Error });
 
             return Ok(result.Value);
+        }
+
+        [HttpPut]
+        public async Task<ActionResult<bool>> UpdateMessageStatus(UpdateMessageDto updateMessageDto)
+        {
+            var result = await _messageService.UpdateMessageStatus(updateMessageDto);
+
+            if (!result.IsSuccess)
+                return StatusCode(result.Code, new { message = result.Error });
+
+            return Ok(true);
+
         }
     }
 }
