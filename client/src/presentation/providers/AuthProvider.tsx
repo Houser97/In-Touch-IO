@@ -45,7 +45,7 @@ export const AuthContext = createContext<AuthContextProps>({
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {
 
-    const [auth, setAuth] = useState(initialState)
+    const [auth, setAuth] = useState(initialState);
 
     const login = async (email: string, password: string) => {
         try {
@@ -67,11 +67,10 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
                     errorMessage: error.message
                 });
             }
-            console.log(error);
             setAuth({
                 status: 'unauthenticated',
                 user: userInitialState,
-                errorMessage: error.response.data?.error || 'Wrong credentials'
+                errorMessage: error.response.data?.message || 'Wrong credentials'
             });
         }
     };
@@ -98,6 +97,17 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     const checkAuthToken = async () => {
         try {
             const { data } = await inTouchIoApi.get('/auth');
+            
+            if (data.user == null) {
+                setAuth({
+                  status: "unauthenticated",
+                  user: userInitialState,
+                  errorMessage: '',
+                });
+
+                return;
+            } 
+
             setAuth({
                 status: 'authenticated',
                 user: data.user,
