@@ -3,23 +3,28 @@ using System.Dynamic;
 using Application.Core;
 using Application.DTOs;
 using Application.DTOs.Chats;
-using Application.Messages;
+using Application.Services.Messages;
 using Domain;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Persistence;
 
-namespace Application.Chats;
+namespace Application.Services.Chats;
 
-public class ChatsService(AppDbContext dbContext, IOptions<AppDbSettings> settings, MessageService messageService)
+public class ChatsService(
+    AppDbContext dbContext,
+    IOptions<AppDbSettings> settings,
+    MessageService messageService,
+    ServiceHelper<ChatsService> serviceHelper)
 {
-    private readonly IMongoCollection<Chat> _chatsCollection = dbContext.Database.GetCollection<Chat>(settings.Value.ChatsCollectionName);
+    private readonly IMongoCollection<Chat> _chatsCollection =
+        dbContext.Database.GetCollection<Chat>(settings.Value.ChatsCollectionName);
     private readonly MessageService _messageService = messageService;
 
     public async Task<Result<object>> GetById(string chatId, string userId)
     {
-        try
+        return await serviceHelper.ExecuteSafeAsync<object>(async () =>
         {
             var pipeline = new[]
             {
@@ -68,16 +73,12 @@ public class ChatsService(AppDbContext dbContext, IOptions<AppDbSettings> settin
             result.unseenMessages = unseenMessages;
 
             return Result<object>.Success(result);
-        }
-        catch (Exception ex)
-        {
-            return Result<object>.Failure($"Internal Server Error: {ex.Message}", 500);
-        }
+        });
     }
 
     public async Task<Result<object>> GetChatsByUserId(string userId)
     {
-        try
+        return await serviceHelper.ExecuteSafeAsync(async () =>
         {
             var userObjectId = new ObjectId(userId);
 
@@ -122,30 +123,25 @@ public class ChatsService(AppDbContext dbContext, IOptions<AppDbSettings> settin
             var unseenMessages = unseenMessagesResult.Value;
 
             return Result<object>.Success(new { chats, unseenMessages });
-
-        }
-        catch (Exception ex)
-        {
-            return Result<object>.Failure($"Internal server error: {ex.Message}", 500);
-        }
+        });
     }
 
     public async Task<Result<object>> CreateChat(CreateChatDto createChatDto, string userId)
     {
-        var userIds = createChatDto.UserIds;
-
-        var filter = Builders<Chat>.Filter.And(
-            Builders<Chat>.Filter.All(c => c.Users, userIds),
-            Builders<Chat>.Filter.Size(c => c.Users, userIds.Count)
-        );
-
-        var chatExists = await _chatsCollection.Find(filter).FirstOrDefaultAsync();
-
-        if (chatExists != null)
-            return Result<object>.Failure("Chat already exists", 400);
-
-        try
+        return await serviceHelper.ExecuteSafeAsync(async () =>
         {
+            var userIds = createChatDto.UserIds;
+
+            var filter = Builders<Chat>.Filter.And(
+                Builders<Chat>.Filter.All(c => c.Users, userIds),
+                Builders<Chat>.Filter.Size(c => c.Users, userIds.Count)
+            );
+
+            var chatExists = await _chatsCollection.Find(filter).FirstOrDefaultAsync();
+
+            if (chatExists != null)
+                return Result<object>.Failure("Chat already exists", 400);
+
             var newChat = new Chat
             {
                 Users = userIds,
@@ -156,16 +152,12 @@ public class ChatsService(AppDbContext dbContext, IOptions<AppDbSettings> settin
             await _chatsCollection.InsertOneAsync(newChat);
 
             return await GetById(newChat.Id!.ToString(), userId);
-        }
-        catch (Exception ex)
-        {
-            return Result<object>.Failure($"Internal server error: {ex.Message}", 500);
-        }
+        });        
     }
 
     public async Task<Result<object>> UpdateChat(string id, string userId, UpdateChatDto updateChatDto)
     {
-        try
+        return await serviceHelper.ExecuteSafeAsync(async () =>
         {
             var filter = Builders<Chat>.Filter.Eq(c => c.Id, id);
             var update = Builders<Chat>.Update.Set(c => c.LastMessage, updateChatDto.LastMessage);
@@ -176,10 +168,6 @@ public class ChatsService(AppDbContext dbContext, IOptions<AppDbSettings> settin
                 return Result<object>.Failure("Chat not found", 404);
 
             return await GetById(id, userId);
-        }
-        catch (Exception ex)
-        {
-            return Result<object>.Failure($"Internal server error: {ex.Message}", 500);
-        }
+        });
     }
 }
