@@ -3,34 +3,22 @@ using System.Text.Json;
 using API.SignalR;
 using Application;
 using Application.Auth;
-using Application.Chats;
-using Application.Messages;
+using Application.Services.Chats;
+using Application.Core;
+using Application.Interfaces;
+using Application.Services.Messages;
 using Domain;
+using Infrastructure.Photos;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson.Serialization;
 using Persistence;
+using Persistence.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Mongo Configuration
-BsonClassMap.RegisterClassMap<Message>(cm =>
-{
-    cm.AutoMap();
-    cm.SetIgnoreExtraElements(true);
-});
-
-BsonClassMap.RegisterClassMap<User>(cm =>
-{
-    cm.AutoMap();
-    cm.SetIgnoreExtraElements(true);
-});
-
-BsonClassMap.RegisterClassMap<Chat>(cm =>
-{
-    cm.AutoMap();
-    cm.SetIgnoreExtraElements(true);
-});
+MongoDbConventions.Register();
 
 // Configure settings inject IOptions<AppDbSettings>
 builder.Services.Configure<AppDbSettings>(
@@ -43,9 +31,14 @@ builder.Services.AddScoped<MessageService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ChatsService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped(typeof(ServiceHelper<>));
 
 // SignalR
 builder.Services.AddSignalR();
+
+// Cloudinary
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+builder.Services.AddScoped<IPhotoService, PhotoService>();
 
 // 1. JWT configuration
 builder.Services.Configure<JwtSettings>(
