@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using Application.Chats;
+using Application.Services.Chats;
 using Application.Core;
 using Application.DTOs.Chats;
 using Domain;

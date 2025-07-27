@@ -1,6 +1,6 @@
 using Application.DTOs;
 using Application.DTOs.Messages;
-using Application.Messages;
+using Application.Services.Messages;
 using Domain;
 using Microsoft.AspNetCore.Mvc;
 

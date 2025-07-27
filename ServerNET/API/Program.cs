@@ -1,19 +1,17 @@
 using System.Text;
 using System.Text.Json;
 using API.SignalR;
-using Application;
 using Application.Auth;
 using Application.Services.Chats;
 using Application.Core;
 using Application.Interfaces;
 using Application.Services.Messages;
-using Domain;
 using Infrastructure.Photos;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using MongoDB.Bson.Serialization;
 using Persistence;
 using Persistence.Configurations;
+using Application.Services.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 

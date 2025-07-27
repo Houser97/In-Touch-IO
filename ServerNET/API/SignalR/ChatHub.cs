@@ -1,5 +1,5 @@
-using Application.Chats;
-using Application.Messages;
+using Application.Services.Chats;
+using Application.Services.Messages;
 using Microsoft.AspNetCore.SignalR;
 using Application.DTOs.Messages;
 using Application.DTOs.Chats;
