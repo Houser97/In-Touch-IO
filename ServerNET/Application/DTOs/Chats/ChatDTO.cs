@@ -44,5 +44,4 @@ public class ChatDTO(string id, List<UserLikeDTO> users, object lastMessage, Dat
 
         return new ChatDTO(id!, users, lastMessage, updatedAt);
     }
-
 }
