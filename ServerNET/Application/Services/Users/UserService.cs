@@ -9,15 +9,19 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Persistence;
 
-namespace Application;
+namespace Application.Services.Users;
 
-public class UserService(AppDbContext dbContext, IOptions<AppDbSettings> settings)
+public class UserService(
+    AppDbContext dbContext,
+    IOptions<AppDbSettings> settings,
+    ServiceHelper<UserService> serviceHelper)
 {
-    private readonly IMongoCollection<User> _userCollection = dbContext.Database.GetCollection<User>(settings.Value.UsersCollectionName);
+    private readonly IMongoCollection<User> _userCollection =
+        dbContext.Database.GetCollection<User>(settings.Value.UsersCollectionName);
 
     public async Task<Result<List<UserLikeDTO>>> GetUserByNameOrEmail(string? searchTerm)
     {
-        try
+        return await serviceHelper.ExecuteSafeAsync(async () =>
         {
             FilterDefinition<User> filter;
 
@@ -34,7 +38,7 @@ public class UserService(AppDbContext dbContext, IOptions<AppDbSettings> setting
                     Builders<User>.Filter.Regex(u => u.Name, regexFilter)
                 );
             }
-            
+
             var users = await _userCollection.Find(filter).ToListAsync();
 
             var formattedUsers = users
@@ -43,17 +47,12 @@ public class UserService(AppDbContext dbContext, IOptions<AppDbSettings> setting
                 .ToList();
 
             return Result<List<UserLikeDTO>>.Success(formattedUsers);
-        }
-        catch (Exception ex)
-        {
-            return Result<List<UserLikeDTO>>.Failure($"Internal Server Error: {ex.Message}", 500);
-        }
+        });
     }
 
     public async Task<Result<UserLikeDTO>> Update(string id, string oldPublicId, UpdateUserDto updateUserDto)
     {
-        try
-        {
+        return await serviceHelper.ExecuteSafeAsync( async () => {
             var filter = Builders<User>.Filter.Eq(u => u.Id, id);
             var user = await _userCollection.Find(filter).FirstOrDefaultAsync();
 
@@ -76,11 +75,6 @@ public class UserService(AppDbContext dbContext, IOptions<AppDbSettings> setting
             );
 
             return Result<UserLikeDTO>.Success(UserLikeDTO.FromEntity(updatedUser));
-
-        }
-        catch (Exception ex)
-        {
-            return Result<UserLikeDTO>.Failure($"Internal Server Error: {ex.Message}", 500);
-        }
+        });
     }
 }

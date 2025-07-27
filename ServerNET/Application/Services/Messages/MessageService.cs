@@ -8,9 +8,12 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Persistence;
 
-namespace Application.Messages;
+namespace Application.Services.Messages;
 
-public class MessageService(AppDbContext dbContext, IOptions<AppDbSettings> settings)
+public class MessageService(
+    AppDbContext dbContext,
+    IOptions<AppDbSettings> settings,
+    ServiceHelper<MessageService> serviceHelper)
 {
     private readonly IMongoCollection<Message> _messagesCollection = dbContext.Database.GetCollection<Message>(settings.Value.MessagesCollectionName);
     public async Task<List<Message>> GetAll()
@@ -18,9 +21,9 @@ public class MessageService(AppDbContext dbContext, IOptions<AppDbSettings> sett
         return await _messagesCollection.Find(_ => true).ToListAsync();
     }
 
-    public async Task<Result<object>> GetMessagesByChatId(string chatId, PaginationDto paginationDto)
+    public async Task<Result<PaginatedMessagesDto>> GetMessagesByChatId(string chatId, PaginationDto paginationDto)
     {
-        try
+        return await serviceHelper.ExecuteSafeAsync( async () =>
         {
             int page = paginationDto.Page;
             int limit = paginationDto.Limit;
@@ -42,33 +45,28 @@ public class MessageService(AppDbContext dbContext, IOptions<AppDbSettings> sett
 
             var totalPages = (int)Math.Ceiling((double)total / limit);
 
-            var result = new
+            var result = new PaginatedMessagesDto
             {
-                page,
-                limit,
-                total,
-                totalPages,
-                next = (page * limit < total) ? $"/api/messages/{chatId}?page={page + 1}&limit={limit}" : null,
-                prev = (page > 1) ? $"/api/messages/{chatId}?page={page - 1}&limit={limit}" : null,
-                messages = messagesDto
+                Page = page,
+                Limit = limit,
+                Total = total,
+                TotalPages = totalPages,
+                Next = (page * limit < total) ? $"/api/messages/{chatId}?page={page + 1}&limit={limit}" : null,
+                Prev = (page > 1) ? $"/api/messages/{chatId}?page={page - 1}&limit={limit}" : null,
+                Messages = messagesDto
             };
-            return Result<object>.Success(result);
-
-        }
-        catch (Exception ex)
-        {
-            return Result<object>.Failure($"Internal server error {ex.Message}", 500);
-        }
+            return Result<PaginatedMessagesDto>.Success(result);
+        });
     }
 
     public async Task<Result<object>> GetUnseenMessages(List<string> chatIds, string userId)
     {
-        try
+        return await serviceHelper.ExecuteSafeAsync(async () =>
         {
             var filter = Builders<Message>.Filter.And(
                 Builders<Message>.Filter.Eq(m => m.IsSeen, false),
                 Builders<Message>.Filter.In(m => m.Chat, chatIds)
-            // Builders<Message>.Filter.Ne(m => m.Sender, userId)
+                // Builders<Message>.Filter.Ne(m => m.Sender, userId)
             );
 
             var projection = Builders<Message>.Projection
@@ -99,16 +97,12 @@ public class MessageService(AppDbContext dbContext, IOptions<AppDbSettings> sett
             }
 
             return Result<object>.Success(unseenMessagesByChat);
-        }
-        catch (Exception ex)
-        {
-            return Result<object>.Failure($"Internal server error: {ex.Message}", 500);
-        }
+        });
     }
 
     public async Task<Result<Message>> Create(CreateMessageDto createMessageDto)
     {
-        try
+        return await serviceHelper.ExecuteSafeAsync(async () =>
         {
             var message = new Message
             {
@@ -124,16 +118,12 @@ public class MessageService(AppDbContext dbContext, IOptions<AppDbSettings> sett
             await _messagesCollection.InsertOneAsync(message);
 
             return Result<Message>.Success(await _messagesCollection.Find(m => m.Id == message.Id).FirstOrDefaultAsync());
-        }
-        catch (Exception ex)
-        {
-            return Result<Message>.Failure($"Internal server error: {ex.Message}", 500);
-        }
+        });
     }
 
     public async Task<Result<bool>> UpdateMessageStatus(UpdateMessageDto updateMessageDto)
     {
-        try
+        return await serviceHelper.ExecuteSafeAsync<bool>( async () =>
         {
             var ids = updateMessageDto.MessageIds;
 
@@ -148,10 +138,6 @@ public class MessageService(AppDbContext dbContext, IOptions<AppDbSettings> sett
             }
 
             return Result<bool>.Success(true);
-        }
-        catch (Exception ex)
-        {
-            return Result<bool>.Failure($"Internal server error: {ex.Message}", 500);
-        }
+        });
     }
 }
