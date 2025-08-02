@@ -3,6 +3,7 @@ using System.Data.Common;
 using Application.Core;
 using Application.DTOs;
 using Application.DTOs.Users;
+using Application.Interfaces;
 using Domain;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
@@ -14,14 +15,17 @@ namespace Application.Services.Users;
 public class UserService(
     AppDbContext dbContext,
     IOptions<AppDbSettings> settings,
-    ServiceHelper<UserService> serviceHelper)
+    ServiceHelper<UserService> serviceHelper,
+    IPhotoService photoService)
 {
     private readonly IMongoCollection<User> _userCollection =
         dbContext.Database.GetCollection<User>(settings.Value.UsersCollectionName);
 
+    private readonly ServiceHelper<UserService> _serviceHelper = serviceHelper;
+
     public async Task<Result<List<UserLikeDTO>>> GetUserByNameOrEmail(string? searchTerm)
     {
-        return await serviceHelper.ExecuteSafeAsync(async () =>
+        return await _serviceHelper.ExecuteSafeAsync(async () =>
         {
             FilterDefinition<User> filter;
 
@@ -50,15 +54,18 @@ public class UserService(
         });
     }
 
-    public async Task<Result<UserLikeDTO>> Update(string id, string oldPublicId, UpdateUserDto updateUserDto)
+    public async Task<Result<UserLikeDTO>> Update(string id, UpdateUserDto updateUserDto)
     {
-        return await serviceHelper.ExecuteSafeAsync( async () => {
+        return await _serviceHelper.ExecuteSafeAsync( async () => {
             var filter = Builders<User>.Filter.Eq(u => u.Id, id);
             var user = await _userCollection.Find(filter).FirstOrDefaultAsync();
 
             if (user == null) return Result<UserLikeDTO>.Failure("User does not exist", 400);
 
-            // TODO: delete previous image if oldPublicId is not 'defult'
+            if (updateUserDto.OldPublicId != "default")
+            {
+                await photoService.DeletePhoto(updateUserDto.OldPublicId);
+            }
 
             var update = Builders<User>.Update
                 .Set(u => u.Name, updateUserDto.Name)
