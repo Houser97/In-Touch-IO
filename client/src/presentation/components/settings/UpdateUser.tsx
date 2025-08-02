@@ -58,7 +58,7 @@ const UpdateUser = () => {
     const previewFile = async (file: File) => {
         try {
             const filePreview = await FileAdapter.readAsDataURL(file);
-            setPreviewSource(filePreview as string);
+            setPreviewSourceCrop(filePreview as string);
         } catch (error) {
             console.log(error);
         }
