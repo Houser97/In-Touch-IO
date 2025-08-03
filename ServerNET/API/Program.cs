@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using Persistence;
 using Persistence.Configurations;
 using Application.Services.Users;
+using Persistence.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,13 +24,13 @@ builder.Services.Configure<AppDbSettings>(
     builder.Configuration.GetSection("InTouchIoDatabase"));
 
 // Register AppDbContext as singleton
-builder.Services.AddSingleton<AppDbContext>();
+builder.Services.AddSingleton<IAppDbContext, AppDbContext>();
 
-builder.Services.AddScoped<MessageService>();
-builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<ChatsService>();
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped(typeof(ServiceHelper<>));
+builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IChatService, ChatsService>();
+builder.Services.AddScoped<IUserService ,UserService>();
+builder.Services.AddScoped(typeof(IServiceHelper<>), typeof(ServiceHelper<>));
 
 // SignalR
 builder.Services.AddSignalR();
