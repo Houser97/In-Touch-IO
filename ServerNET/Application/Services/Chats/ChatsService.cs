@@ -3,24 +3,26 @@ using System.Dynamic;
 using Application.Core;
 using Application.DTOs;
 using Application.DTOs.Chats;
+using Application.Interfaces;
 using Application.Services.Messages;
 using Domain;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Persistence;
+using Persistence.Interfaces;
 
 namespace Application.Services.Chats;
 
 public class ChatsService(
-    AppDbContext dbContext,
+    IAppDbContext dbContext,
     IOptions<AppDbSettings> settings,
-    MessageService messageService,
-    ServiceHelper<ChatsService> serviceHelper)
+    IMessageService messageService,
+    IServiceHelper<IChatService> serviceHelper) : IChatService
 {
     private readonly IMongoCollection<Chat> _chatsCollection =
         dbContext.Database.GetCollection<Chat>(settings.Value.ChatsCollectionName);
-    private readonly MessageService _messageService = messageService;
+    private readonly IMessageService _messageService = messageService;
 
     public async Task<Result<object>> GetById(string chatId, string userId)
     {

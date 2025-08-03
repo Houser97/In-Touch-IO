@@ -2,18 +2,20 @@ using System;
 using Application.Core;
 using Application.DTOs;
 using Application.DTOs.Messages;
+using Application.Interfaces;
 using Domain;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Persistence;
+using Persistence.Interfaces;
 
 namespace Application.Services.Messages;
 
 public class MessageService(
-    AppDbContext dbContext,
+    IAppDbContext dbContext,
     IOptions<AppDbSettings> settings,
-    ServiceHelper<MessageService> serviceHelper)
+    IServiceHelper<IMessageService> serviceHelper) : IMessageService
 {
     private readonly IMongoCollection<Message> _messagesCollection = dbContext.Database.GetCollection<Message>(settings.Value.MessagesCollectionName);
     public async Task<List<Message>> GetAll()

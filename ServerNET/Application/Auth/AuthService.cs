@@ -1,13 +1,19 @@
 using System;
 using Application.DTOs;
+using Application.Interfaces;
 using Domain;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Persistence;
+using Persistence.Interfaces;
 
 namespace Application.Auth;
 
-public class AuthService(JwtTokenGenerator tokenGenerator, AppDbContext dbContext, IOptions<AppDbSettings> settings)
+public class AuthService(
+    JwtTokenGenerator tokenGenerator,
+    IAppDbContext dbContext,
+    IOptions<AppDbSettings> settings
+) : IAuthService
 {
     private readonly JwtTokenGenerator _tokenGenerator = tokenGenerator;
     private readonly IMongoCollection<User> _usersCollection = dbContext.Database.GetCollection<User>(settings.Value.UsersCollectionName);

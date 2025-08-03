@@ -2,10 +2,11 @@ using System;
 
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using Persistence.Interfaces;
 
 namespace Persistence;
 
-public class AppDbContext
+public class AppDbContext : IAppDbContext
 {
     private readonly IMongoDatabase _database;
 

@@ -1,5 +1,6 @@
 using Application.DTOs;
 using Application.DTOs.Messages;
+using Application.Interfaces;
 using Application.Services.Messages;
 using Domain;
 using Microsoft.AspNetCore.Mvc;
@@ -8,9 +9,9 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MessagesController(MessageService messageService) : ControllerBase
+    public class MessagesController(IMessageService messageService) : ControllerBase
     {
-        private readonly MessageService _messageService = messageService;
+        private readonly IMessageService _messageService = messageService;
 
         [HttpGet]
         public async Task<ActionResult<List<Message>>> GetAllMessages()

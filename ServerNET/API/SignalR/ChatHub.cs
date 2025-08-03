@@ -1,17 +1,14 @@
-using Application.Services.Chats;
-using Application.Services.Messages;
 using Microsoft.AspNetCore.SignalR;
 using Application.DTOs.Messages;
 using Application.DTOs.Chats;
-using Domain;
-using Application.DTOs;
 using System.Text.Json;
+using Application.Interfaces;
 
 namespace API.SignalR;
 
 public class ChatHub(
-    MessageService messageService,
-    ChatsService chatService
+    IMessageService messageService,
+    IChatService chatService
 ) : Hub
 {
     public async Task Setup(string userId)

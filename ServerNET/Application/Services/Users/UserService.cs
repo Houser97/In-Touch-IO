@@ -9,19 +9,20 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Persistence;
+using Persistence.Interfaces;
 
 namespace Application.Services.Users;
 
 public class UserService(
-    AppDbContext dbContext,
+    IAppDbContext dbContext,
     IOptions<AppDbSettings> settings,
-    ServiceHelper<UserService> serviceHelper,
-    IPhotoService photoService)
+    IServiceHelper<UserService> serviceHelper,
+    IPhotoService photoService) : IUserService
 {
     private readonly IMongoCollection<User> _userCollection =
         dbContext.Database.GetCollection<User>(settings.Value.UsersCollectionName);
 
-    private readonly ServiceHelper<UserService> _serviceHelper = serviceHelper;
+    private readonly IServiceHelper<UserService> _serviceHelper = serviceHelper;
 
     public async Task<Result<List<UserLikeDTO>>> GetUserByNameOrEmail(string? searchTerm)
     {

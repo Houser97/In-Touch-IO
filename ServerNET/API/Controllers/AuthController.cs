@@ -1,6 +1,6 @@
 using System.Security.Claims;
-using Application.Auth;
 using Application.DTOs;
+using Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,10 +8,10 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController(AuthService authService) : ControllerBase
+    public class AuthController(IAuthService authService) : ControllerBase
     {
 
-        private readonly AuthService _authService = authService;
+        private readonly IAuthService _authService = authService;
 
         [HttpPost("login")]
         [AllowAnonymous]

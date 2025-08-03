@@ -4,14 +4,15 @@ using Application.Core;
 using Application.DTOs.Chats;
 using Domain;
 using Microsoft.AspNetCore.Mvc;
+using Application.Interfaces;
 
 namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ChatsController(ChatsService chatsService) : ControllerBase
+    public class ChatsController(IChatService chatsService) : ControllerBase
     {
-        private readonly ChatsService _chatsService = chatsService;
+        private readonly IChatService _chatsService = chatsService;
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Chat>> GetById(string id)
