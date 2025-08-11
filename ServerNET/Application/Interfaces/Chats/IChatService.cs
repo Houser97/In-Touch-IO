@@ -2,7 +2,7 @@ using System;
 using Application.Core;
 using Application.DTOs.Chats;
 
-namespace Application.Interfaces;
+namespace Application.Interfaces.Chats;
 
 public interface IChatService
 {

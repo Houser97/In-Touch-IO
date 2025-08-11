@@ -1,9 +1,8 @@
 using System;
 using Application.Core;
-using Application.DTOs;
 using Application.DTOs.Users;
 
-namespace Application.Interfaces;
+namespace Application.Interfaces.Auth;
 
 public interface IUserService
 {
