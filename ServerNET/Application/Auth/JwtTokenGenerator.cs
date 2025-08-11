@@ -1,15 +1,17 @@
 using System;
-
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Application.Interfaces.Core;
 using Domain;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Application.Auth;
 
-public class JwtTokenGenerator(IOptions<JwtSettings> options)
+public class JwtTokenGenerator(
+    IOptions<JwtSettings> options
+) : ITokenGenerator
 {
     private readonly JwtSettings _settings = options.Value;
 
