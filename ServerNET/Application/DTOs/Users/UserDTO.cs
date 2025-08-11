@@ -2,7 +2,7 @@ using System;
 using Domain;
 using MongoDB.Bson;
 
-namespace Application.DTOs;
+namespace Application.DTOs.Users;
 
 public class UserDTO
 {

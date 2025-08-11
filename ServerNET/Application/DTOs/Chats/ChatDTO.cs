@@ -1,9 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using Application.DTOs.Messages;
+using Application.DTOs.Users;
 using MongoDB.Bson;
 
-namespace Application.DTOs;
+namespace Application.DTOs.Chats;
 
 public class ChatDTO(string id, List<UserLikeDTO> users, object lastMessage, DateTime updatedAt)
 {

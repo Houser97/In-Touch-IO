@@ -1,6 +1,6 @@
 using System;
 
-namespace Application.DTOs;
+namespace Application.DTOs.Shared;
 
 public class PaginationDto(int page, int limit)
 {

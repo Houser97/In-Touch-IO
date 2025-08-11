@@ -2,7 +2,7 @@ using System;
 using Domain;
 using MongoDB.Bson;
 
-namespace Application.DTOs;
+namespace Application.DTOs.Messages;
 
 public class MessageDTO(string id, string sender, string content, string chat, bool isSeen, string image, DateTime createdAt)
 {
@@ -65,10 +65,4 @@ public class MessageDTO(string id, string sender, string content, string chat, b
             message.CreatedAt
         );
     }
-}
-
-public class UnseenMessageDTO
-{
-    public required  string Id { get; set; }
-    public required string Sender { get; set; }
 }
