@@ -4,7 +4,6 @@ using API.SignalR;
 using Application.Auth;
 using Application.Services.Chats;
 using Application.Core;
-using Application.Interfaces;
 using Application.Services.Messages;
 using Infrastructure.Photos;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -13,6 +12,17 @@ using Persistence;
 using Persistence.Configurations;
 using Application.Services.Users;
 using Persistence.Interfaces;
+using Application.Repositories;
+using Application.Interfaces.Repositories;
+using Application.Interfaces.Messages;
+using Application.Interfaces.Auth;
+using Application.Interfaces.Chats;
+using Application.Interfaces.Core;
+using Application.Interfaces.Storage;
+using Application.Interfaces.Security;
+using Infrastructure.Security;
+using MongoDB.Driver;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,14 +33,29 @@ MongoDbConventions.Register();
 builder.Services.Configure<AppDbSettings>(
     builder.Configuration.GetSection("InTouchIoDatabase"));
 
-// Register AppDbContext as singleton
-builder.Services.AddSingleton<IAppDbContext, AppDbContext>();
+// MongoClient as Singleton (thread-safe)
+builder.Services.AddSingleton<IMongoClient>(sp =>
+{
+    var settings = sp.GetRequiredService<IOptions<AppDbSettings>>().Value;
+    return new MongoClient(settings.ConnectionString);
+});
+
+// Register AppDbContext as scoped
+builder.Services.AddScoped<IAppDbContext, AppDbContext>();
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IMessagesRepository, MessagesRepository>();
+builder.Services.AddScoped<IChatsRepository, ChatsRepository>();
 
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IChatService, ChatsService>();
 builder.Services.AddScoped<IUserService ,UserService>();
 builder.Services.AddScoped(typeof(IServiceHelper<>), typeof(ServiceHelper<>));
+
+// Accessors
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 
 // SignalR
 builder.Services.AddSignalR();
@@ -72,7 +97,7 @@ builder.Services.AddAuthorizationBuilder()
     .RequireAuthenticatedUser()
     .Build());
 
-builder.Services.AddSingleton<JwtTokenGenerator>();
+builder.Services.AddSingleton<ITokenGenerator, JwtTokenGenerator>();
 
 
 
