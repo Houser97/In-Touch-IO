@@ -1,126 +1,101 @@
 using System;
-using Application.DTOs;
-using Application.Interfaces;
+using Application.Core;
+using Application.DTOs.Auth;
+using Application.Interfaces.Auth;
+using Application.Interfaces.Core;
+using Application.Interfaces.Repositories;
+using Application.Interfaces.Security;
 using Domain;
-using Microsoft.Extensions.Options;
-using MongoDB.Driver;
-using Persistence;
-using Persistence.Interfaces;
 
 namespace Application.Auth;
 
 public class AuthService(
-    JwtTokenGenerator tokenGenerator,
-    IAppDbContext dbContext,
-    IOptions<AppDbSettings> settings
+    ITokenGenerator tokenGenerator,
+    IServiceHelper<AuthService> serviceHelper,
+    IUserRepository userRepository,
+    IUserAccessor userAccessor
 ) : IAuthService
 {
-    private readonly JwtTokenGenerator _tokenGenerator = tokenGenerator;
-    private readonly IMongoCollection<User> _usersCollection = dbContext.Database.GetCollection<User>(settings.Value.UsersCollectionName);
+    private readonly ITokenGenerator _tokenGenerator = tokenGenerator;
+    private readonly IServiceHelper<AuthService> _serviceHelper = serviceHelper;
+    private readonly IUserRepository _userRepository = userRepository;
+    private readonly IUserAccessor _userAccessor = userAccessor;
 
-    public async Task<AuthResultDto> Login(LoginUserDto loginUserDto)
+    public async Task<Result<AuthResultDto>> Login(LoginUserDto loginUserDto)
     {
-        var user = await _usersCollection.Find(u => u.Email == loginUserDto.Email).FirstOrDefaultAsync();
-
-        if (user == null)
+        return await _serviceHelper.ExecuteSafeAsync( async() =>
         {
-            return new AuthResultDto
+            var user = await _userRepository.GetByEmailAsync(loginUserDto.Email.Trim().ToLowerInvariant());
+
+            if (user == null)
+                return Result<AuthResultDto>.Failure("User does not exist", 400);
+
+
+            bool passwordMatches = BCrypt.Net.BCrypt.Verify(loginUserDto.Password, user.Password);
+
+            if (!passwordMatches)
+                return Result<AuthResultDto>.Failure("Password is incorrect", 400);
+
+
+            var token = _tokenGenerator.GenerateToken(user);
+            user.Password = "";
+
+            return Result<AuthResultDto>.Success(new AuthResultDto
             {
-                Success = false,
-                Message = "User does not exist"
-            };
-        }
+                Token = token,
+                User = user
+            });
 
-        bool passwordMatches = BCrypt.Net.BCrypt.Verify(loginUserDto.Password, user.Password);
-
-        if (!passwordMatches)
-        {
-            return new AuthResultDto
-            {
-                Success = false,
-                Message = "Password is incorrect"
-            };
-        }
-
-
-        var token = _tokenGenerator.GenerateToken(user);
-        user.Password = "";
-
-        return new AuthResultDto
-        {
-            Success = true,
-            Token = token,
-            User = user
-        };
-
+        });
     }
 
-    public async Task<AuthResultDto> Register(RegisterUserDto registerUserDto)
+    public async Task<Result<AuthResultDto>> Register(RegisterUserDto registerUserDto)
     {
-        var userExists = await _usersCollection
-            .Find(u => u.Email == registerUserDto.Email)
-            .FirstOrDefaultAsync();
-
-        if (userExists != null)
+        return await _serviceHelper.ExecuteSafeAsync( async() =>
         {
-            return new AuthResultDto
-            {
-                Success = false,
-                Message = "User already exists"
-            };
-        }
+            var userExists = await _userRepository.GetByEmailAsync(registerUserDto.Email.Trim().ToLowerInvariant());
 
-        try
-        {
+            if (userExists != null)
+                return Result<AuthResultDto>.Failure("User already exists", 400);
+
+
             var user = new User
             {
-                Email = registerUserDto.Email,
+                Email = registerUserDto.Email.Trim().ToLowerInvariant(),
                 Name = registerUserDto.Name,
                 PictureUrl = registerUserDto.PictureUrl ?? string.Empty,
                 Password = BCrypt.Net.BCrypt.HashPassword(registerUserDto.Password),
                 PictureId = registerUserDto.PictureId ?? "default"
             };
 
-            await _usersCollection.InsertOneAsync(user);
+            await _userRepository.InsertUserAsync(user);
 
             user.Password = null!;
 
             var token = _tokenGenerator.GenerateToken(user);
 
-            return new AuthResultDto
+            return Result<AuthResultDto>.Success(new AuthResultDto
             {
-                Success = true,
                 Token = token,
                 User = user
-            };
-        }
-        catch (Exception ex)
-        {
-            return new AuthResultDto
-            {
-                Success = false,
-                Message = $"Internal server error: {ex.Message}"
-            };
-        }
+            });
+        });
     }
 
-    public async Task<AuthResultDto> GetAuthenticatedUser(string userId)
+    public async Task<Result<AuthResultDto>> GetAuthenticatedUser()
     {
-        var user = await _usersCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
-
-        if (user == null)
+        return await _serviceHelper.ExecuteSafeAsync( async() =>
         {
-            return new AuthResultDto
+            var user = await _userRepository.GetById(_userAccessor.GetUserId()!);
+
+            if (user == null)
+                return Result<AuthResultDto>.Failure("User does not exist", 404);
+
+            user.Password = null!;
+            return Result<AuthResultDto>.Success(new AuthResultDto
             {
-                Success = false,
-                Message = "User not found",
-            };
-        }
-
-        return new AuthResultDto
-        {
-            Success = true,
-            User = user
-        };
+                User = user
+            });
+        });
     }
 }
