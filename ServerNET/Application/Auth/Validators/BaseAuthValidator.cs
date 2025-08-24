@@ -1,0 +1,43 @@
+using System;
+using Application.DTOs.Auth;
+using FluentValidation;
+
+namespace Application.Auth.Validators;
+
+public class BaseAuthValidator<T> : AbstractValidator<T> where T : BaseAuthDto
+{
+    public BaseAuthValidator()
+    {
+        RuleFor(x => x.Email)
+            .Cascade(CascadeMode.Stop)
+            .NotEmpty().WithMessage("Email is required")
+            .EmailAddress().WithMessage("Invalid email format")
+            .Custom((email, context) =>
+            {
+                var normalized = BaseAuthValidator<T>.NormalizeEmail(email);
+                context.InstanceToValidate.Email = normalized;
+            }); ;
+
+        RuleFor(x => x.Password)
+            .Cascade(CascadeMode.Stop)
+            .NotEmpty().WithMessage("Password is required")
+            .MinimumLength(5).WithMessage("Password should have al least y characters");
+    }
+
+    private static string NormalizeEmail(string? email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return string.Empty;
+
+        email = email.Trim().ToLowerInvariant();
+
+        var parts = email.Split('@');
+        if (parts.Length == 2 && (parts[1] == "gmail.com" || parts[1] == "googlemail.com"))
+        {
+            parts[0] = parts[0].Replace(".", ""); // quitamos puntos del username
+            email = $"{parts[0]}@{parts[1]}";
+        }
+
+        return email;
+    }
+}
