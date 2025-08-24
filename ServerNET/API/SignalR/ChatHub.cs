@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.SignalR;
 using Application.DTOs.Messages;
 using Application.DTOs.Chats;
 using System.Text.Json;
-using Application.Interfaces;
+using Application.Interfaces.Messages;
+using Application.Interfaces.Chats;
 
 namespace API.SignalR;
 

@@ -1,10 +1,8 @@
 using System.Security.Claims;
-using Application.Services.Chats;
-using Application.Core;
 using Application.DTOs.Chats;
 using Domain;
 using Microsoft.AspNetCore.Mvc;
-using Application.Interfaces;
+using Application.Interfaces.Chats;
 
 namespace API.Controllers
 {
