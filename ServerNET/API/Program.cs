@@ -23,6 +23,9 @@ using Application.Interfaces.Security;
 using Infrastructure.Security;
 using MongoDB.Driver;
 using Microsoft.Extensions.Options;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Application.DTOs.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -106,6 +109,7 @@ builder.Services.AddSingleton<ITokenGenerator, JwtTokenGenerator>();
 
 // Add services to the container.
 
+
 builder.Services
     .AddControllers()
     .AddJsonOptions(options =>
@@ -113,6 +117,11 @@ builder.Services
         options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
         options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     });
+
+builder.Services.AddFluentValidationAutoValidation()
+    .AddFluentValidationClientsideAdapters();
+
+builder.Services.AddValidatorsFromAssemblyContaining<BaseAuthDto>();
 
 var app = builder.Build();
 
