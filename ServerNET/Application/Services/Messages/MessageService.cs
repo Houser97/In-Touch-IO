@@ -1,45 +1,41 @@
 using System;
 using Application.Core;
-using Application.DTOs;
 using Application.DTOs.Messages;
-using Application.Interfaces;
+using Application.DTOs.Shared;
+using Application.Interfaces.Core;
+using Application.Interfaces.Messages;
+using Application.Interfaces.Repositories;
 using Domain;
-using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Persistence;
-using Persistence.Interfaces;
 
 namespace Application.Services.Messages;
 
 public class MessageService(
-    IAppDbContext dbContext,
-    IOptions<AppDbSettings> settings,
+    IMessagesRepository messagesRepository,
     IServiceHelper<IMessageService> serviceHelper) : IMessageService
 {
-    private readonly IMongoCollection<Message> _messagesCollection = dbContext.Database.GetCollection<Message>(settings.Value.MessagesCollectionName);
+
+    private readonly IServiceHelper<IMessageService> _serviceHelper = serviceHelper;
+    private readonly IMessagesRepository _messagesRepository = messagesRepository;
+
     public async Task<List<Message>> GetAll()
     {
-        return await _messagesCollection.Find(_ => true).ToListAsync();
+        return await _messagesRepository.GetAllAsync();
     }
 
     public async Task<Result<PaginatedMessagesDto>> GetMessagesByChatId(string chatId, PaginationDto paginationDto)
     {
-        return await serviceHelper.ExecuteSafeAsync( async () =>
+        return await _serviceHelper.ExecuteSafeAsync( async () =>
         {
             int page = paginationDto.Page;
             int limit = paginationDto.Limit;
 
             var filter = Builders<Message>.Filter.Eq(m => m.Chat, chatId);
 
-            var total = await _messagesCollection.CountDocumentsAsync(filter);
+            var total = await _messagesRepository.CountByChatIdAsync(chatId);
 
-            var messages = await _messagesCollection
-                .Find(filter)
-                .SortByDescending(m => m.CreatedAt)
-                .Skip((page - 1) * limit)
-                .Limit(limit)
-                .ToListAsync();
+            var messages = await _messagesRepository.GetByChatIdAsync(chatId, page, limit);
 
             messages.Reverse();
 
@@ -63,40 +59,21 @@ public class MessageService(
 
     public async Task<Result<object>> GetUnseenMessages(List<string> chatIds, string userId)
     {
-        return await serviceHelper.ExecuteSafeAsync(async () =>
+        return await _serviceHelper.ExecuteSafeAsync(async () =>
         {
-            var filter = Builders<Message>.Filter.And(
-                Builders<Message>.Filter.Eq(m => m.IsSeen, false),
-                Builders<Message>.Filter.In(m => m.Chat, chatIds)
-                // Builders<Message>.Filter.Ne(m => m.Sender, userId)
-            );
+            var unseenMessages = await _messagesRepository.GetUnseenByChatIdsAsync(chatIds);
 
-            var projection = Builders<Message>.Projection
-                .Include(m => m.Id)
-                .Include(m => m.Sender)
-                .Include(m => m.Chat);
-
-            var bsonMessages = await _messagesCollection
-                .Find(filter)
-                .Project<BsonDocument>(projection)
-                .ToListAsync();
-
-            var unseenMessagesByChat = new Dictionary<string, List<UnseenMessageDTO>>();
-
-            foreach (var doc in bsonMessages)
-            {
-                var chatId = doc["chat"].AsObjectId.ToString();
-                var message = new UnseenMessageDTO
-                {
-                    Id = doc["_id"].AsObjectId.ToString(),
-                    Sender = doc["sender"].AsObjectId.ToString()
-                };
-
-                if (!unseenMessagesByChat.ContainsKey(chatId))
-                    unseenMessagesByChat[chatId] = [];
-
-                unseenMessagesByChat[chatId].Add(message);
-            }
+            var unseenMessagesByChat = unseenMessages
+                .GroupBy(m => m.Chat)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(m => new UnseenMessageDto
+                    {
+                        Id = m.Id,
+                        Sender = m.Sender,
+                        Chat = m.Chat
+                    }).ToList()
+                );
 
             return Result<object>.Success(unseenMessagesByChat);
         });
@@ -104,7 +81,7 @@ public class MessageService(
 
     public async Task<Result<Message>> Create(CreateMessageDto createMessageDto)
     {
-        return await serviceHelper.ExecuteSafeAsync(async () =>
+        return await _serviceHelper.ExecuteSafeAsync(async () =>
         {
             var message = new Message
             {
@@ -117,24 +94,25 @@ public class MessageService(
                 UpdatedAt = DateTime.UtcNow
             };
 
-            await _messagesCollection.InsertOneAsync(message);
+            await _messagesRepository.InsertAsync(message);
 
-            return Result<Message>.Success(await _messagesCollection.Find(m => m.Id == message.Id).FirstOrDefaultAsync());
+            return Result<Message>.Success(message);
         });
     }
 
+
     public async Task<Result<bool>> UpdateMessageStatus(UpdateMessageDto updateMessageDto)
     {
-        return await serviceHelper.ExecuteSafeAsync<bool>( async () =>
+        return await _serviceHelper.ExecuteSafeAsync<bool>( async () =>
         {
             var ids = updateMessageDto.MessageIds;
 
-            var filter = Builders<Message>.Filter.In(m => m.Id, ids);
-            var update = Builders<Message>.Update.Set(m => m.IsSeen, true);
+            if (ids.Length == 0 || ids[0] == "")
+                return Result<bool>.Failure("Ids are empty", 400);            
 
-            var result = await _messagesCollection.UpdateManyAsync(filter, update);
+            var modifiedCount = await _messagesRepository.UpdateStatusAsync(ids);
 
-            if (result.ModifiedCount == 0)
+            if (modifiedCount == 0)
             {
                 return Result<bool>.Failure("No messages were updated", 404);
             }
