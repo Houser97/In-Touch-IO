@@ -1,5 +1,5 @@
 using System;
-using Application.Interfaces;
+using Application.Interfaces.Storage;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Microsoft.Extensions.Options;

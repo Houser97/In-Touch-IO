@@ -1,9 +1,9 @@
 using System;
-using System.Data.Common;
 using Application.Core;
-using Application.DTOs;
 using Application.DTOs.Users;
-using Application.Interfaces;
+using Application.Interfaces.Auth;
+using Application.Interfaces.Core;
+using Application.Interfaces.Storage;
 using Domain;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
@@ -17,7 +17,8 @@ public class UserService(
     IAppDbContext dbContext,
     IOptions<AppDbSettings> settings,
     IServiceHelper<UserService> serviceHelper,
-    IPhotoService photoService) : IUserService
+    IPhotoService photoService
+) : IUserService
 {
     private readonly IMongoCollection<User> _userCollection =
         dbContext.Database.GetCollection<User>(settings.Value.UsersCollectionName);
