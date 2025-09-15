@@ -26,6 +26,8 @@ using Microsoft.Extensions.Options;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Application.DTOs.Auth;
+using Application.Interfaces.Helpers;
+using Application.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,6 +48,8 @@ builder.Services.AddSingleton<IMongoClient>(sp =>
 // Register AppDbContext as scoped
 builder.Services.AddScoped<IAppDbContext, AppDbContext>();
 
+builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IMessagesRepository, MessagesRepository>();
 builder.Services.AddScoped<IChatsRepository, ChatsRepository>();
@@ -55,6 +59,9 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IChatService, ChatsService>();
 builder.Services.AddScoped<IUserService ,UserService>();
 builder.Services.AddScoped(typeof(IServiceHelper<>), typeof(ServiceHelper<>));
+
+// AutoMapper
+builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 
 // Accessors
 builder.Services.AddHttpContextAccessor();
