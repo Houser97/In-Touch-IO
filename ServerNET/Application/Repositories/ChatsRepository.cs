@@ -1,9 +1,11 @@
 using System;
+using Application.Aggregates;
 using Application.DTOs.Chats;
+using Application.DTOs.Messages;
+using Application.DTOs.Users;
 using Application.Interfaces.Repositories;
 using Domain;
 using Microsoft.Extensions.Options;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using Persistence;
 using Persistence.Interfaces;
@@ -19,6 +21,12 @@ public class ChatsRepository(
     private readonly IMongoCollection<Chat> _chatsCollection =
         dbContext.Database.GetCollection<Chat>(settings.Value.ChatsCollectionName);
 
+    private readonly IMongoCollection<User> _usersCollection =
+        dbContext.Database.GetCollection<User>(settings.Value.UsersCollectionName);
+
+    private readonly IMongoCollection<Message> _messagesCollection =
+        dbContext.Database.GetCollection<Message>(settings.Value.MessagesCollectionName);
+
     public async Task<Chat?> FindExistingChatAsync(List<string> userIds)
     {
         var filter = Builders<Chat>.Filter.And(
@@ -31,80 +39,83 @@ public class ChatsRepository(
 
     public async Task<List<ChatDTO>> GetAllByUserId(string userId)
     {
-        var userObjectId = new ObjectId(userId);
-
-        var pipeline = new[]
+        var chats = await _chatsCollection.Aggregate()
+        .Match(chat => chat.Users.Contains(userId))
+        .SortByDescending(chat => chat.UpdatedAt)
+        .Lookup<Chat, User, ChatWithDetails>(
+            _usersCollection,
+            chat => chat.Users,
+            user => user.Id,
+            chat => chat.UsersWithDetails
+        )
+        .Lookup<ChatWithDetails, Message, ChatWithDetails>(
+            _messagesCollection,
+            chat => chat.LastMessage,
+            msg => msg.Id,
+            chat => chat.LastMessageWithDetails
+        )
+        .Unwind(chat => chat.LastMessageWithDetails, new AggregateUnwindOptions<ChatWithDetails>
         {
-                new BsonDocument("$match", new BsonDocument("users", userObjectId)),
-                new BsonDocument("$lookup", new BsonDocument
+            PreserveNullAndEmptyArrays = true
+        })
+            .Project(chat => new ChatDTO
+            {
+                Id = chat.Id,
+                Users = chat.UsersWithDetails.Select(u => new UserDTO
                 {
-                    { "from", "users" },
-                    { "localField", "users" },
-                    { "foreignField", "_id" },
-                    { "as", "users" }
-                }),
-                new BsonDocument("$lookup", new BsonDocument
+                    Id = u.Id.ToString(),
+                    Name = u.Email,
+                    Email = u.Email,
+                    PictureUrl = u.PictureUrl,
+                    PictureId = u.PictureId
+                }).ToList(),
+                LastMessage = chat.LastMessageWithDetails == null ? null : new LastMessageDto
                 {
-                    { "from", "messages" },
-                    { "localField", "lastMessage" },
-                    { "foreignField", "_id" },
-                    { "as", "lastMessage" }
-                }),
+                    Id = chat.LastMessageWithDetails.Id.ToString(),
+                    Sender = chat.LastMessageWithDetails.Sender,
+                    Content = chat.LastMessageWithDetails.Content
+                },
+                UpdatedAt = (DateTime)chat.UpdatedAt
+            })
+        .ToListAsync();
 
-                new BsonDocument("$unwind", new BsonDocument
-                {
-                    { "path", "$lastMessage" },
-                    { "preserveNullAndEmptyArrays", true }
-                }),
+        foreach (var user in chats)
+        {
+            Console.WriteLine(user.Id);
+            foreach (var user2 in user.Id)
+            {
+                Console.WriteLine(user2);
+            }
+                
+            Console.WriteLine(user.LastMessage);
+        }
 
-                new BsonDocument("$sort", new BsonDocument("updatedAt", -1))
-        };
-
-        var bsonChats = await _chatsCollection
-            .Aggregate<BsonDocument>(pipeline)
-            .ToListAsync();
-
-        var chats = bsonChats
-            .Select(ChatDTO.FromBson)
-            .ToList();
-
+        Console.WriteLine(chats);
         return chats;
     }
 
-    public async Task<ChatDTO?> GetByIdAsync(string chatId)
+    public async Task<ChatWithDetails?> GetByIdAsync(string chatId)
     {
-        var pipeline = new[]
+        return await _chatsCollection.Aggregate()
+        .Match(chat => chat.Id == chatId)
+        .SortByDescending(chat => chat.UpdatedAt)
+        .Lookup<Chat, User, ChatWithDetails>(
+            _usersCollection,
+            chat => chat.Users,
+            user => user.Id,
+            chatWithDetails => chatWithDetails.UsersWithDetails
+        )
+        .Lookup<ChatWithDetails, Message, ChatWithDetails>(
+            _messagesCollection,
+            chat => chat.LastMessage,
+            msg => msg.Id,
+            chatWithDetails => chatWithDetails.LastMessageWithDetails
+        )
+        .Unwind(chat => chat.LastMessageWithDetails, new AggregateUnwindOptions<ChatWithDetails>
         {
-        new BsonDocument("$match", new BsonDocument("_id", new ObjectId(chatId))),
-        new BsonDocument("$lookup", new BsonDocument
-        {
-            { "from", "users" },
-            { "localField", "users" },
-            { "foreignField", "_id" },
-            { "as", "users" }
-        }),
-        new BsonDocument("$lookup", new BsonDocument
-        {
-            { "from", "messages" },
-            { "localField", "lastMessage" },
-            { "foreignField", "_id" },
-            { "as", "lastMessage" }
-        }),
-        new BsonDocument("$unwind", new BsonDocument
-        {
-            { "path", "$lastMessage" },
-            { "preserveNullAndEmptyArrays", true }
+            PreserveNullAndEmptyArrays = true
         })
-    };
-
-        var chatDoc = await _chatsCollection
-            .Aggregate<BsonDocument>(pipeline)
-            .FirstOrDefaultAsync();
-
-        if (chatDoc == null)
-            return null;
-
-        return ChatDTO.FromBson(chatDoc);
+        .FirstOrDefaultAsync();
     }
 
     public async Task InsertAsync(Chat chat)
