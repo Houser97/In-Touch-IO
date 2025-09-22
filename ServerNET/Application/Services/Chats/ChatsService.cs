@@ -1,80 +1,47 @@
 using System;
 using System.Dynamic;
 using Application.Core;
-using Application.DTOs;
 using Application.DTOs.Chats;
-using Application.Interfaces;
-using Application.Services.Messages;
+using Application.DTOs.Messages;
+using Application.Interfaces.Chats;
+using Application.Interfaces.Core;
+using Application.Interfaces.Messages;
+using Application.Interfaces.Repositories;
+using AutoMapper;
 using Domain;
-using Microsoft.Extensions.Options;
-using MongoDB.Bson;
 using MongoDB.Driver;
-using Persistence;
-using Persistence.Interfaces;
 
 namespace Application.Services.Chats;
 
 public class ChatsService(
-    IAppDbContext dbContext,
-    IOptions<AppDbSettings> settings,
+    IChatsRepository chatsRepository,
     IMessageService messageService,
-    IServiceHelper<IChatService> serviceHelper) : IChatService
+    IServiceHelper<IChatService> serviceHelper,
+    IMapper mapper
+) : IChatService
 {
-    private readonly IMongoCollection<Chat> _chatsCollection =
-        dbContext.Database.GetCollection<Chat>(settings.Value.ChatsCollectionName);
     private readonly IMessageService _messageService = messageService;
+    private readonly IChatsRepository _chatsRepository = chatsRepository;
+    private readonly IMapper _mapper = mapper;
 
-    public async Task<Result<object>> GetById(string chatId, string userId)
+    public async Task<Result<ChatDTO>> GetById(string chatId, string userId)
     {
-        return await serviceHelper.ExecuteSafeAsync<object>(async () =>
+        return await serviceHelper.ExecuteSafeAsync(async () =>
         {
-            var pipeline = new[]
-            {
-                new BsonDocument("$match", new BsonDocument("_id", new ObjectId(chatId))),
-                new BsonDocument("$lookup", new BsonDocument
-                {
-                    { "from", "users" },
-                    { "localField", "users" },
-                    { "foreignField", "_id" },
-                    { "as", "users" }
-                }),
-                new BsonDocument("$lookup", new BsonDocument
-                {
-                    {"from", "messages"},
-                    {"localField", "lastMessage"},
-                    {"foreignField", "_id"},
-                    {"as", "lastMessage"}
-                }),
-                new BsonDocument("$unwind", new BsonDocument
-                {
-                    {"path", "$lastMessage"},
-                    {"preserveNullAndEmptyArrays", true}
-                })
-            };
+            var chatWithDetails = await _chatsRepository.GetByIdAsync(chatId);
+            
+            if (chatWithDetails == null)
+                return Result<ChatDTO>.Failure("Chat not found", 404);
 
-            var chat = await _chatsCollection.Aggregate<BsonDocument>(pipeline).FirstOrDefaultAsync();
-            if (chat == null)
-                return Result<object>.Failure("Chat not found", 404);
+            var chatDto = _mapper.Map<ChatDTO>(chatWithDetails);
 
             var unseenMessagesResult = await _messageService.GetUnseenMessages([chatId], userId);
-            var unseenMessagesMap = unseenMessagesResult.Value as Dictionary<string, List<UnseenMessageDTO>>;
-            var unseenMessages = unseenMessagesMap?.GetValueOrDefault(chatId) ?? new List<UnseenMessageDTO>();
+            var unseenMessagesMap = unseenMessagesResult.Value as Dictionary<string, List<UnseenMessageDto>>;
+            var unseenMessages = unseenMessagesMap?.GetValueOrDefault(chatId) ?? [];
 
-            // Aplanar: Combina propiedades del DTO con unseenMessages
-            var chatDto = ChatDTO.FromBson(chat);
+            chatDto.UnseenMessages = unseenMessages;
 
-            dynamic result = new ExpandoObject();
-            var resultDict = (IDictionary<string, object>)result;
-
-            foreach (var prop in chatDto.GetType().GetProperties())
-            {
-                var camelCaseName = char.ToLowerInvariant(prop.Name[0]) + prop.Name[1..];
-                resultDict[camelCaseName] = prop.GetValue(chatDto)!;
-            }
-
-            result.unseenMessages = unseenMessages;
-
-            return Result<object>.Success(result);
+            return Result<ChatDTO>.Success(chatDto);
         });
     }
 
@@ -82,67 +49,26 @@ public class ChatsService(
     {
         return await serviceHelper.ExecuteSafeAsync(async () =>
         {
-            var userObjectId = new ObjectId(userId);
-
-            var pipeline = new[]
-            {
-                new BsonDocument("$match", new BsonDocument("users", userObjectId)),
-                new BsonDocument("$lookup", new BsonDocument
-                {
-                    { "from", "users" },
-                    { "localField", "users" },
-                    { "foreignField", "_id" },
-                    { "as", "users" }
-                }),
-                new BsonDocument("$lookup", new BsonDocument
-                {
-                    { "from", "messages" },
-                    { "localField", "lastMessage" },
-                    { "foreignField", "_id" },
-                    { "as", "lastMessage" }
-                }),
-
-                new BsonDocument("$unwind", new BsonDocument
-                {
-                    { "path", "$lastMessage" },
-                    { "preserveNullAndEmptyArrays", true }
-                }),
-
-                new BsonDocument("$sort", new BsonDocument("updatedAt", -1))
-            };
-
-            var bsonChats = await _chatsCollection
-                .Aggregate<BsonDocument>(pipeline)
-                .ToListAsync();
-
-            var chats = bsonChats
-                .Select(ChatDTO.FromBson)
-                .ToList();
-
+            var chats = await _chatsRepository.GetAllByUserId(userId);
             var chatIds = chats.Select(c => c.Id).ToList();
 
-            var unseenMessagesResult = await _messageService.GetUnseenMessages(chatIds, userId);
+            var unseenMessagesResult = await _messageService.GetUnseenMessages([.. chatIds.Select(c => c.ToString())], userId);
             var unseenMessages = unseenMessagesResult.Value;
 
             return Result<object>.Success(new { chats, unseenMessages });
         });
     }
 
-    public async Task<Result<object>> CreateChat(CreateChatDto createChatDto, string userId)
+    public async Task<Result<ChatDTO>> CreateChat(CreateChatDto createChatDto, string userId)
     {
         return await serviceHelper.ExecuteSafeAsync(async () =>
         {
             var userIds = createChatDto.UserIds;
 
-            var filter = Builders<Chat>.Filter.And(
-                Builders<Chat>.Filter.All(c => c.Users, userIds),
-                Builders<Chat>.Filter.Size(c => c.Users, userIds.Count)
-            );
-
-            var chatExists = await _chatsCollection.Find(filter).FirstOrDefaultAsync();
+            var chatExists = await _chatsRepository.FindExistingChatAsync(userIds);
 
             if (chatExists != null)
-                return Result<object>.Failure("Chat already exists", 400);
+                return Result<ChatDTO>.Failure("Chat already exists", 400);
 
             var newChat = new Chat
             {
@@ -151,23 +77,22 @@ public class ChatsService(
                 UpdatedAt = DateTime.UtcNow
             };
 
-            await _chatsCollection.InsertOneAsync(newChat);
+            await _chatsRepository.InsertAsync(newChat);
 
             return await GetById(newChat.Id!.ToString(), userId);
-        });        
+        });
     }
 
-    public async Task<Result<object>> UpdateChat(string id, string userId, UpdateChatDto updateChatDto)
+    public async Task<Result<ChatDTO>> UpdateChat(string id, string userId, UpdateChatDto updateChatDto)
     {
         return await serviceHelper.ExecuteSafeAsync(async () =>
         {
-            var filter = Builders<Chat>.Filter.Eq(c => c.Id, id);
-            var update = Builders<Chat>.Update.Set(c => c.LastMessage, updateChatDto.LastMessage);
 
-            var result = await _chatsCollection.UpdateOneAsync(filter, update);
 
-            if (result.ModifiedCount == 0)
-                return Result<object>.Failure("Chat not found", 404);
+            var modifiedCount = await _chatsRepository.UpdateAsync(id, userId, updateChatDto);
+
+            if (modifiedCount == 0)
+                return Result<ChatDTO>.Failure("Chat not found", 404);
 
             return await GetById(id, userId);
         });
