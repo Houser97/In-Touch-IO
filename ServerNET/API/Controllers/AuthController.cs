@@ -1,6 +1,6 @@
 using System.Security.Claims;
-using Application.DTOs;
-using Application.Interfaces;
+using Application.DTOs.Auth;
+using Application.Interfaces.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,15 +19,15 @@ namespace API.Controllers
         {
             var result = await _authService.Login(loginUserDto);
 
-            if (!result.Success)
+            if (!result.IsSuccess)
             {
-                return BadRequest(new { message = result.Message });
+                return BadRequest(new { message = result.Error });
             }
 
             return Ok(new
             {
-                user = result.User,
-                token = result.Token
+                user = result.Value!.User,
+                token = result.Value.Token
             });
         }
 
@@ -37,38 +37,31 @@ namespace API.Controllers
         {
             var result = await _authService.Register(registerUserDto);
 
-            if (!result.Success)
+            if (!result.IsSuccess)
             {
-                return BadRequest(new { message = result.Message });
+                return BadRequest(new { message = result.Error });
             }
 
             return Ok(new
             {
-                user = result.User,
-                token = result.Token
+                user = result.Value!.User,
+                token = result.Value.Token
             });
         }
 
         [HttpGet("status")]
         public async Task<IActionResult> GetStatus()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var result = await _authService.GetAuthenticatedUser();
 
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized();
-            }
-
-            var AuthResultDto = await _authService.GetAuthenticatedUser(userId);
-
-            if (!AuthResultDto.Success)
+            if (!result.IsSuccess)
             {
                 return Unauthorized();
             }
 
             return Ok(new
             {
-                AuthResultDto.User,
+                result.Value!.User,
             });
         }
 
@@ -76,12 +69,12 @@ namespace API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetCurrentUser()
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+            var result = await _authService.GetAuthenticatedUser();
 
-            var user = await _authService.GetAuthenticatedUser(userId!);
+            if (!result.IsSuccess)
+                return StatusCode(result.Code, new { message = result.Error });
 
-            return Ok(new { user.User, email });
+            return Ok(new { result.Value!.User, result.Value!.User!.Email });
         }
     }
 }
