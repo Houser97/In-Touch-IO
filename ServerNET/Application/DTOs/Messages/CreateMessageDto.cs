@@ -1,38 +1,11 @@
 namespace Application.DTOs.Messages;
 
-public record CreateMessageDto(
-    string Sender,
-    string Content,
-    string Chat,
-    string Image,
-    bool IsSeen
-)
+public class CreateMessageDto
 {
-    public static (string? Error, CreateMessageDto? Dto) Create(
-        string sender,
-        string content,
-        string chat,
-        string image,
-        bool? isSeen = null
-    )
-    {
-        if (string.IsNullOrWhiteSpace(sender))
-            return ("Sender is required.", null);
-
-        if (string.IsNullOrWhiteSpace(content) && string.IsNullOrWhiteSpace(image))
-            return ("Either content or image must be provided.", null);
-
-        if (string.IsNullOrWhiteSpace(chat))
-            return ("Chat ID is required.", null);
-
-        return (null, new CreateMessageDto(
-            Sender: sender.Trim(),
-            Content: content.Trim(),
-            Chat: chat.Trim(),
-            Image: image?.Trim() ?? string.Empty,
-            IsSeen: isSeen ?? false
-        ));
-    }
-
-
+    public string Sender { get; set; } = null!;
+    public string Content { get; set; } = null!;
+    public string Chat { get; set; } = null!;
+    public string Image { get; set; } = null!;
+    public bool IsSeen { get; set; }
 }
+
