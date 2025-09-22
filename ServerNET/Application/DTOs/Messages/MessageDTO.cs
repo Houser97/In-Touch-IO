@@ -4,6 +4,13 @@ using MongoDB.Bson;
 
 namespace Application.DTOs.Messages;
 
+public class LastMessageDto
+{
+    public required string Id { get; set; }
+    public required string Content { get; set; }
+    public required string Sender { get; set; }
+}
+
 public class MessageDTO(string id, string sender, string content, string chat, bool isSeen, string image, DateTime createdAt)
 {
     public string Id { get; set; } = id;
