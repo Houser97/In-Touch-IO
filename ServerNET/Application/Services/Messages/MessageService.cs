@@ -6,7 +6,6 @@ using Application.Interfaces.Core;
 using Application.Interfaces.Messages;
 using Application.Interfaces.Repositories;
 using Domain;
-using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Application.Services.Messages;
