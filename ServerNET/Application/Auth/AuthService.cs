@@ -25,7 +25,7 @@ public class AuthService(
     {
         return await _serviceHelper.ExecuteSafeAsync( async() =>
         {
-            var user = await _userRepository.GetByEmailAsync(loginUserDto.Email.Trim().ToLowerInvariant());
+            var user = await _userRepository.GetByEmailAsync(loginUserDto.Email);
 
             if (user == null)
                 return Result<AuthResultDto>.Failure("User does not exist", 400);
@@ -53,7 +53,7 @@ public class AuthService(
     {
         return await _serviceHelper.ExecuteSafeAsync( async() =>
         {
-            var userExists = await _userRepository.GetByEmailAsync(registerUserDto.Email.Trim().ToLowerInvariant());
+            var userExists = await _userRepository.GetByEmailAsync(registerUserDto.Email);
 
             if (userExists != null)
                 return Result<AuthResultDto>.Failure("User already exists", 400);
@@ -61,7 +61,7 @@ public class AuthService(
 
             var user = new User
             {
-                Email = registerUserDto.Email.Trim().ToLowerInvariant(),
+                Email = registerUserDto.Email,
                 Name = registerUserDto.Name,
                 PictureUrl = registerUserDto.PictureUrl ?? string.Empty,
                 Password = BCrypt.Net.BCrypt.HashPassword(registerUserDto.Password),
