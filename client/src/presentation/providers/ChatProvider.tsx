@@ -18,7 +18,7 @@ interface ChatContextProps {
     getUserChats: () => void;
     getUnseenMessageIds: (chat: Chat) => string[];
     clearChat: () => void;
-    joinChat: (id: string) => void;
+    joinChat: (id: string, userId: string) => void;
     leaveChat: (id: string) => void;
     clearUnseenMessages: (chatId: string) => void;
     createChat: (userIds: string[]) => void;
@@ -54,8 +54,8 @@ export const ChatProvider = ({ children }: PropsWithChildren) => {
     const [chat, setChat] = useState<Chat>(chatInitialState);
     const [userChats, setUserChats] = useState<UserChats>({});
 
-    const joinChat = (id: string) => {
-        socket?.invoke('JoinChat', id);
+    const joinChat = (id: string, userId: string) => {
+        socket?.invoke('JoinChat', id, userId);
     }
 
     const leaveChat = (id: string) => {
@@ -89,7 +89,6 @@ export const ChatProvider = ({ children }: PropsWithChildren) => {
     }
 
     const getUnseenMessageIds = (chat: Chat) => {
-        console.log(chat)
         return chat.unseenMessages
             .filter(message => message.sender != auth.user.id)
             .map((message) => message.id);
