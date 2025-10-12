@@ -1,74 +1,77 @@
 using Microsoft.AspNetCore.SignalR;
 using Application.DTOs.Messages;
 using Application.DTOs.Chats;
-using System.Text.Json;
 using Application.Interfaces.Messages;
 using Application.Interfaces.Chats;
+using Application.Interfaces.Helpers;
 
 namespace API.SignalR;
 
 public class ChatHub(
     IMessageService messageService,
-    IChatService chatService
+    IChatService chatService,
+    IConnectionManager connectionManager
 ) : Hub
 {
+
+    public override Task OnDisconnectedAsync(Exception? exception)
+    {
+        foreach (var chatId in connectionManager.GetUsersInChat(Context.ConnectionId))
+        {
+            connectionManager.RemoveFromChat(chatId, Context.ConnectionId);
+        }
+        return base.OnDisconnectedAsync(exception);
+    }
+
     public async Task Setup(string userId)
     {
         await Groups.AddToGroupAsync(Context.ConnectionId, userId);
         Console.WriteLine($"User {userId} joined their personal group.");
     }
 
-    public async Task JoinChat(string chatId)
+    public async Task JoinChat(string chatId, string userId)
     {
         await Groups.AddToGroupAsync(Context.ConnectionId, chatId);
+        connectionManager.AddToChat(chatId, Context.ConnectionId, userId);
         Console.WriteLine($"Joined chat {chatId}");
     }
 
     public async Task LeaveChat(string chatId)
     {
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, chatId);
+        connectionManager.RemoveFromChat(chatId, Context.ConnectionId);
         Console.WriteLine($"Left chat {chatId}");
+    }
+
+    private async Task NotifyChatUsers(ChatDTO chat, object payload)
+    {
+        foreach (var user in chat.Users)
+        {
+            await Clients.Group(user.Id!).SendAsync("personal-message-chat", payload);
+        }
     }
 
     public async Task PersonalMessage(PersonalMessagePayload payload)
     {
-        Console.WriteLine(payload);
         try
         {
-            var json = JsonSerializer.Serialize(payload); // convértelo a JSON string
-            var deserializedPayload = JsonSerializer.Deserialize<PersonalMessagePayload>(json); // deserialízalo como DTO
+            var chat = payload.Chat;
+            var createMessageDto = payload.Message;
 
-            if (deserializedPayload == null) throw new Exception("Payload inválido");
+            var sender = createMessageDto.Sender;
+            var friendId = chat.Users.First(u => u.Id != createMessageDto.Sender).Id;
 
-            var chat = deserializedPayload.Chat;
-            var messageData = deserializedPayload.Message;
-
-            string sender = messageData.Sender;
-            string content = messageData.Content;
-            string image = messageData.Image;
-            bool? isSeen = messageData.IsSeen;
-
-            var (error, createMessageDto) = CreateMessageDto.Create(sender, content, chat.Id!, image, isSeen);
-            if (error != null)
+            if (friendId != null && connectionManager.IsUserInChat(chat.Id, friendId))
             {
-                await Clients.Group(messageData.Sender.ToString())
-                    .SendAsync("personal-message-chat", error);
-                return;
+                createMessageDto.IsSeen = true;
             }
 
-            // Suponiendo que puedes obtener las conexiones activas por grupo de alguna forma
-            // Aquí se omite ese detalle por ser más complejo en SignalR nativamente
-            //createMessageDto.IsSeen = true; // Asume que el otro está conectado
-
             var messageResult = await messageService.Create(createMessageDto!);
-            Console.WriteLine(messageResult.Value);
 
             var updateChatDto = new UpdateChatDto(messageResult.Value!.Id!);
 
             await chatService.UpdateChat(chat.Id!.ToString(), sender, updateChatDto!);
 
-            // Supongamos que tu método `GetById` necesita el ID del otro usuario
-            var friendId = chat.Users.First(u => u.Id != messageResult.Value.Sender);
             var updatedChat = await chatService.GetById(chat.Id.ToString(), friendId.ToString()!);
 
             var chatPayload = (dynamic)updatedChat.Value;
@@ -78,11 +81,11 @@ public class ChatHub(
                 await Clients.Group(user.Id.ToString()!).SendAsync("personal-message-chat", new
                 {
                     chat = chatPayload,
-                    unseenMessages = chatPayload.unseenMessages
+                    unseenMessages = chatPayload.UnseenMessages
                 });
             }
 
-            await Clients.Group(chat.Id.ToString()).SendAsync("personal-message-local",  messageResult.Value );
+            await Clients.Group(chat.Id.ToString()).SendAsync("personal-message-local", messageResult.Value);
 
         }
         catch (Exception ex)
@@ -94,35 +97,15 @@ public class ChatHub(
     }
 }
 
-public class UserDto
-{
-    public string Id { get; set; }
-    public string Name { get; set; }
-    public string Email { get; set; }
-    public string PictureUrl { get; set; }
-    public string PictureId { get; set; }
-}
-
-public class ChatDto
-{
-    public string Id { get; set; }
-    public List<UserDto> Users { get; set; }
-    public DateTime UpdatedAt { get; set; }
-    public List<MessageDto> UnseenMessages { get; set; }
-}
-
-public class MessageDto
-{
-    public string Sender { get; set; }
-    public string Content { get; set; }
-    public string Chat { get; set; }
-    public string Image { get; set; }
-    public bool? IsSeen { get; set; }
-}
-
 
 public class PersonalMessagePayload
 {
-    public ChatDto Chat { get; set; }
-    public MessageDto Message { get; set; }
+    public required ChatDTO Chat { get; set; }
+    public required CreateMessageDto Message { get; set; }
+}
+
+public class ChatPayloadDto
+{
+    public ChatDTO Chat { get; set; } = default!;
+    public int UnseenMessages { get; set; }
 }
