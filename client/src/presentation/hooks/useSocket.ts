@@ -4,7 +4,7 @@ import { AuthContext } from "../providers/AuthProvider";
 
 export const useSocket = (serverUrl: string) => {
   const { auth } = useContext(AuthContext);
-  const { user } = auth;
+  const { user, status } = auth;
 
   const connectionRef = useRef<signalR.HubConnection | null>(null);
   const [connected, setConnected] = useState(false);
@@ -39,7 +39,7 @@ export const useSocket = (serverUrl: string) => {
     } catch (error) {
       console.error("[SignalR] Connection failed:", error);
     }
-  }, [serverUrl, user.id]);
+  }, [serverUrl, user?.id, status]);
 
   const disconnect = useCallback(async () => {
     try {
