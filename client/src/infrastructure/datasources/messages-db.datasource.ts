@@ -18,7 +18,6 @@ export class MessagesDbDatasource extends MessagesDatasource {
     async getMessages(chatId: string, page: number = 1, limit: number = 10): Promise<MessagesData> {
         try {
             const { data } = await inTouchIoApi.get<MessageDBResponse>(`/messages/${chatId}?page=${page}&limit=${limit}`);
-            console.log(data)
             const messages = data.messages.map(MessageMapper.toEntity);
             return { messages, next: data.next }
         } catch (error) {
