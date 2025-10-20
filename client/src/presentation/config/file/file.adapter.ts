@@ -4,7 +4,7 @@ export class FileAdapter {
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onloadend = () => {
-                resolve(reader.result);
+                resolve(reader.result as string);
             };
             reader.onerror = (error) => {
                 reject(error);
