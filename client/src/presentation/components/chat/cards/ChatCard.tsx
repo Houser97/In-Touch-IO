@@ -31,7 +31,7 @@ const ChatCard = ({ picture, name, chatId, lastMessage, unseen, hour, senderId }
     selectChat(chatId);
     updateMessagesStatus(unseen);
     clearUnseenMessages(chatId);
-    joinChat(chatId);
+    joinChat(chatId, auth.user.id);
   }
 
   const LastMessage = () => {
