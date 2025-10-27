@@ -1250,31 +1250,215 @@ export const SocketProvider = ({ children }: PropsWithChildren) => {
     }, [socket])
 ```
 
-# Pendientes
-- Al crear Chat se debe mostrar el chat creado para la segunda persona, ya que al crear un nuevo chat no se actualiza para la persona nueva solo hasta refrescar la app, ni aunque se reciban mensajes
-- Al refrescar navevagor revisar si no afecta que el usuario vuelva a unirse al chat de su id.
 
-- Agregar paginaciones en busqueda de usuarios.
-- Borrar imagen de usuario cuando actualice su foto.
-- Colocar IsSeen en true cuando el otro usuario este presente en el chat.
+## 09. Cloudinary
+### 01. Instalación de Cloudinary
+1. Agregar credenciales de cloduniary (API Key, etc) en API\appsettings.json
+
+```json
+  "CloudinarySetting": {
+    "CloudName": "",
+    "ApiKey": "",
+    "ApiSecret": ""
+  },
+```
+
+2. Crear clase de configuración.
+  - No es obligatoria pero permite añadir type safety.
+  - Se recuerda que la parte de cloudinary se agrega en el proyecto de infrastructure __Infrastructure\Photos\CloudinarySettings.cs.__
+
+```c#
+using System;
+
+namespace Infrastructure.Photos;
+
+public class CloudinarySettings
+{
+using System;
+
+namespace Infrastructure.Photos;
+
+public class CloudinarySettings
+{
+    public required string CloudName { get; set; }
+    public required string ApiKey { get; set; }
+    public required string ApiSecret { get; set; }
+}
+
+}
+
+```
+
+3. Agregar clase de configuración como servicio en Program.cs
+
+```c#
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+```
+
+4. Instalar paquete de cloudinary.
+  - CloudinaryDotNet @Cloudinary en proyecto de infrastructura.
+  - La versión del video es 1.27.2.
+
+### 02. Servicio
+1. Crear DTO en Application. Application\Profiles\DTOs\PhotoUploadResult.cs
+Acá se resalta que no se tiene el tipado ya que el paquete se instaló con Infrastructure.
+Se prefiere así, ya que si en un futuro cambia habría que cambiar el paquete en todos lados.
+
+```c#
+using System;
+
+namespace Application.Profiles.DTOs;
+
+public class PhotoUploadResult
+{
+    public required string PublicId { get; set; }
+    public required string Url { get; set; }
+}
+
+```
+
+2. Crear interfaz.
+  - Acá se tuvo el inconveniente que IFormFile no podía importarse. Lo que se hizo fue copiar el siguiente de reactivities\Infrastructure\Infrastructure.csproj hacia reactivities\Application\Application.csproj.
+  - Esto se debe a que son Class Library, y no tiene acceso a todos los servicios del framework disponibles.
+  - Si después de hacer esto sigue sin aparecer
+
+```xml
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+```
+
+__reactivities\Application\Interfaces\IPhotoService.cs__
+```c#
+using System;
+using Application.Profiles.DTOs;
+using Microsoft.AspNetCore.Http;
+
+namespace Application.Interfaces;
+
+public interface IPhotoService
+{
+    Task<PhotoUploadResult?> UploadPhoto(IFormFile file);
+    Task<string> DeletePhoto(string publicId);
+}
+```
+
+
+3. Crear implementación de la interfaz.
+  - La implementación se coloca en Infrastructure.
+  - En este caso se usa using para await using var stream ya que la variable stream va a estar contenida en la memoria del servidor con el conteido del archivo que se lee. Entonces, una vez que ya no se utiliza el método se desea dejar de usar stream para liberar la memoria que consume.
+
+```c#
+using System;
+using Application.Interfaces;
+using Application.Profiles.DTOs;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
+
+namespace Infrastructure.Photos;
+
+public class PhotoService : IPhotoService
+{
+    private readonly Cloudinary _cloudinary;
+
+    public PhotoService(IOptions<CloudinarySettings> config)
+    {
+        var account = new Account(
+            config.Value.CloudName,
+            config.Value.ApiKey,
+            config.Value.ApiSecret
+        );
+
+        _cloudinary = new Cloudinary(account);
+    }
+
+    public async Task<string> DeletePhoto(string publicId)
+    {
+        var deleteParams = new DeletionParams(publicId);
+
+        var result = await _cloudinary.DestroyAsync(deleteParams);
+
+        if (result.Error != null)
+        {
+            throw new Exception(result.Error.Message);
+        }
+
+        return result.Result;
+    }
+
+    public async Task<PhotoUploadResult?> UploadPhoto(IFormFile file)
+    {
+        if (file.Length > 0)
+        {
+            await using var stream = file.OpenReadStream();
+
+            var uploadParams = new ImageUploadParams
+            {
+                File = new FileDescription(file.FileName, stream),
+                // Transformation = new Transformation().Height(500).Width(500).Crop("fill"),
+                Folder = "Reactivities2025"
+            };
+
+            var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+            if (uploadResult.Error != null)
+            {
+                throw new Exception(uploadResult.Error.Message);
+            }
+
+            return new PhotoUploadResult
+            {
+                PublicId = uploadResult.PublicId,
+                Url = uploadResult.SecureUrl.AbsoluteUri
+            };
+        }
+
+        return null;
+    }
+}
+
+```
+
+4. Añadir interfaz e implementación en Program.cs.
+
+```c#
+builder.Services.AddScoped<IPhotoService, PhotoService>();
+```
+
+# Pendientes
+1. Colocar indicador de carga al momento de actualizar usuario, ya que no hay feedback acerca de si la operación se está ejecutando.
+
+
+4. Al crear Chat se debe mostrar el chat creado para la segunda persona, ya que al crear un nuevo chat no se actualiza para la persona nueva solo hasta refrescar la app, ni aunque se reciban mensajes
+5. Al refrescar navevagor revisar si no afecta que el usuario vuelva a unirse al chat de su id.
+6. Agregar paginaciones en busqueda de usuarios.
+7. Colocar IsSeen en true cuando el otro usuario este presente en el chat.
   - No se tiene al igual que con node una forma de traer todos los sockets, cosa que se hizo con node para ver si el numero de sockets en el chat era mayor que 1 para saber si el otro usuario estaba en el chat.
-- Definir archivo de variables de entorno en Vite.
+8. Definir archivo de variables de entorno en Vite.
   - Se debe ajustar el url en client/src/presentation/providers/SocketProvider.tsx.
 
-- Revisar mensaje de 'Wrong credentials' que sale el login del cliente.
-
-- 
-
-- El email debe venir siempre en minúsculas para autenticación. Revisar si se le da formato el email.
+9. El email debe venir siempre en minúsculas para autenticación. Revisar si se le da formato el email.
   - Pendiente ver si hay una mejor forma de hacer en LoginUserDto.
+  - Se tiene como prospecto a FluentValidator, lo cual ya se contempla en el punto 11.
+10. Afinar endpoint que revisa la validez de la sesión y retorna la información del usuario.
 
-- Afinar endpoint que revisa la validez de la sesión y retorna la información del usuario.
-
-- Revisar validaciones en DTOs.
+11. Revisar validaciones en DTOs.
   - Ver si se instala FluentValidation.
+12. Colocar mensajes en visto si el otro usuario está en el chat.
 
 ## Terminado
 - Crear política de autenticación para evitar tener que poner [Authorize] en cada controlador. De esta forma solo se deberían especificar los que son accesibles sin autenticación.
 - infinite scroll no estéa funcionando en los chats. Solo funciona la primera vez en el primer chat que se abre.
   - Sucedia que la variable page en custom hook no se reiniciaba al valor inicial al abrir un nuevo chat, por lo que se quedaba con el valor dado con otro chat. Ahora se recibe el page y la funcion setter como argumento en lugar de manejarlo en el custom hook.
 - Validar creacion de chats
+- Revisar mensaje de 'Wrong credentials' que sale el login del cliente.
+  - En el backend ese endpoint no tenía allowAnonymous. El backend siempre regresaba user y email, pero eran null. En el frontend se esperaba que no vinieran esos campos si no estaba autenticado el user.
+- Borrar imagen de usuario cuando actualice su foto.
+
+
+2. Revisar trimming de la imagen al cargarla al momento de actualizar el usuario.
+   1. No se estaba actalizando previousImageCrop al escoger una imagen del filesystem, solo se estaba actualizando la imagen que aparece como preview.
+3. Revisar catch de errors en servicios definidos en Infrastructure.
+   1. Ya se manejan, ya que los métodos se usan en el servicio de Users de Application, en donde se tiene ServiceHelper que atrapa esos errores.
