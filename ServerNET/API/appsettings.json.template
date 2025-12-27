@@ -1,0 +1,28 @@
+{
+  "Jwt": {
+    "Key": "",
+    "Issuer": "",
+    "Audience": "",
+    "ExpiresInMinutes": 60
+  },
+  "InTouchIoDatabase": {
+    "ConnectionString": "",
+    "DatabaseName": "",
+    "ChatsCollectionName": "",
+    "UsersCollectionName": "",
+    "MessagesCollectionName": ""
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "CloudinarySettings": {
+    "CloudName": "",
+    "ApiKey": "",
+    "ApiSecret": "",
+    "Preset": ""
+  },
+  "AllowedHosts": "*"
+}
