@@ -23,7 +23,8 @@ export const SocketContext = createContext<SignalRContextProps>({
 export const SocketProvider = ({ children }: PropsWithChildren) => {
   const { connection, connected, connect, disconnect, send, on } = useSocket(
     //"https://in-touch-io.onrender.com/chats"
-    "https://localhost:5001/signalR"
+    //"https://localhost:5001/signalR"
+    import.meta.env.VITE_SOCKET_URL
   );
   const { auth } = useContext(AuthContext);
 
