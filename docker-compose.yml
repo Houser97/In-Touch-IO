@@ -1,10 +1,11 @@
 services:
   in-touch-io:
     build:
-      content: .
+      context: .
       args:
         VITE_API: ${VITE_API}
+        VITE_SOCKET_URL: ${VITE_SOCKET_URL}
     ports:
-      - 5000:8080
+      - 5001:8080
     env_file:
       - .env
