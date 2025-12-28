@@ -133,14 +133,25 @@ builder.Services.AddValidatorsFromAssemblyContaining<BaseAuthDto>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod()
-    .AllowCredentials()
-    .WithOrigins("http://localhost:5173", "https://localhost:5173"));
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors(policy =>
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+    );
+}
+// Static fields
+app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapFallbackToFile("index.html").AllowAnonymous();
+
 app.MapHub<ChatHub>("/signalR");
 
 app.Run();
